@@ -48,6 +48,7 @@ class CalculatedTeamData(object):
 		self.avgDefenseCrossingEffeciveness = [-1.0, -1.0, -1.0, -1.0]
 		self.avgTimesCrossedDefensesAuto = [-1.0, -1.0, -1.0, -1.0]
 		self.avgTimesCrossedDefensesTele = [-1.0, -1.0, -1.0, -1.0]
+
 		
 
 class Team(object):
@@ -113,6 +114,6 @@ class TeamInMatchData(object):
 		self.didChallengeTele = False
 		self.timesDefensesCrossedTele = [-1, -1, -1, -1]
 		
-
+		
 		self.__dict__.update(args)		
 

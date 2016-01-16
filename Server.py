@@ -7,12 +7,14 @@ import sys
 import DataModel
 import utils
 import firebaseCommunicator
+import Math
 
-#print(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
-c = DataModel.Competition()
-c.updateTIMDsFromFirebase()
-print c.TIMDs
+comp = DataModel.Competition()
+comp.updateTeamsAndMatchesFromFirebase()
+comp.updateTIMDsFromFirebase()
 
+calculator = Math.Calculator(comp)
+calculator.averageTIMDObjectOverMatches(254, 'rankTorque', 1)
 
 ''' # DEBUG
 teams = []

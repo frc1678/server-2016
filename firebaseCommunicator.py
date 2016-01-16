@@ -28,7 +28,6 @@ class FirebaseCommunicator(object):
 	def updateFirebaseWithTIMD(self, timd):
 		timdDict = utils.makeDictFromTIMD(timd)
 		FBLocation = "/TeamInMatchDatas"
-		print timdDict
 		result = firebase.put(FBLocation, str(timd.teamNumber) + "Q" + str(timd.matchNumber), timdDict)
 
 
@@ -36,8 +35,8 @@ class FirebaseCommunicator(object):
 		print "\nDoing Teams..."
 		for team in self.JSONteams:
 			print str(team["team_number"]) + ",", # This is weird syntax, I'm aware. The comma on the end tells it not to print a new line, but to do a space instead
-			if team["team_number"] == 254: #DEBUG
-				break
+			#if team["team_number"] == 254: #DEBUG
+			#	break
 			t = DataModel.Team()
 			t.number = team["team_number"]
 			t.name = team["nickname"]
@@ -46,8 +45,8 @@ class FirebaseCommunicator(object):
 	def addMatchesToFirebase(self):
 		print "\nDoing Matches..."
 		for match in self.JSONmatches:
-			if match["match_number"] == 14: #DEBUG
-				break
+			#if match["match_number"] == 14: #DEBUG
+			#	break
 			if match["comp_level"] != "qm":
 				continue # goes to next loop iteration
 			m = DataModel.Match()
