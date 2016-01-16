@@ -22,6 +22,33 @@ class CalculatedTeamData(object):
 	def __init__(self):
 		super(CalculatedTeamData, self).__init__()
 		self.driverAbility = -1
+		self.highShotAccuracyAuto = -1.0
+		self.lowShotAccuracyAuto = -1.0
+		self.highShotAccuracyTele = -1.0
+		self.lowShotAccuracyTele = -1.0
+		self.avgGroundIntakes = -1.0
+		self.avgHighShotsTele = -1.0
+		self.avgLowShotsTele = -1.0
+		self.avgShotsBlocked = -1.0
+		self.avgHighShotsAuto = -1.0
+		self.avgLowShotsAuto = -1.0
+		self.avgMidlineBallsIntakedAuto = -1.0
+		self.avgBallsKnockedOffMidlineAuto = -1.0
+		self.avgTorque = -1.0
+		self.avgSpeed = -1.0
+		self.avgEvasion = -1.0
+		self.avgDefense = -1.0
+		self.avgBallControl = -1.0
+		self.disfunctionalPercentage = -1.0
+		self.reachPercentage = -1.0
+		self.disabledPercentage = -1.0
+		self.incapacitatedPercentage = -1.0
+		self.scalePercentage = -1.0
+		self.challengePercentage = -1.0
+		self.avgDefenseCrossingEffeciveness = [-1.0, -1.0, -1.0, -1.0]
+		self.avgTimesCrossedDefensesAuto = [-1.0, -1.0, -1.0, -1.0]
+		self.avgTimesCrossedDefensesTele = [-1.0, -1.0, -1.0, -1.0]
+		
 
 class Team(object):
 	"""An FRC Team object"""
@@ -58,7 +85,7 @@ class TeamInMatchData(object):
 		self.didGetIncapacitated = False
 		self.didGetDisabled = False
 
-		self.rankCrossingEffeciveness = [-1, -1, -1, -1]
+		self.rankDefenseCrossingEffeciveness = [-1, -1, -1, -1]
 		self.rankTorque = -1
 		self.rankSpeed = -1
 		self.rankEvasion = -1
@@ -66,7 +93,7 @@ class TeamInMatchData(object):
 		self.rankBallControl = -1
 
 		#Auto
-		self.numBallsIntakenAuto = -1
+		self.numBallsIntakedAuto = -1
 		self.numBallsKnockedOffMidlineAuto = -1
 		self.timesDefensesCrossedAuto = [-1, -1, -1, -1]
 		self.numHighShotsMadeAuto = -1
