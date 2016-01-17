@@ -72,6 +72,9 @@ def makeDictFromTIMD(timd):
 	d = timd.__dict__
 	return d
 
+def makeDictFromCalculatedTeamData(calculatedData):
+	return calculatedData.__dict__
+
 def makeTIMDsFromDicts(timds):
 	t = []
 	for key in timds.keys():

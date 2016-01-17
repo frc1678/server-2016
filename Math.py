@@ -1,5 +1,6 @@
 # Math.py
 import utils
+import firebaseCommunicator
 
 class Calculator(object):
 	"""docstring for Calculator"""
@@ -158,7 +159,7 @@ class Calculator(object):
 
 	def siegePower(self, team): return (team.calculatedData.siegeConsistency * team.calculatedData.siegeAbility)
 
-	def doCalculations(self):
+	def doCalculations(self, FBC):
 		for team in self.comp.teams:
 <<<<<<< HEAD
 '''MAKE A FUNCTION LIKE averageTIMDObjectOverMatches that works for bools. Then you can do the calculations for everything in TIMD besides the arrays
@@ -222,6 +223,9 @@ WHEN YOU ARE DONE, TALK TO ME AND WE CAN DO THE ARRAYs TOGETHER'''
 				team.calculatedData.siegeConsistency = self.siegeConsistency(team)
 				team.calculatedData.siegeAbility = self.siegeAbility(team)
 				team.calculatedData.siegePower = self.siegePower(team)
+
+				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
+				
 
 
 >>>>>>> b47eb54e2c91c06ef4a580168861e0fc2513f083

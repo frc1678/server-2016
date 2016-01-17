@@ -11,13 +11,13 @@ import Math
 import unicodedata
 
 
-
+FBC = firebaseCommunicator.FirebaseCommunicator()
 comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()
 
 calculator = Math.Calculator(comp)
-calculator.doCalculations()
+calculator.doCalculations(FBC)
 
 ''' # DEBUG
 teams = []
