@@ -45,7 +45,7 @@ class CalculatedTeamData(object):
 		self.incapacitatedPercentage = -1.0
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
-		self.avgDefenseCrossingEffeciveness = [-1.0, -1.0, -1.0, -1.0]
+		self.avgDefenseCrossingEffectiveness = [-1.0, -1.0, -1.0, -1.0]
 		self.avgTimesCrossedDefensesAuto = [-1.0, -1.0, -1.0, -1.0]
 		self.avgTimesCrossedDefensesTele = [-1.0, -1.0, -1.0, -1.0]
 
@@ -86,7 +86,7 @@ class TeamInMatchData(object):
 		self.didGetIncapacitated = False
 		self.didGetDisabled = False
 
-		self.rankDefenseCrossingEffeciveness = [-1, -1, -1, -1]
+		self.rankDefenseCrossingEffectiveness = [-1, -1, -1, -1]
 		self.rankTorque = -1
 		self.rankSpeed = -1
 		self.rankEvasion = -1
