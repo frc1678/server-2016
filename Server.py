@@ -8,6 +8,15 @@ import DataModel
 import utils
 import firebaseCommunicator
 import Math
+import unicodedata
+
+a = ['frc3333', 'frc343434343', 'frc6']
+ar = []
+for s in a:
+	s = s.replace('frc', '')
+	ar.append(s)
+
+print ar
 
 
 comp = DataModel.Competition()
