@@ -94,7 +94,7 @@ class TeamInMatchData(object):
 		self.rankBallControl = -1
 
 		#Auto
-		self.numBallsIntakedAuto = -1
+		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
 		self.timesDefensesCrossedAuto = [-1, -1, -1, -1]
 		self.numHighShotsMadeAuto = -1
@@ -114,6 +114,6 @@ class TeamInMatchData(object):
 		self.didChallengeTele = False
 		self.timesDefensesCrossedTele = [-1, -1, -1, -1]
 		
-		
+
 		self.__dict__.update(args)		
 

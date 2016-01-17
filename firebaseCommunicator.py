@@ -1,6 +1,8 @@
 import DataModel
 import utils
+import json
 from firebase import firebase as fb
+import unicodedata
 
 superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc"
 
@@ -17,12 +19,19 @@ class FirebaseCommunicator(object):
 
 	def updateFirebaseWithTeam(self, team):
 		teamDict = utils.makeDictFromTeam(team)
+		teamDict['name'] = unicodedata.normalize('NFKD', teamDict['name']).encode('ascii','ignore')
+		#teamDict.keys()[0] = teamDict.keys()[0]
+		print teamDict
 		FBLocation = "/Teams"
 		result = firebase.put(FBLocation, team.number, teamDict)
 
 	def updateFirebaseWithMatch(self, match):
 		matchDict = utils.makeDictFromMatch(match)
 		FBLocation = "/Matches"
+		for number in matchDict["blueAllianceTeamNumbers"]:
+			number = str(number)
+			number = number.replace(number[:3], '')
+		print matchDict["blueAllianceTeamNumbers"]
 		result = firebase.put(FBLocation, match.number, matchDict)
 
 	def updateFirebaseWithTIMD(self, timd):
@@ -80,4 +89,4 @@ def getPythonObjectForFirebaseDataAtLocation(location):
 	But it was throwing errors when I tried it, soo...
 	But they will be JSON formatted get request parameters. :)
 	'''
-	return result
+	return utils.readJSONFromString(json.dumps(result))

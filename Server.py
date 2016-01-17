@@ -9,6 +9,7 @@ import utils
 import firebaseCommunicator
 import Math
 
+
 comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()

@@ -35,7 +35,7 @@ class Calculator(object):
 	def averageTIMDObjectOverMatches(self, teamNumber, key, coefficient):
 		timds = self.getPlayedTIMDsForTeamNumber(teamNumber)
 		if len(timds) == 0:
-			print "No played TIMDs for " + teamNumber
+			print "No played TIMDs for " + str(teamNumber)
 			return -1
 		total = 0.0
 		for timd in timds:
