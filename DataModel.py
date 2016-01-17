@@ -45,9 +45,9 @@ class CalculatedTeamData(object):
 		self.incapacitatedPercentage = -1.0
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
-		self.avgDefenseCrossingEffectiveness = [-1.0, -1.0, -1.0, -1.0]
-		self.avgTimesCrossedDefensesAuto = [-1.0, -1.0, -1.0, -1.0]
-		self.avgTimesCrossedDefensesTele = [-1.0, -1.0, -1.0, -1.0]
+		self.avgDefenseCrossingEffectiveness = [-1.0, -1.0, -1.0, -1.0, -1.0]
+		self.avgTimesCrossedDefensesAuto = [-1.0, -1.0, -1.0, -1.0, -1.0]
+		self.avgTimesCrossedDefensesTele = [-1.0, -1.0, -1.0, -1.0, -1.0]
 
 		
 
@@ -71,8 +71,8 @@ class Match(object):
 		self.blueAllianceTeamNumbers = []
 		self.redScore = -1
 		self.blueScore = -1
-		self.redDefensePositions = [-1, -1, -1, -1]
-		self.blueDefensePositions = [-1, -1, -1, -1]
+		self.redDefensePositions = ['', '', '', '']
+		self.blueDefensePositions = ['', '', '', '']
 
 		self.__dict__.update(args)
 		
@@ -86,7 +86,7 @@ class TeamInMatchData(object):
 		self.didGetIncapacitated = False
 		self.didGetDisabled = False
 
-		self.rankDefenseCrossingEffectiveness = [-1, -1, -1, -1]
+		self.rankDefenseCrossingEffectiveness = [-1, -1, -1, -1, -1]
 		self.rankTorque = -1
 		self.rankSpeed = -1
 		self.rankEvasion = -1
@@ -96,7 +96,7 @@ class TeamInMatchData(object):
 		#Auto
 		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
-		self.timesDefensesCrossedAuto = [-1, -1, -1, -1]
+		self.timesDefensesCrossedAuto = [-1, -1, -1, -1, -1]
 		self.numHighShotsMadeAuto = -1
 		self.numLowShotsMadeAuto = -1
 		self.numHighShotsMissedAuto = -1
@@ -112,7 +112,7 @@ class TeamInMatchData(object):
 		self.numShotsBlockedTele = -1
 		self.didScaleTele = False
 		self.didChallengeTele = False
-		self.timesDefensesCrossedTele = [-1, -1, -1, -1]
+		self.timesDefensesCrossedTele = [-1, -1, -1, -1, -1]
 		
 
 		self.__dict__.update(args)		
