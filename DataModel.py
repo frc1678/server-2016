@@ -19,7 +19,7 @@ class Competition(object):
 
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
-	def __init__(self):
+	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.driverAbility = -1
 		self.highShotAccuracyAuto = -1.0
@@ -45,9 +45,13 @@ class CalculatedTeamData(object):
 		self.incapacitatedPercentage = -1.0
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
-		self.avgDefenseCrossingEffectiveness = [-1.0, -1.0, -1.0, -1.0, -1.0]
-		self.avgTimesCrossedDefensesAuto = [-1.0, -1.0, -1.0, -1.0, -1.0]
-		self.avgTimesCrossedDefensesTele = [-1.0, -1.0, -1.0, -1.0, -1.0]
+		self.avgDefenseCrossingEffectiveness = {}
+		self.avgTimesCrossedDefensesAuto = {}
+		self.avgTimesCrossedDefensesTele = {}
+		self.seigePower = -1.0
+		self.seigeConsistency = -1.0
+		self.seigeAbility = -1.0
+		self.__dict__.update(args)
 
 		
 
@@ -62,11 +66,19 @@ class Team(object):
 		self.calculatedData = CalculatedTeamData()
 		self.__dict__.update(args)
 
+class CalculatedMatchData(object):
+	"""docstring for CalculatedMatchData"""
+	def __init__(self):
+		super(CalculatedMatchData, self).__init__()
+		self.predictedRedScore = -1.0
+		self.predictedBlueScore = -1.0		
+
 class Match(object):
 	"""An FRC Match Object"""
 	def __init__(self, **args):
 		super(Match, self).__init__()
 		self.number = -1
+		self.calculatedData = CalculatedMatchData()
 		self.redAllianceTeamNumbers = []
 		self.blueAllianceTeamNumbers = []
 		self.redScore = -1
@@ -86,7 +98,7 @@ class TeamInMatchData(object):
 		self.didGetIncapacitated = False
 		self.didGetDisabled = False
 
-		self.rankDefenseCrossingEffectiveness = [-1, -1, -1, -1, -1]
+		self.rankDefenseCrossingEffectiveness = {}
 		self.rankTorque = -1
 		self.rankSpeed = -1
 		self.rankEvasion = -1
@@ -96,7 +108,7 @@ class TeamInMatchData(object):
 		#Auto
 		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
-		self.timesDefensesCrossedAuto = [-1, -1, -1, -1, -1]
+		self.timesDefensesCrossedAuto = {}
 		self.numHighShotsMadeAuto = -1
 		self.numLowShotsMadeAuto = -1
 		self.numHighShotsMissedAuto = -1
@@ -112,7 +124,7 @@ class TeamInMatchData(object):
 		self.numShotsBlockedTele = -1
 		self.didScaleTele = False
 		self.didChallengeTele = False
-		self.timesDefensesCrossedTele = [-1, -1, -1, -1, -1]
+		self.timesDefensesCrossedTele = {}
 		
 
 		self.__dict__.update(args)		
