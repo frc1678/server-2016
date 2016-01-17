@@ -19,19 +19,22 @@ class FirebaseCommunicator(object):
 
 	def updateFirebaseWithTeam(self, team):
 		teamDict = utils.makeDictFromTeam(team)
-		teamDict['name'] = unicodedata.normalize('NFKD', teamDict['name']).encode('ascii','ignore')
-		#teamDict.keys()[0] = teamDict.keys()[0]
-		print teamDict
+		#teamDict['name'] = unicodedata.normalize('NFKD', teamDict['name']).encode('ascii','ignore') # For some strange reason the names of the teams are all in unicode strings
 		FBLocation = "/Teams"
 		result = firebase.put(FBLocation, team.number, teamDict)
 
 	def updateFirebaseWithMatch(self, match):
 		matchDict = utils.makeDictFromMatch(match)
 		FBLocation = "/Matches"
+		tempA = []
 		for number in matchDict["blueAllianceTeamNumbers"]:
-			number = str(number)
-			number = number.replace(number[:3], '')
-		print matchDict["blueAllianceTeamNumbers"]
+			tempA.append(number.replace('frc', ''))
+		matchDict["blueAllianceTeamNumbers"] = tempA
+		tempA = []
+		for number in matchDict["redAllianceTeamNumbers"]:
+			tempA.append(number.replace('frc', ''))
+		matchDict["redAllianceTeamNumbers"] = tempA
+		print matchDict
 		result = firebase.put(FBLocation, match.number, matchDict)
 
 	def updateFirebaseWithTIMD(self, timd):
@@ -44,8 +47,8 @@ class FirebaseCommunicator(object):
 		print "\nDoing Teams..."
 		for team in self.JSONteams:
 			print str(team["team_number"]) + ",", # This is weird syntax, I'm aware. The comma on the end tells it not to print a new line, but to do a space instead
-			#if team["team_number"] == 254: #DEBUG
-			#	break
+			if team["team_number"] == 254: #DEBUG
+				break
 			t = DataModel.Team()
 			t.number = team["team_number"]
 			t.name = team["nickname"]

@@ -10,8 +10,18 @@ for fake database creation purposes it is not worth it'''
 def jprint(JSON):
 	print(json.dumps(JSON, sort_keys=True, indent=4))
 
+def makeASCIIFromJSON(input):
+    if isinstance(input, dict):
+        return { makeASCIIFromJSON(key) : makeASCIIFromJSON(value) for key, value in input.iteritems() }
+    elif isinstance(input, list):
+        return [makeASCIIFromJSON(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
+
 def readJSONFromString(string):
-	return json.load(StringIO(string))
+	return makeASCIIFromJSON(json.load(StringIO(string)))
 
 def readJSONFileToObj(fileName):
 	fileInput = open(fileName, 'r')
