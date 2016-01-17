@@ -1,5 +1,6 @@
 # Math.py
 import utils
+import firebaseCommunicator
 
 class Calculator(object):
 	"""docstring for Calculator"""
@@ -153,7 +154,7 @@ class Calculator(object):
 
 	def siegePower(self, team): return (team.calculatedData.siegeConsistency * team.calculatedData.siegeAbility)
 
-	def doCalculations(self):
+	def doCalculations(self, FBC):
 		for team in self.comp.teams:
 			timds = self.getPlayedTIMDsForTeam(team)
 			if len(timds) <= 0:
@@ -193,5 +194,8 @@ class Calculator(object):
 				team.calculatedData.siegeConsistency = self.siegeConsistency(team)
 				team.calculatedData.siegeAbility = self.siegeAbility(team)
 				team.calculatedData.siegePower = self.siegePower(team)
+
+				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
+				
 
 
