@@ -32,7 +32,7 @@ class Calculator(object):
 		return timds
 
 	# Calculated Team Data
-	def averageTIMDObjectOverMatches(self, teamNumber, key, coefficient):
+	def averageTIMDObjectOverMatches(self, teamNUmber, key, coefficient):
 		timds = self.getPlayedTIMDsForTeamNumber(teamNumber)
 		if len(timds) == 0:
 			print "No played TIMDs for " + str(teamNumber)
@@ -64,14 +64,16 @@ WHEN YOU ARE DONE, TALK TO ME AND WE CAN DO THE ARRAYs TOGETHER'''
 			team.avgEvasion = team.averageTIMDObjectOverMatches(team.number, 'rankEvasion', 1)
 			team.avgDefense = team.averageTIMDObjectOverMatches(team.number, 'rankDefense', 1)
 			team.avgBallControl = team.averageTIMDObjectOverMatches(team.number, 'rankBallControl', 1)
+			team.disabledPercentage = team.percentagesInAllTIMDs(team.number, '')
 			
 
 			#Auto
 			team.avgHighShotsAuto = team.averageTIMDObjectOverMatches(team.number, 'numHighShotsMadeAuto', 1)
 			team.avgLowShotsAuto = team.averageTIMDObjectOverMatches(team.number, 'numLowShotsMadeAuto', 1)
+			team.reachPercentage = team.percentagesInAllTIMDs(team.number, 'didReachAuto', 1)
+			team.avgBallsKnockedOffMidlineAuto = team.averageTIMDObjectOverMatches(team.number, 'numBallsKnockedOffMidlineAuto', 1)
 
-
-
+			
 			#Tele
-			team.challengePercentage = team.averageTIMDObjectOverMatches(team.number, 'didChallengeTele', 1)
-			team.scalePercentage = team.averageTIMDObjectOverMatches(team.number, 'didScaleTele', 1)
+			team.challengePercentage = team.percentagesInAllTIMDs(team.number, 'didChallengeTele', 1)
+			team.scalePercentage = team.percentagesInAllTIMDs(team.number, 'didScaleTele', 1)
