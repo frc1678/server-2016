@@ -42,4 +42,10 @@ class Calculator(object):
 			 total = total + utils.makeDictFromTIMD(timd)[key]
 		return total/len(timds)
 
-
+	def doCalculations():
+		for team in self.comp.teams:
+			team.avgTorque = team.averageTIMDObjectOverMatches(team.number, rankTorque, 1)
+			team.avgSpeed = team.averageTIMDObjectOverMatches(team.number, rankSpeed, 1)
+			team.avgEvasion = team.averageTIMDObjectOverMatches(team.number, rankEvasion, 1)
+			team.avgDefense = team.averageTIMDObjectOverMatches(team.number, rankDefense, 1)
+			team.avgBallControl = team.averageTIMDObjectOverMatches(team.number, rankBallControl, 1)
