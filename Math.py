@@ -7,6 +7,13 @@ class Calculator(object):
 	def __init__(self, competition):
 		super(Calculator, self).__init__()
 		self.comp = competition
+		self.defenseCategories = {
+		'a' : ['pc', 'cdf'],
+		'b' : ['mt', 'rp'],
+		'c' : ['db', 'sp'],
+		'd' : ['rw', 'rt'],
+		'e' : ['lb']
+		}
 		
 	def getTeamForNumber(self, num):
 		for team in self.comp.teams:
@@ -185,7 +192,7 @@ class Calculator(object):
 		avgHighShotAccuracy = allHighShotsAccuracies / len(self.comp.teams)
 		return 5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked
 
-	def predictedScoreForMatch(self, match):
+	#def predictedScoreForMatch(self, match):
 
 	def teleopShotAbility(self, team): return (5 * team.calculatedData.avgHighShotsTele + 2 * team.calculatedData.avgLowShotsTele)
 
@@ -213,9 +220,9 @@ class Calculator(object):
 		totalRPsForTeam = 0
 		for m in self.getPlayedMatchesForTeam(team):
 			RPs = self.RPsGainedFromMatch(m)
-			if team.number is in m.blueAllianceTeamNumbers:
+			if team.number in m.blueAllianceTeamNumbers:
 				totalRPsForTeam += RPs['blue']
-			elif team.number is in m.redAllianceTeamNumbers:
+			elif team.number in m.redAllianceTeamNumbers:
 				totalRPsForTeam += RPs['red']
 			else:
 				print "ERROR: team not in match."
@@ -224,39 +231,146 @@ class Calculator(object):
 		return 5 * team.calculatedData.challengePercentage * self.getPlayedTIMDsForTeam(team) + 15 * team.calculatedData.scalePercentage * self.getPlayedTIMDsForTeam(team)
 
 	def avgNumberOfTimesDefenseCrossedByAlliance(self, alliance, defense):
-		
+		totalAvg = 0
+		for team in alliance:
+			avgTimesDefenseCrossedForTeam = 0
+			for defenseKey, value in team.calculatedData.avgTimesCrossedDefensesAuto:
+				if defenseKey == defense and value > -1: avgTimesDefenseCrossedForTeam += value
+			for defenseKey, value in team.calculatedData.avgTimesCrossedDefensesTele:
+				if defenseKey == defense and value > -1: avgTimesDefenseCrossedForTeam += value
+			totalAvg += avgTimesDefenseCrossedForTeam
+		return totalAvg / 3
 
 	def predictedScoreLambda1(self, alliance, a, defense):
 		return (2 - (a / 5) / self.avgNumberOfTimesDefenseCrossedByAlliance(alliance))
 
+	def predictedScoreBeta(self, alliance, a, defenseCategory):
+		total = 0
+		for category, defenses in self.defenseCategories[defenseCategory]:
+			for defense in defenses:
+				total += self.predictedScoreLambda1(alliance, a, defense)
+		return total / len(self.defenseCategories[defenseCategory])
+
+	def sumOf4SmallestBetas(self, alliance, a):
+		betas = []
+		for catagory, defenses in self.defenseCategories:
+			betas.append(self.predictedScoreBeta(alliance, a, catagory))
+		betas = sorted(betas)
+		return betas[0] + betas[1] + betas[2] + betas[3]
+	
+	def totalAvgNumShotPointsForTeam(self, team):
+		return 5 * team.calculatedData.avgHighShotsTele + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
+	
+	def createCrossingsArray(self, alliance, a):
+		betaA = self.predictedScoreBeta(alliance, a, 'a')
+		betaB = self.predictedScoreBeta(alliance, a, 'b')
+		betaC = self.predictedScoreBeta(alliance, a, 'c')
+		betaD = self.predictedScoreBeta(alliance, a, 'd')
+		betaE = self.predictedScoreBeta(alliance, a, 'e')
+		return sorted([betaA, betaA, betaB, betaB, betaC, betaC, betaD, betaD]) #low to high
+
+
+	def totalAvgNumShotsForAlliance(self, alliance):
+		totalAvgNumShots = 0
+		for team in alliance:
+			totalAvgNumShots += team.calculatedData.avgHighShotsAuto + team.calculatedData.avgHighShotsTele + team.calculatedData.avgLowShotsTele + team.calculatedData.avgLowShotsAuto
+
+	def highShotAccuracyForAlliance(self, alliance):
+		overallHighShotAccuracy = 0
+		for team in alliance:
+			overallHighShotAccuracy += team.calculatedData.highShotAccuracy
+		return overallHighShotAccuracy / 3
+
+	def blockedShotPointsForAlliance(self, alliance, opposingAlliance):
+		blockedShotPoints = 0
+		for team in opposingAlliance:
+			blockedShotPoints += (self.highShotAccuracyForAlliance(alliance) * team.calculatedData.avgShotsBlocked)
+		return 5 * blockedShotPoints
+
+	def reachPointsForAlliance(self, alliance):
+		reachPoints = 0
+		for team in alliance:
+			reachPoints += 2 * team.calculatedData.reachPercentage
+		return reachPoints
+		
 	#Matches Metrics
 	def predictedScoreForMatch(self, match):
 		predictedScoreForMatch = {'blue': 0, 'red': 0}
+
+		# Blue Alliance First
 		totalAvgNumShots = 0
-		teams = []
+		blueTeams = []
 		for teamNumber in match.blueAllianceTeamNumbers:
 			team = self.getTeamForNumber(teamNumber)
-			teams.append(team)
-			predictedScoreForMatch['blue'] += 5 * team.calculatedData.avgHighShotsTele + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
-			totalAvgNumShots += avgHighShotsAuto + avgHighShotsTele + avgLowShotsTele + avgLowShotsAuto
-		if totalAvgNumShots >= 8: 
+			blueTeams.append(team)
+			predictedScoreForMatch['blue'] += self.totalAvgNumShotPointsForTeam(team)
+		if self.totalAvgNumShotsForAlliance(blueTeams) >= 8: 
 			challengeAndScale = 1
 			a = 0
-			for team in teams:
-				predictedScoreForMatch['blue'] += 5 * team.calculatedData.challengePercentage + 15 * team.calculatedData.scalePercentage
+			for team in blueTeams:
+				predictedScoreForMatch['blue'] += self.totalAvgNumShotPointsForTeam(team)
 				a += 10 * team.calculatedData.avgTimesCrossedDefensesAuto
 				challengeAndScale *= team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
 			predictedScoreForMatch['blue'] += 25 * challengeAndScale
 			predictedScoreForMatch['blue'] += a
+		if self.sumOf4SmallestBetas(blueTeams, a) < 135: predictedScoreForMatch['blue'] += 20
 
+		crossings = self.createCrossingsArray(alliance, a)
+
+		redTeams = []
+		for teamNumber in match.redAllianceTeamNumbers:
+			redTeams.append(self.getTeamForNumber(teamNumber))
+		for defenseCategory in crossings:
+			if timeUsed > 135:
+				break
+			timeUsed += crossings.pop(0)
+			predictedScoreForMatch['blue'] += 5
+		
+		predictedScoreForMatch['blue'] -= self.blockedShotPointsForAlliance(blueTeams, redTeams)
+		predictedScoreForMatch['blue'] += self.reachPointsForAlliance(blueTeams)
+
+		# Red Alliance Next
+		totalAvgNumShots = 0
+		redTeams = []
+		for teamNumber in match.redAllianceTeamNumbers:
+			team = self.getTeamForNumber(teamNumber)
+			redTeams.append(team)
+			predictedScoreForMatch['red'] += self.totalAvgNumShotPointsForTeam(team)
+		if self.totalAvgNumShotsForAlliance(redTeams) >= 8: 
+			challengeAndScale = 1
+			a = 0
+			for team in redTeams:
+				predictedScoreForMatch['red'] += self.totalAvgNumShotPointsForTeam(team)
+				a += 10 * team.calculatedData.avgTimesCrossedDefensesAuto
+				challengeAndScale *= team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
+			predictedScoreForMatch['red'] += 25 * challengeAndScale
+			predictedScoreForMatch['red'] += a
+		if self.sumOf4SmallestBetas(redTeams, a) < 135: predictedScoreForMatch['red'] += 20
+
+		crossings = self.createCrossingsArray(alliance, a)
+
+		blueTeams = []
+		for teamNumber in match.blueAllianceTeamNumbers:
+			blueTeams.append(self.getTeamForNumber(teamNumber))
+		for defenseCategory in crossings:
+			if timeUsed > 135:
+				break
+			timeUsed += crossings.pop(0)
+			predictedScoreForMatch['red'] += 5
+		
+		predictedScoreForMatch['red'] -= self.blockedShotPointsForAlliance(redTeams, blueTeams)
+		predictedScoreForMatch['red'] += self.reachPointsForAlliance(redTeams)
+
+
+		return predictedScoreForMatch
 
 		
 
 	def didBreachInMatch(self, match):
 		didBreach = {'red': False, 'blue': False}
-		if match.numDefenseCrossesByBlue >= 10:
+		if match.numDefenseCrossesByBlue >= 8:
 			didBreach['blue'] = True
-		if match.numDefenseCrossesByRed >= 10:
+		if match.numDefenseCrossesByRed >= 8:
 			didBreach['red'] = True
 		return didBreach
 		
