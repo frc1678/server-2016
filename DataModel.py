@@ -100,7 +100,11 @@ class CalculatedMatchData(object):
 	def __init__(self):
 		super(CalculatedMatchData, self).__init__()
 		self.predictedRedScore = -1.0
-		self.predictedBlueScore = -1.0		
+		self.predictedBlueScore = -1.0	
+		self.numDefenseCrossesByBlue = -1
+		self.numDefensesCrossedByRed = -1 
+		self.blueRPs = -1
+		self.redRPs = -1	
 
 class Match(object):
 	"""An FRC Match Object"""
