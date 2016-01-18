@@ -38,6 +38,11 @@ class Calculator(object):
 				return timd
 		return(-1)
 
+	def getPlayedMatchesForTeam(self, team):
+		matches = []
+		for timd in self.getPlayedTIMDsForTeam(team):
+			matches.append(self.getMatchForNumber(timd.matchNumber))
+
 	# Calculated Team Data
 	def averageTIMDObjectOverMatches(self, team, key, coefficient = 1):
 		timds = self.getPlayedTIMDsForTeam(team)
@@ -188,6 +193,34 @@ class Calculator(object):
 
 	def siegePower(self, team): return (team.calculatedData.siegeConsistency * team.calculatedData.siegeAbility)
 
+	def numAutoPointsForTIMD(self, timd):
+		defenseCrossesInAuto = 0
+		for value in timd.timesDefensesCrossedAuto.values():
+					if value > -1:
+						defenseCrossesInAuto += 1
+		if defenseCrossesInAuto > 1: print "ERROR: Num Auto Points From Defenses Is Too High."
+		return 10 * timd.numHighShotsMadeAuto + 5 * timd.numLowShotsMadeAuto + 2 * timd.didReachAuto + 10 * defenseCrossesInAuto
+
+	def numAutoPointsForTeam(self, team):
+		totalAutoPoints = 0
+		for timd in self.getPlayedTIMDsForTeam(team):
+			totalAutoPoints += self.numAutoPointsForTIMD(timd)
+		return totalAutoPoints
+
+	def numRPsForTeam(self, team):
+		totalRPsForTeam = 0
+		for m in self.getPlayedMatchesForTeam(team):
+			RPs = self.RPsGainedFromMatch(m)
+			if team.number is in m.blueAllianceTeamNumbers:
+				totalRPsForTeam += RPs['blue']
+			elif team.number is in m.redAllianceTeamNumbers:
+				totalRPsForTeam += RPs['red']
+			else:
+				print "ERROR: team not in match."
+
+	def numScaleAndChallangePointsForTeam(self, team):
+		return 5 * team.calculatedData.challengePercentage * self.getPlayedTIMDsForTeam(team) + 15 * team.calculatedData.scalePercentage * self.getPlayedTIMDsForTeam(team)
+
 	#Matches Metrics
 	def didBreachInMatch(self, match):
 		didBreach = {'red': False, 'blue': False}
@@ -226,18 +259,20 @@ class Calculator(object):
 	def RPsGainedFromMatch(self, match):
 		blueRPs = 0
 		redRPs = 0
-		if match.blueScore > match.redScore:
-			blueRPs += 2
-		elif match.redScore > match.blueScore:
-			redRPs += 2
+		if match.blueScore > match.redScore: blueRPs += 2
+		elif match.redScore > match.blueScore: redRPs += 2
 		else:
 			blueRPs += 1
 			redRPs += 1
+
 		didBreach = self.didBreachInMatch(match)
-		if didBreach['blue']:
-			blueRPs += 1
-		if didBreach['red']:
-			redRPs += 1
+		if didBreach['blue']: blueRPs += 1
+		if didBreach['red']: redRPs += 1
+
+		if match.blueAllianceDidCapture: blueRPs += 1
+		if match.redAllianceDidCapture: redRPs += 1
+
+		return {'blue': blueRPs, 'red': redRPs}
 
 	#Competition wide Metrics
 	def avgCompScore(self):
@@ -286,6 +321,7 @@ class Calculator(object):
 					team.calculatedData.lowShotAccuracyAuto = self.lowShotAccuracy(team, True)
 					team.calculatedData.avgMidlineBallsIntakedAuto = self.averageArrays(self.makeArrayOfArrays(team, 'ballsIntakedAuto'))
 					team.calculatedData.avgTimesCrossedDefensesAuto = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedAuto'))
+					team.calculatedData.numAutoPoints = self.numAutoPointsForTeam(team)
 
 					#Tele
 					team.calculatedData.challengePercentage = self.percentagesOverAllTIMDs(team, 'didChallengeTele')
@@ -304,6 +340,9 @@ class Calculator(object):
 					team.calculatedData.siegePower = self.siegePower(team)
 					team.calculatedData.avgTimesCrossedDefensesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedTele'))
 
+					team.calculatedData.numRPs = self.numRPsForTeam(team)
+					team.calculatedData.numScaleAndChallangePoints = self.numScaleAndChallangePointsForTeam(team)
+
 					FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 			
 			#Match Metrics
@@ -311,6 +350,8 @@ class Calculator(object):
 				numDefenseCrosses = self.numDefensesCrossedInMatch(match)
 				match.calculatedData.numDefenseCrossesByBlue = numDefenseCrosses['blue']
 				match.calculatedData.numDefenseCrossesByRed = numDefenseCrosses['red']
+				match.calculatedData.blueRPs = self.RPsGainedFromMatch(match)['blue']
+				match.calculatedData.redRPs = self.RPsGainedFromMatch(match)['red']
 
 			#Competition metrics
 			self.comp.averageScore = self.avgCompScore()
