@@ -33,13 +33,8 @@ class Calculator(object):
 		return timds
 
 	# Calculated Team Data
-<<<<<<< HEAD
-	def averageTIMDObjectOverMatches(self, teamNUmber, key, coefficient):
-		timds = self.getPlayedTIMDsForTeamNumber(teamNumber)
-=======
 	def averageTIMDObjectOverMatches(self, team, key, coefficient = 1):
 		timds = self.getPlayedTIMDsForTeam(team)
->>>>>>> b47eb54e2c91c06ef4a580168861e0fc2513f083
 		if len(timds) == 0:
 			return -1
 		total = 0.0
@@ -117,14 +112,23 @@ class Calculator(object):
 				else:
 					return totalLowShotsMade / (totalLowShotsMade + totalLowShotsMissed)
 
+	def averageDictionaries(self, array):
+		if array == -1:
+			return -1
+		outputArray = []
+		numPlayed = 0
+		for dictionary in array:
+			if dictionary[0] > -1:
+				numPlayed += 1
+
 	def averageArrays(self, arrays):
 		if arrays == -1: # we will return a -1 from makeArrayOfArrays if there are no played timds.
 			return [-1]
 		outputArray = []
 		numPlayed = 0
-		for array in arrays:
-			if array[0] > -1:
-				numPlayed += 1
+		for array in arrays:                          #for dictionary in array: add all values of dict key in index 0, 1, ... 
+			if array[0] > -1:						  #assign each added value to bigger array, from that array take each index and divide by numPlayed
+				numPlayed += 1						  #add these to another array (or just replace the existing array indices with the calculated averages) 
 		for index in range(0, len(arrays[0]) - 1):
 			totalForIndex = 0
 			for array in arrays:
@@ -133,16 +137,27 @@ class Calculator(object):
 				outputArray.append(totalForIndex/numPlayed)
 		return outputArray
 
-	def makeArrayOfArrays(self, team, key):
-		timds = self.getPlayedTIMDsForTeam(team)
-		arrayOfArrays = []
+	def makeArrayOfArrays(self, team, key): 
+		arrayOfArrays = [] 
 		if len(timds) == 0:
 			return -1
 		for timd in timds:
-			array = utils.makeDictFromTIMD(timd)[key]
+			array = utils.makeDictFromTIMD(timd)[key] 
 			if array[0] > -1:
 				arrayOfArrays.append(array)
-		return arrayOfArrays
+		return arrayOfArrays 
+
+		def makeArrayOfDictionaries(self, team, key): 
+			timds = self.getPlayedTIMDsForTeam(team)
+			arrayOfDictionaries = [] 
+			if len(timds) == 0:
+				return -1
+			for timd in timds:
+				dictionary = utils.makeDictFromTIMD(timd)[key]
+				if dictionary[0] > -1:
+					arrayOfDictionaries.append(dictionary) 
+			return arrayOfDictionaries 
+
 
 	def blockingAbility(self, team):
 		allHighShotsAccuracies = 0
@@ -161,32 +176,8 @@ class Calculator(object):
 
 	def doCalculations(self, FBC):
 		for team in self.comp.teams:
-<<<<<<< HEAD
-'''MAKE A FUNCTION LIKE averageTIMDObjectOverMatches that works for bools. Then you can do the calculations for everything in TIMD besides the arrays
-WHEN YOU ARE DONE, TALK TO ME AND WE CAN DO THE ARRAYs TOGETHER'''
-			#Super Scout Averages
-			team.avgDefenseCrossingEffectiveness = team.averageTIMDObjectOverMatches(team.number, 'rankDefenseCrossingEffectiveness', 1)			
-			team.avgTorque = team.averageTIMDObjectOverMatches(team.number, 'rankTorque', 1)
-			team.avgSpeed = team.averageTIMDObjectOverMatches(team.number, 'rankSpeed', 1)
-			team.avgEvasion = team.averageTIMDObjectOverMatches(team.number, 'rankEvasion', 1)
-			team.avgDefense = team.averageTIMDObjectOverMatches(team.number, 'rankDefense', 1)
-			team.avgBallControl = team.averageTIMDObjectOverMatches(team.number, 'rankBallControl', 1)
-			team.disabledPercentage = team.percentagesInAllTIMDs(team.number, '')
-			
-
-			#Auto
-			team.avgHighShotsAuto = team.averageTIMDObjectOverMatches(team.number, 'numHighShotsMadeAuto', 1)
-			team.avgLowShotsAuto = team.averageTIMDObjectOverMatches(team.number, 'numLowShotsMadeAuto', 1)
-			team.reachPercentage = team.percentagesInAllTIMDs(team.number, 'didReachAuto', 1)
-			team.avgBallsKnockedOffMidlineAuto = team.averageTIMDObjectOverMatches(team.number, 'numBallsKnockedOffMidlineAuto', 1)
-
-			
-			#Tele
-			team.challengePercentage = team.percentagesInAllTIMDs(team.number, 'didChallengeTele', 1)
-			team.scalePercentage = team.percentagesInAllTIMDs(team.number, 'didScaleTele', 1)
-=======
 			timds = self.getPlayedTIMDsForTeam(team)
-			if len(timds) <= 0:
+			if len(timds) <= 0:                                                                                                        
 				print "No Complete TIMDs for team: " + str(team.number) + ", " + team.name
 			else:
 				#Super Scout Averages
@@ -226,6 +217,3 @@ WHEN YOU ARE DONE, TALK TO ME AND WE CAN DO THE ARRAYs TOGETHER'''
 
 				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 				
-
-
->>>>>>> b47eb54e2c91c06ef4a580168861e0fc2513f083
