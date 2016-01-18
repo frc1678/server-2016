@@ -28,7 +28,7 @@ def makeEventTeamsRequest(competition, year):
 	return makeRequest(makeYearEventKeyRequestURL(year, competition, 'teams'))
 
 def makeFakeDatabase(eventCode='casj', year=2015):
-	FBC = firebaseCommunicator.FirebaseCommunicator()
+	FBC = firebaseCommunicator.FirebaseCommunicator(competition)
 	FBC.JSONteams = utils.readJSONFromString(makeEventTeamsRequest(eventCode, year))
 	FBC.JSONmatches = utils.readJSONFromString(makeRequest(makeYearEventKeyRequestURL(year, eventCode, 'matches')))
 	FBC.addTeamsToFirebase()

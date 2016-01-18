@@ -13,7 +13,6 @@ class FirebaseCommunicator(object):
 	"""docstring for FirebaseCommunicator"""
 	def __init__(self, competition):
 		super(FirebaseCommunicator, self).__init__()
-		self.arg = arg
 		self.JSONmatches = []
 		self.JSONteams = []
 		self.competition = competition
@@ -51,8 +50,8 @@ class FirebaseCommunicator(object):
 		print "\nDoing Teams..."
 		for team in self.JSONteams:
 			print str(team["team_number"]) + ",", # This is weird syntax, I'm aware. The comma on the end tells it not to print a new line, but to do a space instead
-			if team["team_number"] == 254: #DEBUG
-				break
+			#if team["team_number"] == 254: #DEBUG
+			#	break
 			t = DataModel.Team()
 			t.number = team["team_number"]
 			t.name = team["nickname"]

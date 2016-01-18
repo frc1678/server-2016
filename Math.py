@@ -185,6 +185,8 @@ class Calculator(object):
 		avgHighShotAccuracy = allHighShotsAccuracies / len(self.comp.teams)
 		return 5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked
 
+	def predictedScoreForMatch(self, match):
+
 	def teleopShotAbility(self, team): return (5 * team.calculatedData.avgHighShotsTele + 2 * team.calculatedData.avgLowShotsTele)
 
 	def siegeAbility(self, team): return (15 * team.calculatedData.scalePercentage + 5 * team.calculatedData.challengePercentage)
@@ -221,7 +223,35 @@ class Calculator(object):
 	def numScaleAndChallangePointsForTeam(self, team):
 		return 5 * team.calculatedData.challengePercentage * self.getPlayedTIMDsForTeam(team) + 15 * team.calculatedData.scalePercentage * self.getPlayedTIMDsForTeam(team)
 
+	def avgNumberOfTimesDefenseCrossedByAlliance(self, alliance, defense):
+		
+
+	def predictedScoreLambda1(self, alliance, a, defense):
+		return (2 - (a / 5) / self.avgNumberOfTimesDefenseCrossedByAlliance(alliance))
+
 	#Matches Metrics
+	def predictedScoreForMatch(self, match):
+		predictedScoreForMatch = {'blue': 0, 'red': 0}
+		totalAvgNumShots = 0
+		teams = []
+		for teamNumber in match.blueAllianceTeamNumbers:
+			team = self.getTeamForNumber(teamNumber)
+			teams.append(team)
+			predictedScoreForMatch['blue'] += 5 * team.calculatedData.avgHighShotsTele + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
+			totalAvgNumShots += avgHighShotsAuto + avgHighShotsTele + avgLowShotsTele + avgLowShotsAuto
+		if totalAvgNumShots >= 8: 
+			challengeAndScale = 1
+			a = 0
+			for team in teams:
+				predictedScoreForMatch['blue'] += 5 * team.calculatedData.challengePercentage + 15 * team.calculatedData.scalePercentage
+				a += 10 * team.calculatedData.avgTimesCrossedDefensesAuto
+				challengeAndScale *= team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
+			predictedScoreForMatch['blue'] += 25 * challengeAndScale
+			predictedScoreForMatch['blue'] += a
+
+
+		
+
 	def didBreachInMatch(self, match):
 		didBreach = {'red': False, 'blue': False}
 		if match.numDefenseCrossesByBlue >= 10:
