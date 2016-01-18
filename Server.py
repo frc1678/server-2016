@@ -11,6 +11,7 @@ import Math
 import unicodedata
 
 
+
 comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()
