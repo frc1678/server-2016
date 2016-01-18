@@ -120,6 +120,13 @@ class Calculator(object):
 		for dictionary in array:
 			if dictionary[0] > -1:
 				numPlayed += 1
+		for key in dictionary:
+			totalForKey = 0
+			for dictionary in array:
+				if dictionary[key] > -1:
+					totalForKey += dictionary[key]
+				outputArray.append(totalForKey/numPlayed)
+		return totalForKey
 
 	def averageArrays(self, arrays):
 		if arrays == -1: # we will return a -1 from makeArrayOfArrays if there are no played timds.
@@ -189,6 +196,7 @@ class Calculator(object):
 				team.calculatedData.disabledPercentage = self.percentagesOverAllTIMDs(team, 'didGetDisabled')
 				team.calculatedData.incapacitatedPercentage = self.percentagesOverAllTIMDs(team, 'didGetIncapacitated')
 				team.calculatedData.disfunctionalPercentage = self.disfunctionalPercentage(team)
+				team.calculatedData.avgDefenseCrossingEffectiveness = self.averageDictionaries(team, 'rankDefenseCrossingEffectiveness')
 
 				#Auto
 				team.calculatedData.avgHighShotsAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeAuto')
@@ -197,7 +205,7 @@ class Calculator(object):
 				team.calculatedData.highShotAccuracyAuto = self.highShotAccuracy(team, True)
 				team.calculatedData.lowShotAccuracyAuto = self.lowShotAccuracy(team, True)
 				team.calculatedData.avgMidlineBallsIntakedAuto = self.averageArrays(self.makeArrayOfArrays(team, 'ballsIntakedAuto'))
-
+				team.calculatedData.avgTimesCrossedDefensesAuto = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedAuto'))
 
 				#Tele
 				team.calculatedData.challengePercentage = self.percentagesOverAllTIMDs(team, 'didChallengeTele')
@@ -214,6 +222,8 @@ class Calculator(object):
 				team.calculatedData.siegeConsistency = self.siegeConsistency(team)
 				team.calculatedData.siegeAbility = self.siegeAbility(team)
 				team.calculatedData.siegePower = self.siegePower(team)
+				team.calculatedData.avgTimesCrossedDefensesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedTele'))
+
 
 				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 				
