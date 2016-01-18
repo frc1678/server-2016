@@ -47,10 +47,10 @@ class CalculatedTeamData(object):
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
 		self.avgDefenseCrossingEffectiveness = {
-		 'pc' : -1, 
+		 	'pc' : -1, 
 			'cdf' : -1, 
-			'moat' :  -1,
-			'ramparts' : -1,
+			'mt' :  -1,
+			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
 			'lb' : -1,
@@ -60,8 +60,8 @@ class CalculatedTeamData(object):
 		self.avgTimesCrossedDefensesAuto = {
 		 	'pc' : -1, 
 			'cdf' : -1,
-			'moat' :  -1,
-			'ramparts' : -1,
+			'mt' :  -1,
+			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
 			'lb' : -1,
@@ -70,8 +70,8 @@ class CalculatedTeamData(object):
 		self.avgTimesCrossedDefensesTele = {
 		 	'pc' : -1, 
 			'cdf' : -1,
-			'moat' :  -1,
-			'ramparts' : -1,
+			'mt' :  -1,
+			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
 			'lb' : -1,
@@ -135,7 +135,7 @@ class TeamInMatchData(object):
 		self.rankDefenseCrossingEffectiveness = {
 			'pc' : -1, 
 			'cdf' : -1, 
-			'moat':  -1,
+			'mt':  -1,
 			'ramparts' : -1,
 			'sp' : -1,
 			'db' : -1,
@@ -181,7 +181,7 @@ class TeamInMatchData(object):
 		self.timesDefensesCrossedTele = {
 			'pc' : -1, 
 			'cdf' : -1, 
-			'moat' :  -1,
+			'mt' :  -1,
 			'ramparts' : -1,
 			'sp' : -1,
 			'db' : -1,
