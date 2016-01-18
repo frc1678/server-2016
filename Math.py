@@ -32,6 +32,12 @@ class Calculator(object):
 				timds.append(timd)
 		return timds
 
+	def getTIMDForTeamNumberAndMatchNumber(self, teamNumber, matchNumber): # Match number is an int
+		for timd in self.getTIMDsForTeamNumber(teamNumber):
+			if timd.matchNumber == matchNumber:
+				return timd
+		return "No TIMD found for team " + str(teamNumber) " in match " + str(matchNumber)
+
 	# Calculated Team Data
 	def averageTIMDObjectOverMatches(self, team, key, coefficient = 1):
 		timds = self.getPlayedTIMDsForTeam(team)
@@ -154,6 +160,57 @@ class Calculator(object):
 
 	def siegePower(self, team): return (team.calculatedData.siegeConsistency * team.calculatedData.siegeAbility)
 
+	#Matches Metrics
+	def didBreachInMatch(self, match):
+		didBreach = {'red': False, 'blue': False}
+		if match.numDefenseCrossesByBlue >= 10:
+			didBreach['blue'] = True
+		if match.numDefenseCrossesByRed >= 10:
+			didBreach['red'] = True
+		return didBreach
+		
+	def numDefensesCrossedInMatch(self, match):
+		numDefensesCrossedInMatch = {'red': -1, 'blue': -1}
+		blueAllianceCrosses = 0
+		for teamNum in match.blueAllianceTeamNumbers:
+			for timd in self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
+				for value in timd.timesDefensesCrossedAuto.values():
+					if value > -1:
+						blueAllianceCrosses += 1
+				for value in timd.timesDefensesCrossedTele.values():
+					if value > -1:
+						blueAllianceCrosses += value
+		numDefensesCrossedInMatch['blue'] = blueAllianceCrosses
+		redAllianceCrosses = 0
+		for teamNum in match.redAllianceTeamNumbers:
+			for timd in self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
+				for value in timd.timesDefensesCrossedAuto.values():
+					if value > -1:
+						redAllianceCrosses += 1
+				for value in timd.timesDefensesCrossedTele.values():
+					if value > -1:
+						redAllianceCrosses += value
+		numDefensesCrossedInMatch['red'] = redAllianceCrosses
+
+		return numDefensesCrossedInMatch
+
+
+	def RPsGainedFromMatch(self, match):
+		blueRPs = 0
+		redRPs = 0
+		if match.blueScore > match.redScore:
+			blueRPs += 2
+		else if match.redScore > match.blueScore:
+			redRPs += 2
+		else:
+			blueRPs += 1
+			redRPs += 1
+		didBreach = self.didBreachInMatch(match)
+		if didBreach['blue']:
+			blueRPs += 1
+		if didBreach['red']:
+			redRPs += 1
+
 	#Competition wide Metrics
 	def avgCompScore(self):
 		totalScore = 0
@@ -165,7 +222,7 @@ class Calculator(object):
 			if match.redScore > -1:
 				totalScore += match.redScore
 				totalNumScores += 1
-		return totalScore/totalNumScores
+		return totalScore / totalNumScores
 
 	def numPlayedMatchesInCompetition(self):
 		numPlayedMatches = 0
@@ -175,49 +232,56 @@ class Calculator(object):
 
 
 	def doCalculations(self, FBC):
-		for team in self.comp.teams:
-			timds = self.getPlayedTIMDsForTeam(team)
-			if len(timds) <= 0:
-				print "No Complete TIMDs for team: " + str(team.number) + ", " + team.name
-			else:
-				#Super Scout Averages
-				team.calculatedData.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')
-				team.calculatedData.avgSpeed = self.averageTIMDObjectOverMatches(team, 'rankSpeed')
-				team.calculatedData.avgEvasion = self.averageTIMDObjectOverMatches(team, 'rankEvasion')
-				team.calculatedData.avgDefense = self.averageTIMDObjectOverMatches(team, 'rankDefense')
-				team.calculatedData.avgBallControl = self.averageTIMDObjectOverMatches(team, 'rankBallControl')
-				team.calculatedData.disabledPercentage = self.percentagesOverAllTIMDs(team, 'didGetDisabled')
-				team.calculatedData.incapacitatedPercentage = self.percentagesOverAllTIMDs(team, 'didGetIncapacitated')
-				team.calculatedData.disfunctionalPercentage = self.disfunctionalPercentage(team)
-
-				#Auto
-				team.calculatedData.avgHighShotsAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeAuto')
-				team.calculatedData.avgLowShotsAuto = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeAuto')
-				team.calculatedData.reachPercentage = self.percentagesOverAllTIMDs(team, 'didReachAuto')
-				team.calculatedData.highShotAccuracyAuto = self.highShotAccuracy(team, True)
-				team.calculatedData.lowShotAccuracyAuto = self.lowShotAccuracy(team, True)
-				team.calculatedData.avgMidlineBallsIntakedAuto = self.averageArrays(self.makeArrayOfArrays(team, 'ballsIntakedAuto'))
-
-
-				#Tele
-				team.calculatedData.challengePercentage = self.percentagesOverAllTIMDs(team, 'didChallengeTele')
-				team.calculatedData.scalePercentage = self.percentagesOverAllTIMDs(team, 'didScaleTele')
-				team.calculatedData.avgGroundIntakes = self.averageTIMDObjectOverMatches(team, 'numGroundIntakesTele')
-				team.calculatedData.avgBallsKnockedOffMidlineAuto = self.averageTIMDObjectOverMatches(team, 'numBallsKnockedOffMidlineAuto')
-				team.calculatedData.avgShotsBlocked = self.averageTIMDObjectOverMatches(team, 'numShotsBlockedTele')
-				team.calculatedData.avgHighShotsTele = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeTele')
-				team.calculatedData.avgLowShotsTele = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeTele')
-				team.calculatedData.highShotAccuracyTele = self.highShotAccuracy(team, False)
-				team.calculatedData.lowShotAccuracyTele = self.lowShotAccuracy(team, False)
-				team.calculatedData.blockingAbility = self.blockingAbility(team)
-				team.calculatedData.teleopShotAbility = self.teleopShotAbility(team)
-				team.calculatedData.siegeConsistency = self.siegeConsistency(team)
-				team.calculatedData.siegeAbility = self.siegeAbility(team)
-				team.calculatedData.siegePower = self.siegePower(team)
-
-				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
-				
-		#Competition wide metrics
+		#team Metrics
 		if self.numPlayedMatchesInCompetition() > 0:
+			for team in self.comp.teams:
+				timds = self.getPlayedTIMDsForTeam(team)
+				if len(timds) <= 0:
+					print "No Complete TIMDs for team: " + str(team.number) + ", " + team.name
+				else:
+					#Super Scout Averages
+					team.calculatedData.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')
+					team.calculatedData.avgSpeed = self.averageTIMDObjectOverMatches(team, 'rankSpeed')
+					team.calculatedData.avgEvasion = self.averageTIMDObjectOverMatches(team, 'rankEvasion')
+					team.calculatedData.avgDefense = self.averageTIMDObjectOverMatches(team, 'rankDefense')
+					team.calculatedData.avgBallControl = self.averageTIMDObjectOverMatches(team, 'rankBallControl')
+					team.calculatedData.disabledPercentage = self.percentagesOverAllTIMDs(team, 'didGetDisabled')
+					team.calculatedData.incapacitatedPercentage = self.percentagesOverAllTIMDs(team, 'didGetIncapacitated')
+					team.calculatedData.disfunctionalPercentage = self.disfunctionalPercentage(team)
+
+					#Auto
+					team.calculatedData.avgHighShotsAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeAuto')
+					team.calculatedData.avgLowShotsAuto = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeAuto')
+					team.calculatedData.reachPercentage = self.percentagesOverAllTIMDs(team, 'didReachAuto')
+					team.calculatedData.highShotAccuracyAuto = self.highShotAccuracy(team, True)
+					team.calculatedData.lowShotAccuracyAuto = self.lowShotAccuracy(team, True)
+					team.calculatedData.avgMidlineBallsIntakedAuto = self.averageArrays(self.makeArrayOfArrays(team, 'ballsIntakedAuto'))
+
+
+					#Tele
+					team.calculatedData.challengePercentage = self.percentagesOverAllTIMDs(team, 'didChallengeTele')
+					team.calculatedData.scalePercentage = self.percentagesOverAllTIMDs(team, 'didScaleTele')
+					team.calculatedData.avgGroundIntakes = self.averageTIMDObjectOverMatches(team, 'numGroundIntakesTele')
+					team.calculatedData.avgBallsKnockedOffMidlineAuto = self.averageTIMDObjectOverMatches(team, 'numBallsKnockedOffMidlineAuto')
+					team.calculatedData.avgShotsBlocked = self.averageTIMDObjectOverMatches(team, 'numShotsBlockedTele')
+					team.calculatedData.avgHighShotsTele = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeTele')
+					team.calculatedData.avgLowShotsTele = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeTele')
+					team.calculatedData.highShotAccuracyTele = self.highShotAccuracy(team, False)
+					team.calculatedData.lowShotAccuracyTele = self.lowShotAccuracy(team, False)
+					team.calculatedData.blockingAbility = self.blockingAbility(team)
+					team.calculatedData.teleopShotAbility = self.teleopShotAbility(team)
+					team.calculatedData.siegeConsistency = self.siegeConsistency(team)
+					team.calculatedData.siegeAbility = self.siegeAbility(team)
+					team.calculatedData.siegePower = self.siegePower(team)
+
+					FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
+			
+			#Match Metrics
+			for match in self.comp.matches:
+				numDefenseCrosses = self.numDefensesCrossedInMatch(match)
+				match.calculatedData.numDefenseCrossesByBlue = numDefenseCrosses['blue']
+				match.calculatedData.numDefenseCrossesByRed = numDefenseCrosses['red']
+
+			#Competition metrics
 			self.comp.averageScore = self.avgCompScore()
 

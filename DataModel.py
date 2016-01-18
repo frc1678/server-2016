@@ -10,6 +10,7 @@ class Competition(object):
 		self.teams = []
 		self.matches = []
 		self.TIMDs = []
+		self.averageScore = -1
 	def updateTeamsAndMatchesFromFirebase(self):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
@@ -45,12 +46,40 @@ class CalculatedTeamData(object):
 		self.incapacitatedPercentage = -1.0
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
-		self.avgDefenseCrossingEffectiveness = {}
-		self.avgTimesCrossedDefensesAuto = {}
-		self.avgTimesCrossedDefensesTele = {}
-		self.seigePower = -1.0
-		self.seigeConsistency = -1.0
-		self.seigeAbility = -1.0
+		self.avgDefenseCrossingEffectiveness = {
+		 'pc' : -1, 
+			'cdf' : -1, 
+			'moat' :  -1,
+			'ramparts' : -1,
+			'sp' : -1,
+			'db' : -1,
+			'lb' : -1,
+			'rt' : -1,
+			'rw' : -1,
+		}
+		self.avgTimesCrossedDefensesAuto = {
+		 	'pc' : -1, 
+			'cdf' : -1,
+			'moat' :  -1,
+			'ramparts' : -1,
+			'sp' : -1,
+			'db' : -1,
+			'lb' : -1,
+			'rt' : -1
+		}
+		self.avgTimesCrossedDefensesTele = {
+		 	'pc' : -1, 
+			'cdf' : -1,
+			'moat' :  -1,
+			'ramparts' : -1,
+			'sp' : -1,
+			'db' : -1,
+			'lb' : -1,
+			'rt' : -1
+		}
+		self.siegePower = -1.0
+		self.siegeConsistency = -1.0
+		self.siegeAbility = -1.0
 		self.__dict__.update(args)
 
 		
@@ -85,7 +114,8 @@ class Match(object):
 		self.blueScore = -1
 		self.redDefensePositions = ['', '', '', '']
 		self.blueDefensePositions = ['', '', '', '']
-
+		self.redAllianceDidCapture = False
+		self.blueAllianceDidCapture = False
 		self.__dict__.update(args)
 		
 class TeamInMatchData(object):
@@ -98,7 +128,17 @@ class TeamInMatchData(object):
 		self.didGetIncapacitated = False
 		self.didGetDisabled = False
 
-		self.rankDefenseCrossingEffectiveness = {}
+		self.rankDefenseCrossingEffectiveness = {
+			'pc' : -1, 
+			'cdf' : -1, 
+			'moat':  -1,
+			'ramparts' : -1,
+			'sp' : -1,
+			'db' : -1,
+			'lb' : -1,
+			'rt' : -1,
+			'rw' : -1
+		}
 		self.rankTorque = -1
 		self.rankSpeed = -1
 		self.rankEvasion = -1
@@ -108,7 +148,17 @@ class TeamInMatchData(object):
 		#Auto
 		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
-		self.timesDefensesCrossedAuto = {}
+		self.timesDefensesCrossedAuto = {
+			'pc' : -1, 
+			'cdf' : -1, 
+			'mt' :  -1,
+			'rp' : -1,
+			'sp' : -1,
+			'db' : -1,
+			'lb' : -1,
+			'rt' : -1,
+			'rw' : -1
+		}
 		self.numHighShotsMadeAuto = -1
 		self.numLowShotsMadeAuto = -1
 		self.numHighShotsMissedAuto = -1
@@ -124,7 +174,16 @@ class TeamInMatchData(object):
 		self.numShotsBlockedTele = -1
 		self.didScaleTele = False
 		self.didChallengeTele = False
-		self.timesDefensesCrossedTele = {}
+		self.timesDefensesCrossedTele = {
+			'pc' : -1, 
+			'cdf' : -1, 
+			'moat' :  -1,
+			'ramparts' : -1,
+			'sp' : -1,
+			'db' : -1,
+			'lb' : -1,
+			'rw' : -1
+		}
 		
 
 		self.__dict__.update(args)		
