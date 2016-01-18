@@ -11,11 +11,12 @@ firebase = fb.FirebaseApplication('https://1678-dev-2016.firebaseio.com/', auth)
 
 class FirebaseCommunicator(object):
 	"""docstring for FirebaseCommunicator"""
-	def __init__(self, arg=None):
+	def __init__(self, competition):
 		super(FirebaseCommunicator, self).__init__()
 		self.arg = arg
 		self.JSONmatches = []
 		self.JSONteams = []
+		self.competition = competition
 
 	def updateFirebaseWithTeam(self, team):
 		teamDict = utils.makeDictFromTeam(team)
@@ -28,13 +29,12 @@ class FirebaseCommunicator(object):
 		FBLocation = "/Matches"
 		tempA = []
 		for number in matchDict["blueAllianceTeamNumbers"]:
-			tempA.append(number.replace('frc', ''))
+			tempA.append(int(number.replace('frc', '')))
 		matchDict["blueAllianceTeamNumbers"] = tempA
 		tempA = []
 		for number in matchDict["redAllianceTeamNumbers"]:
-			tempA.append(number.replace('frc', ''))
+			tempA.append(int(number.replace('frc', '')))
 		matchDict["redAllianceTeamNumbers"] = tempA
-		print matchDict
 		result = firebase.put(FBLocation, match.number, matchDict)
 
 	def updateFirebaseWithTIMD(self, timd):
@@ -78,15 +78,21 @@ class FirebaseCommunicator(object):
 	def addTIMDsToFirebase(self, matches):
 		print "Doing TIMDs...\n"
 		for match in matches:
-			print match.redAllianceTeamNumbers
-			for team in match.redAllianceTeamNumbers:
-				teamNumber = int(team.replace("frc", ""))
-				timd = utils.makeTIMDFromTeamNumberAndMatchNumber(teamNumber, match.number)
+			for teamNum in match.redAllianceTeamNumbers:
+				#teamNumber = int(teamNum.replace("frc", ""))
+				timd = utils.makeTIMDFromTeamNumberAndMatchNumber(teamNum, match.number)
 				self.updateFirebaseWithTIMD(timd)
-			for team in match.blueAllianceTeamNumbers:
-				teamNumber = int(team.replace("frc", ""))
-				timd = utils.makeTIMDFromTeamNumberAndMatchNumber(teamNumber, match.number)
+			for teamNum in match.blueAllianceTeamNumbers:
+				#teamNumber = int(teamNum.replace("frc", ""))
+				timd = utils.makeTIMDFromTeamNumberAndMatchNumber(teamNum, match.number)
 				self.updateFirebaseWithTIMD(timd)
+
+	def addCompInfoToFirebase(self): #Doing these keys manually so less clicking in firebase is better and because just easier
+		FBLocation = "/"
+		result = firebase.put(FBLocation, 'code', self.competition.code)
+		result = firebase.put(FBLocation, 'averageScore', self.competition.averageScore)
+		
+		self.competition.averageScore = -1
 
 def getPythonObjectForFirebaseDataAtLocation(location):
 	# The location will be a key path, like '/' for the root (entire) object.

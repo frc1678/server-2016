@@ -36,7 +36,7 @@ class Calculator(object):
 		for timd in self.getTIMDsForTeamNumber(teamNumber):
 			if timd.matchNumber == matchNumber:
 				return timd
-		return "No TIMD found for team " + str(teamNumber) " in match " + str(matchNumber)
+		return(-1)
 
 	# Calculated Team Data
 	def averageTIMDObjectOverMatches(self, team, key, coefficient = 1):
@@ -51,21 +51,21 @@ class Calculator(object):
 	def percentagesOverAllTIMDs(self, team, key, coefficient = 1):
 		 timds = self.getPlayedTIMDsForTeam(team)
 		 if len(timds) == 0:
-		 	return -1
+			return -1
 		 conditionTrueCounter = 0
 		 for timd in timds:
-		 	if utils.makeDictFromTIMD(timd)[key] == True:
-		 		conditionTrueCounter = conditionTrueCounter + 1
+			if utils.makeDictFromTIMD(timd)[key] == True:
+				conditionTrueCounter = conditionTrueCounter + 1
 		 return conditionTrueCounter/len(timds)
 
 	def disfunctionalPercentage(self, team):
 		timds = self.getPlayedTIMDsForTeam(team)
 		if len(timds) == 0:
-		 	return -1
+			return -1
 		wasOutOfPlayCounter = 0
 		for timd in timds:
-		 	if timd.didGetDisabled or timd.didGetIncapacitated:
-		 		wasOutOfPlayCounter += 1
+			if timd.didGetDisabled or timd.didGetIncapacitated:
+				wasOutOfPlayCounter += 1
 		return wasOutOfPlayCounter/len(timds)
 
 	def highShotAccuracy(self, team, auto):
@@ -134,6 +134,22 @@ class Calculator(object):
 				outputArray.append(totalForIndex/numPlayed)
 		return outputArray
 
+	def averageDictionaries(self, array):
+		if array == -1:
+			return -1
+		outputArray = []
+		numPlayed = 0
+		for dictionary in array:
+			if dictionary[0] > -1:
+				numPlayed += 1
+		for key in dictionary:
+			totalForKey = 0
+			for dictionary in array:
+				if dictionary[key] > -1:
+					totalForKey += dictionary[key]
+				outputArray.append(totalForKey/numPlayed)
+		return totalForKey
+
 	def makeArrayOfArrays(self, team, key):
 		timds = self.getPlayedTIMDsForTeam(team)
 		arrayOfArrays = []
@@ -144,6 +160,18 @@ class Calculator(object):
 			if array[0] > -1:
 				arrayOfArrays.append(array)
 		return arrayOfArrays
+
+	def makeArrayOfDictionaries(self, team, key): 
+				timds = self.getPlayedTIMDsForTeam(team)
+				arrayOfDictionaries = [] 
+				if len(timds) == 0:
+					return -1
+				for timd in timds:
+					dictionary = utils.makeDictFromTIMD(timd)[key]
+					if dictionary[0] > -1:
+						arrayOfDictionaries.append(dictionary) 
+				return arrayOfDictionaries 
+
 
 	def blockingAbility(self, team):
 		allHighShotsAccuracies = 0
@@ -173,7 +201,7 @@ class Calculator(object):
 		numDefensesCrossedInMatch = {'red': -1, 'blue': -1}
 		blueAllianceCrosses = 0
 		for teamNum in match.blueAllianceTeamNumbers:
-			for timd in self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
+			for timd in self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number):
 				for value in timd.timesDefensesCrossedAuto.values():
 					if value > -1:
 						blueAllianceCrosses += 1
@@ -183,7 +211,7 @@ class Calculator(object):
 		numDefensesCrossedInMatch['blue'] = blueAllianceCrosses
 		redAllianceCrosses = 0
 		for teamNum in match.redAllianceTeamNumbers:
-			for timd in self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
+			for timd in self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number):
 				for value in timd.timesDefensesCrossedAuto.values():
 					if value > -1:
 						redAllianceCrosses += 1
@@ -200,7 +228,7 @@ class Calculator(object):
 		redRPs = 0
 		if match.blueScore > match.redScore:
 			blueRPs += 2
-		else if match.redScore > match.blueScore:
+		elif match.redScore > match.blueScore:
 			redRPs += 2
 		else:
 			blueRPs += 1
@@ -248,6 +276,7 @@ class Calculator(object):
 					team.calculatedData.disabledPercentage = self.percentagesOverAllTIMDs(team, 'didGetDisabled')
 					team.calculatedData.incapacitatedPercentage = self.percentagesOverAllTIMDs(team, 'didGetIncapacitated')
 					team.calculatedData.disfunctionalPercentage = self.disfunctionalPercentage(team)
+					team.calculatedData.avgDefenseCrossingEffectiveness = self.averageDictionaries(team, 'rankDefenseCrossingEffectiveness')
 
 					#Auto
 					team.calculatedData.avgHighShotsAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeAuto')
@@ -256,7 +285,7 @@ class Calculator(object):
 					team.calculatedData.highShotAccuracyAuto = self.highShotAccuracy(team, True)
 					team.calculatedData.lowShotAccuracyAuto = self.lowShotAccuracy(team, True)
 					team.calculatedData.avgMidlineBallsIntakedAuto = self.averageArrays(self.makeArrayOfArrays(team, 'ballsIntakedAuto'))
-
+					team.calculatedData.avgTimesCrossedDefensesAuto = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedAuto'))
 
 					#Tele
 					team.calculatedData.challengePercentage = self.percentagesOverAllTIMDs(team, 'didChallengeTele')
@@ -273,6 +302,7 @@ class Calculator(object):
 					team.calculatedData.siegeConsistency = self.siegeConsistency(team)
 					team.calculatedData.siegeAbility = self.siegeAbility(team)
 					team.calculatedData.siegePower = self.siegePower(team)
+					team.calculatedData.avgTimesCrossedDefensesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedTele'))
 
 					FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 			

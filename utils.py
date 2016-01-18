@@ -64,8 +64,8 @@ def makeDictFromTeam(t):
 
 def makeDictFromMatch(m):
 	d = m.__dict__
-	if not isinstance(t.calculatedData, dict):
-		d["calculatedData"] = t.calculatedData.__dict__
+	if not isinstance(m.calculatedData, dict):
+		d["calculatedData"] = m.calculatedData.__dict__
 	return d
 
 def makeDictFromTIMD(timd):
