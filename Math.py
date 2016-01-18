@@ -154,6 +154,26 @@ class Calculator(object):
 
 	def siegePower(self, team): return (team.calculatedData.siegeConsistency * team.calculatedData.siegeAbility)
 
+	#Competition wide Metrics
+	def avgCompScore(self):
+		totalScore = 0
+		totalNumScores = 0
+		for match in self.comp.matches:
+			if match.blueScore > -1:
+				totalScore += match.blueScore
+				totalNumScores += 1
+			if match.redScore > -1:
+				totalScore += match.redScore
+				totalNumScores += 1
+		return totalScore/totalNumScores
+
+	def numPlayedMatchesInCompetition(self):
+		numPlayedMatches = 0
+		for match in self.comp.matches:
+			if match.redScore > -1 and match.blueScore > -1:
+				numPlayedMatches += 1
+
+
 	def doCalculations(self, FBC):
 		for team in self.comp.teams:
 			timds = self.getPlayedTIMDsForTeam(team)
@@ -197,5 +217,7 @@ class Calculator(object):
 
 				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 				
-
+		#Competition wide metrics
+		if self.numPlayedMatchesInCompetition() > 0:
+			self.comp.averageScore = self.avgCompScore()
 
