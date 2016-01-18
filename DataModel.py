@@ -82,7 +82,7 @@ class CalculatedTeamData(object):
 		self.siegeAbility = -1.0
 		self.numRPs = -1
 		self.numAutoPoints = -1
-		self.numScaleAndChallangePoints = -1
+		self.numScaleAndChallengePoints = -1
 
 
 		self.__dict__.update(args)
