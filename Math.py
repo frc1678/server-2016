@@ -400,6 +400,46 @@ class Calculator(object):
 		return numDefensesCrossedInMatch
 
 
+	def predictedNumberOfRPs(self, team):
+		pass
+		''' 
+		totalRPForTeam = 0
+		loop through all matches to be played by team:
+			if predictedScoreForMatch[team's alliance color] > predictedScoreForMatch[opposing team's color]:
+				totalRPForTeam += 2
+			elif predictedScoreForMatch[team's alliance color] == predictedScoreForMatch[opposing team's color]:
+				totalRPForTeam += 1
+
+			totalChallengeAndScalePercentage = 0
+			totalBreachPercentage = 0
+			for eachTeam in team's alliance:
+				totalChallengeAndScalePercentage += eachTeam.calculatedData.challengePercentage + eachTeam.calculatedData.scalePercentage
+			totalChallengeAndScalePercentage /= 3
+			(generate random number between 0 and 1)
+			if it is less than totalChallengeAndScalePercentage:
+				totalRPForTeam += 1 
+			(Need function for breach percentage)
+			(generate another random number between 0 and 1)
+			if it is less than breachPercentage:
+				totalRPForTeam += 1
+		return totalRPForTeam + currentAmountOfRPs
+
+
+		'''
+	def predictedSeeding(self, competition):
+		pass
+		'''
+		teamsArray = []
+		for team in self.comp.teams:
+			teamsArray.append(team)
+		sort teamsArray by predictedNumberOfRPs. If predictedNumberOfRPs for two teams are equal, sort them by predicted amount of scale/challenge points
+		if their scale/challenge predictions are equal, sort them by number of auto points 
+		return teamsArray (sorted from largest to smallest)
+
+
+		'''		
+		
+
 	def RPsGainedFromMatch(self, match):
 		blueRPs = 0
 		redRPs = 0
