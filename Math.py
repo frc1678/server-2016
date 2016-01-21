@@ -374,7 +374,20 @@ class Calculator(object):
 		if match.numDefenseCrossesByRed >= 8:
 			didBreach['red'] = True
 		return didBreach
-		
+
+
+	def breachPercentage(self, team):
+		breachPercentage = 0
+		for match in self.team.matches:
+			if team.number in match.blueAllianceTeamNumbers:
+				if didBreachInMatch(match)['blue'] == True:
+					breachPercentage += 1
+			elif team.number in match.redAllianceTeamNumbers:
+				if didBreachInMatch(match)['red'] == True:
+					breachPercentage += 1
+		return breachPercentage/len(self.team.matches)
+
+
 	def numDefensesCrossedInMatch(self, match):
 		numDefensesCrossedInMatch = {'red': -1, 'blue': -1}
 		blueAllianceCrosses = 0
@@ -408,71 +421,56 @@ class Calculator(object):
 			totalBreachPercentage = 0
 			randomNum = random.random()			#Generate random number to check if the team is likely to make a challenge or scale
 			if team.number in match.redAllianceTeamNumbers and match.redScore == -1:
-				for teamNumber in match.redAllianceTeamNumbers:
-					teamInAlliance = self.getTeamForNumber(teamNumber)
+				for teamNumber in match.blueAllianceTeamNumbers:
+					team = self.getTeamForNumber(teamNumber)
 					totalChallengeAndScalePercentage += (team.calculatedData.challengePercentage + team.calculatedData.scalePercentage)
+					totalBreachPercentage += team.calculatedData.breachPercentage(team)
 				totalChallengeAndScalePercentage /= 3
-				if totalChallengeAndScalePercentage > randomNum:		#if compiled chance of making a capture is less than randomNum, then the capture was made
-					totalRPsForTeam += 1
+				totalBreachPercentage /= 3
+
 				if self.calculatedData.predictedScoreForMatch(match)['red'] > self.calculatedData.predictedScoreForMatch(match)['blue']:
 					totalRPForTeam += 2
 				elif self.calculatedData.predictedScoreForMatch(match)['red'] == self.calculatedData.predictedScoreForMatch(match)['blue']:
 					totalRPForTeam += 1
+
+				if totalChallengeAndScalePercentage > randomNum:
+					totalRPsForTeam += 1
+				if totalBreachPercentage > randomNum:
+					totalRPForTeam += 1
+
+
 			elif team.number in match.blueAllianceTeamNumbers and match.blueScore == -1:
 				for teamNumber in match.blueAllianceTeamNumbers:
 					team = self.getTeamForNumber(teamNumber)
 					totalChallengeAndScalePercentage += (team.calculatedData.challengePercentage + team.calculatedData.scalePercentage)
+					totalBreachPercentage += team.calculatedData.breachPercentage(team)
 				totalChallengeAndScalePercentage /= 3
-				if totalChallengeAndScalePercentage < randomNum:
-					totalRPsForTeam += 1
+				totalBreachPercentage /= 3
+
 				if self.calculatedData.predictedScoreForMatch(match)['blue'] > self.calculatedData.predictedScoreForMatch(match)['red']:
 					totalRPForTeam += 2
 				elif self.calculatedData.predictedScoreForMatch(match)['red'] == self.calculatedData.predictedScoreForMatch(match)['blue']:
 					totalRPForTeam += 1
+
+				if totalChallengeAndScalePercentage > randomNum:
+					totalRPsForTeam += 1
+				if totalBreachPercentage > randomNum:
+					totalRPForTeam += 1
+
 			else:
 				print 'This team does not exist or all matches have been played'
 
 		return totalRPForTeam + numRPsForTeam(team)
 
 
-
-		''' 
-		totalRPForTeam = 0
-		loop through all matches to be played by team:
-			if predictedScoreForMatch[team's alliance color] > predictedScoreForMatch[opposing team's color]:
-				totalRPForTeam += 2
-			elif predictedScoreForMatch[team's alliance color] == predictedScoreForMatch[opposing team's color]:
-				totalRPForTeam += 1
-
-			totalChallengeAndScalePercentage = 0
-			totalBreachPercentage = 0
-			for eachTeam in team's alliance:
-				totalChallengeAndScalePercentage += eachTeam.calculatedData.challengePercentage + eachTeam.calculatedData.scalePercentage
-			totalChallengeAndScalePercentage /= 3
-			(generate random number between 0 and 1)
-			if it is less than totalChallengeAndScalePercentage:
-				totalRPForTeam += 1 
-			(Need function for breach percentage)
-			(generate another random number between 0 and 1)
-			if it is less than breachPercentage:
-				totalRPForTeam += 1
-		return totalRPForTeam + currentAmountOfRPs
-
-
-		'''
-
 	def predictedSeeding(self, competition):
-		pass
-		'''
 		teamsArray = []
 		for team in self.comp.teams:
 			teamsArray.append(team)
-		sort teamsArray by predictedNumberOfRPs. If predictedNumberOfRPs for two teams are equal, sort them by predicted amount of scale/challenge points
-		if their scale/challenge predictions are equal, sort them by number of auto points 
-		return teamsArray (sorted from largest to smallest)
+		for team in range(len(teamsArray), 0, -1):
+			for i in range(teams):
+				pass
 
-
-		'''		
 		
 
 	def RPsGainedFromMatch(self, match):
