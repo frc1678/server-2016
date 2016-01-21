@@ -1,5 +1,6 @@
 # Math.py
 import utils
+import random
 import firebaseCommunicator
 
 class Calculator(object):
@@ -227,7 +228,7 @@ class Calculator(object):
 			else:
 				print "ERROR: team not in match."
 
-	def numScaleAndChallangePointsForTeam(self, team):
+	def numScaleAndChallengePointsForTeam(self, team):
 		return 5 * team.calculatedData.challengePercentage * self.getPlayedTIMDsForTeam(team) + 15 * team.calculatedData.scalePercentage * self.getPlayedTIMDsForTeam(team)
 
 	def avgNumberOfTimesDefenseCrossedByAlliance(self, alliance, defense):
@@ -401,7 +402,40 @@ class Calculator(object):
 
 
 	def predictedNumberOfRPs(self, team):
-		pass
+		totalRPForTeam = 0
+		for match in self.comp.matches:
+			totalChallengeAndScalePercentage = 0
+			totalBreachPercentage = 0
+			randomNum = random.random()			#Generate random number to check if the team is likely to make a challenge or scale
+			if team.number in match.redAllianceTeamNumbers and match.redScore == -1:
+				for teamNumber in match.redAllianceTeamNumbers:
+					teamInAlliance = self.getTeamForNumber(teamNumber)
+					totalChallengeAndScalePercentage += (team.calculatedData.challengePercentage + team.calculatedData.scalePercentage)
+				totalChallengeAndScalePercentage /= 3
+				if totalChallengeAndScalePercentage > randomNum:		#if compiled chance of making a capture is less than randomNum, then the capture was made
+					totalRPsForTeam += 1
+				if self.calculatedData.predictedScoreForMatch(match)['red'] > self.calculatedData.predictedScoreForMatch(match)['blue']:
+					totalRPForTeam += 2
+				elif self.calculatedData.predictedScoreForMatch(match)['red'] == self.calculatedData.predictedScoreForMatch(match)['blue']:
+					totalRPForTeam += 1
+			elif team.number in match.blueAllianceTeamNumbers and match.blueScore == -1:
+				for teamNumber in match.blueAllianceTeamNumbers:
+					team = self.getTeamForNumber(teamNumber)
+					totalChallengeAndScalePercentage += (team.calculatedData.challengePercentage + team.calculatedData.scalePercentage)
+				totalChallengeAndScalePercentage /= 3
+				if totalChallengeAndScalePercentage < randomNum:
+					totalRPsForTeam += 1
+				if self.calculatedData.predictedScoreForMatch(match)['blue'] > self.calculatedData.predictedScoreForMatch(match)['red']:
+					totalRPForTeam += 2
+				elif self.calculatedData.predictedScoreForMatch(match)['red'] == self.calculatedData.predictedScoreForMatch(match)['blue']:
+					totalRPForTeam += 1
+			else:
+				print 'This team does not exist or all matches have been played'
+
+		return totalRPForTeam + numRPsForTeam(team)
+
+
+
 		''' 
 		totalRPForTeam = 0
 		loop through all matches to be played by team:
@@ -426,6 +460,7 @@ class Calculator(object):
 
 
 		'''
+
 	def predictedSeeding(self, competition):
 		pass
 		'''
@@ -525,7 +560,7 @@ class Calculator(object):
 					team.calculatedData.avgTimesCrossedDefensesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedTele'))
 
 					team.calculatedData.numRPs = self.numRPsForTeam(team)
-					team.calculatedData.numScaleAndChallangePoints = self.numScaleAndChallangePointsForTeam(team)
+					team.calculatedData.numScaleAndChallengePoints = self.numScaleAndChallengePointsForTeam(team)
 
 					FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 			
