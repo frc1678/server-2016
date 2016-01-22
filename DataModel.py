@@ -106,7 +106,7 @@ class CalculatedMatchData(object):
 		super(CalculatedMatchData, self).__init__()
 		self.predictedRedScore = -1.0
 		self.predictedBlueScore = -1.0	
-		self.numDefenseCrossesByBlue = -1
+		self.numDefensesCrossedByBlue = -1
 		self.numDefensesCrossedByRed = -1 
 		self.blueRPs = -1
 		self.redRPs = -1	
@@ -157,7 +157,7 @@ class TeamInMatchData(object):
 		#Auto
 		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
-		self.timesDefensesCrossedAuto = {
+		self.timesCrossedDefensesAuto = {
 			'pc' : -1, 
 			'cdf' : -1, 
 			'mt' :  -1,
@@ -183,7 +183,7 @@ class TeamInMatchData(object):
 		self.numShotsBlockedTele = -1
 		self.didScaleTele = False
 		self.didChallengeTele = False
-		self.timesDefensesCrossedTele = {
+		self.timesCrossedDefensesTele = {
 			'pc' : -1, 
 			'cdf' : -1, 
 			'mt' :  -1,

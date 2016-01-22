@@ -193,8 +193,6 @@ class Calculator(object):
 		avgHighShotAccuracy = allHighShotsAccuracies / len(self.comp.teams)
 		return 5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked
 
-	#def predictedScoreForMatch(self, match):
-
 	def teleopShotAbility(self, team): return (5 * team.calculatedData.avgHighShotsTele + 2 * team.calculatedData.avgLowShotsTele)
 
 	def siegeAbility(self, team): return (15 * team.calculatedData.scalePercentage + 5 * team.calculatedData.challengePercentage)
@@ -254,8 +252,8 @@ class Calculator(object):
 
 	def sumOf4SmallestBetas(self, alliance, a):
 		betas = []
-		for catagory, defenses in self.defenseCategories:
-			betas.append(self.predictedScoreBeta(alliance, a, catagory))
+		for category, defenses in self.defenseCategories:
+			betas.append(self.predictedScoreBeta(alliance, a, category))
 		betas = sorted(betas)
 		return betas[0] + betas[1] + betas[2] + betas[3]
 	
@@ -379,10 +377,10 @@ class Calculator(object):
 	def breachPercentage(self, team):
 		breachPercentage = 0
 		for match in self.team.matches:
-			if team.number in match.blueAllianceTeamNumbers:
+			if team.number in match.blueAllianceTeamNumbers and match.blueScore != -1:
 				if didBreachInMatch(match)['blue'] == True:
 					breachPercentage += 1
-			elif team.number in match.redAllianceTeamNumbers:
+			elif team.number in match.redAllianceTeamNumbers and match.blueScore != -1:
 				if didBreachInMatch(match)['red'] == True:
 					breachPercentage += 1
 		return breachPercentage/len(self.team.matches)
@@ -416,17 +414,17 @@ class Calculator(object):
 
 	def predictedNumberOfRPs(self, team):
 		totalRPForTeam = 0
-		for match in self.comp.matches:
-			totalChallengeAndScalePercentage = 0
-			totalBreachPercentage = 0
-			randomNum = random.random()			#Generate random number to check if the team is likely to make a challenge or scale
+		overallChallengeAndScalePercentage = 0
+		overallBreachPercentage = 0
+		matchesToBePlayedCounter = 0
+
+		for match in self.comp.matches:		
 			if team.number in match.redAllianceTeamNumbers and match.redScore == -1:
+				matchesToBePlayedCounter += 1
 				for teamNumber in match.blueAllianceTeamNumbers:
 					team = self.getTeamForNumber(teamNumber)
-					totalChallengeAndScalePercentage += (team.calculatedData.challengePercentage + team.calculatedData.scalePercentage)
-					totalBreachPercentage += team.calculatedData.breachPercentage(team)
-				totalChallengeAndScalePercentage /= 3
-				totalBreachPercentage /= 3
+					overallChallengeAndScalePercentage += team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
+					overallBreachPercentage += team.calculatedData.breachPercentage
 
 				if self.calculatedData.predictedScoreForMatch(match)['red'] > self.calculatedData.predictedScoreForMatch(match)['blue']:
 					totalRPForTeam += 2
@@ -440,25 +438,22 @@ class Calculator(object):
 
 
 			elif team.number in match.blueAllianceTeamNumbers and match.blueScore == -1:
+				matchesToBePlayedCounter += 1
 				for teamNumber in match.blueAllianceTeamNumbers:
 					team = self.getTeamForNumber(teamNumber)
-					totalChallengeAndScalePercentage += (team.calculatedData.challengePercentage + team.calculatedData.scalePercentage)
-					totalBreachPercentage += team.calculatedData.breachPercentage(team)
-				totalChallengeAndScalePercentage /= 3
-				totalBreachPercentage /= 3
+					overallChallengeAndScalePercentage += team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
+					overallBreachPercentage += team.calculatedData.breachPercentage
 
 				if self.calculatedData.predictedScoreForMatch(match)['blue'] > self.calculatedData.predictedScoreForMatch(match)['red']:
 					totalRPForTeam += 2
 				elif self.calculatedData.predictedScoreForMatch(match)['red'] == self.calculatedData.predictedScoreForMatch(match)['blue']:
 					totalRPForTeam += 1
 
-				if totalChallengeAndScalePercentage > randomNum:
-					totalRPsForTeam += 1
-				if totalBreachPercentage > randomNum:
-					totalRPForTeam += 1
-
 			else:
 				print 'This team does not exist or all matches have been played'
+
+		totalRPForTeam += (overallChallengeAndScalePercentage / 3)
+		totalRPForTeam += (overallBreachPercentage / 3)
 
 		return totalRPForTeam + numRPsForTeam(team)
 
@@ -468,8 +463,12 @@ class Calculator(object):
 		for team in self.comp.teams:
 			teamsArray.append(team)
 		for team in range(len(teamsArray), 0, -1):
-			for i in range(teams):
-				pass
+			for i in range(team):
+				if teamsArray[i].calculatedData.predictedNumberOfRPs > teamsArray[i + 1].calculatedData.predictedNumberOfRPs:
+					temp = teamsArray[i]
+					teamsArray[i] = teamsArray[i + 1]
+					teamsArray[i + 1] = temp
+				
 
 		
 
@@ -517,7 +516,7 @@ class Calculator(object):
 			for team in self.comp.teams:
 				timds = self.getPlayedTIMDsForTeam(team)
 				if len(timds) <= 0:
-					print "No Complete TIMDs for team: " + str(team.number) + ", " + team.name
+					print "No Complete TIMDs for " + str(team.number) + ", " + team.name
 				else:
 					#Super Scout Averages
 					team.calculatedData.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')

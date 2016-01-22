@@ -21,6 +21,7 @@ FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 calculator = Math.Calculator(comp)
 calculator.doCalculations(FBC)
 
+
 ''' # DEBUG
 teams = []
 for i in teams:
