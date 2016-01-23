@@ -20,32 +20,39 @@ def makeASCIIFromJSON(input):
     else:
         return input
 
+
 def readJSONFromString(string):
 	return makeASCIIFromJSON(json.load(StringIO(string)))
+
 
 def readJSONFileToObj(fileName):
 	fileInput = open(fileName, 'r')
 	pythonObj = json.load(fileInput)
 	return pythonObj
 
+
 def makeMatchFromDict(d):
 	match = DataModel.Match(**d) #I have no idea why this works
 	return match
+
 
 def makeTeamFromDict(d):
 	team = DataModel.Team(**d) #I have no idea why this works
 	team.calculatedData = DataModel.CalculatedTeamData(**d['calculatedData'])
 	return team
 
+
 def makeTIMDFromDict(d):
 	TIMD = DataModel.TeamInMatchData(**d)
 	return TIMD
+
 
 def makeTeamsFromDicts(dicts):
 	teams = []
 	for key in dicts.keys():
 		teams.append(makeTeamFromDict(dicts[key]))
 	return teams
+
 
 def makeMatchesFromDicts(dicts):
 	matches = []
@@ -54,6 +61,7 @@ def makeMatchesFromDicts(dicts):
 			continue
 		matches.append(makeMatchFromDict(match))
 	return matches
+
 
 def makeDictFromTeam(t):
 	d = t.__dict__
@@ -68,12 +76,15 @@ def makeDictFromMatch(m):
 		d["calculatedData"] = m.calculatedData.__dict__
 	return d
 
+
 def makeDictFromTIMD(timd):
 	d = timd.__dict__
 	return d
 
+
 def makeDictFromCalculatedTeamData(calculatedData):
 	return calculatedData.__dict__
+
 
 def makeTIMDsFromDicts(timds):
 	t = []
@@ -90,11 +101,19 @@ def makeTeamObjectWithNumberAndName(number, name):
 	team.number = number
 	return team
 
+
 def makeTIMDFromTeamNumberAndMatchNumber(teamNumber, matchNumber):
 	timd = DataModel.TeamInMatchData()
 	timd.teamNumber = teamNumber
 	timd.matchNumber = matchNumber
 	return timd
+
+
+def makeArrayOfTeamNumAndMatchNum(teamNum):
+	timds = []
+	for timd in self.comp.TIMDs:
+		if timd.teamNumber == teamNum:
+			teamNumAndMatchNum = teamNum + "Q" + str(timd.matchNumber)			
 
 
 

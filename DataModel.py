@@ -53,9 +53,9 @@ class CalculatedTeamData(object):
 			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
-			'lb' : -1,
 			'rt' : -1,
 			'rw' : -1,
+			'lb' : -1
 		}
 		self.avgTimesCrossedDefensesAuto = {
 		 	'pc' : -1, 
@@ -64,8 +64,9 @@ class CalculatedTeamData(object):
 			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
-			'lb' : -1,
-			'rt' : -1
+			'rt' : -1,
+			"rw" : -1,
+			"lb" : -1
 		}
 		self.avgTimesCrossedDefensesTele = {
 		 	'pc' : -1, 
@@ -74,8 +75,9 @@ class CalculatedTeamData(object):
 			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
-			'lb' : -1,
-			'rt' : -1
+			'rt' : -1,
+			'rw' : -1,
+			"lb" : -1
 		}
 		self.siegePower = -1.0
 		self.siegeConsistency = -1.0
@@ -144,9 +146,9 @@ class TeamInMatchData(object):
 			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
-			'lb' : -1,
 			'rt' : -1,
-			'rw' : -1
+			'rw' : -1,
+			'lb' : -1
 		}
 		self.rankTorque = -1
 		self.rankSpeed = -1
@@ -164,9 +166,9 @@ class TeamInMatchData(object):
 			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
-			'lb' : -1,
 			'rt' : -1,
-			'rw' : -1
+			'rw' : -1,
+			'lb' : -1
 		}
 		self.numHighShotsMadeAuto = -1
 		self.numLowShotsMadeAuto = -1
@@ -190,8 +192,9 @@ class TeamInMatchData(object):
 			'rp' : -1,
 			'sp' : -1,
 			'db' : -1,
-			'lb' : -1,
-			'rw' : -1
+			'rt' : -1,
+			'rw' : -1,
+			'lb' : -1
 		}
 		
 
