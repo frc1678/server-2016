@@ -22,6 +22,7 @@ class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
+		self.firstPickAbility = -1
 		self.driverAbility = -1
 		self.highShotAccuracyAuto = -1.0
 		self.lowShotAccuracyAuto = -1.0
@@ -47,37 +48,25 @@ class CalculatedTeamData(object):
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
 		self.avgDefenseCrossingEffectiveness = {
-		 	'pc' : -1, 
-			'cdf' : -1, 
-			'mt' :  -1,
-			'rp' : -1,
-			'sp' : -1,
-			'db' : -1,
-			'rt' : -1,
-			'rw' : -1,
-			'lb' : -1
+			'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
 		}
 		self.avgTimesCrossedDefensesAuto = {
-		 	'pc' : -1, 
-			'cdf' : -1,
-			'mt' :  -1,
-			'rp' : -1,
-			'sp' : -1,
-			'db' : -1,
-			'rt' : -1,
-			"rw" : -1,
-			"lb" : -1
+		 	'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
 		}
 		self.avgTimesCrossedDefensesTele = {
-		 	'pc' : -1, 
-			'cdf' : -1,
-			'mt' :  -1,
-			'rp' : -1,
-			'sp' : -1,
-			'db' : -1,
-			'rt' : -1,
-			'rw' : -1,
-			"lb" : -1
+		 	'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
 		}
 		self.siegePower = -1.0
 		self.siegeConsistency = -1.0
@@ -140,15 +129,11 @@ class TeamInMatchData(object):
 		self.didGetDisabled = False
 
 		self.rankDefenseCrossingEffectiveness = {
-			'pc' : -1, 
-			'cdf' : -1, 
-			'mt':  -1,
-			'rp' : -1,
-			'sp' : -1,
-			'db' : -1,
-			'rt' : -1,
-			'rw' : -1,
-			'lb' : -1
+			'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
 		}
 		self.rankTorque = -1
 		self.rankSpeed = -1
@@ -160,15 +145,11 @@ class TeamInMatchData(object):
 		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
 		self.timesCrossedDefensesAuto = {
-			'pc' : -1, 
-			'cdf' : -1, 
-			'mt' :  -1,
-			'rp' : -1,
-			'sp' : -1,
-			'db' : -1,
-			'rt' : -1,
-			'rw' : -1,
-			'lb' : -1
+				'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
 		}
 		self.numHighShotsMadeAuto = -1
 		self.numLowShotsMadeAuto = -1
@@ -186,15 +167,11 @@ class TeamInMatchData(object):
 		self.didScaleTele = False
 		self.didChallengeTele = False
 		self.timesCrossedDefensesTele = {
-			'pc' : -1, 
-			'cdf' : -1, 
-			'mt' :  -1,
-			'rp' : -1,
-			'sp' : -1,
-			'db' : -1,
-			'rt' : -1,
-			'rw' : -1,
-			'lb' : -1
+			'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
 		}
 		
 

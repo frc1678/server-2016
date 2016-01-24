@@ -8,13 +8,7 @@ class Calculator(object):
 	def __init__(self, competition):
 		super(Calculator, self).__init__()
 		self.comp = competition
-		self.defenseCategories = {
-		'a' : ['pc', 'cdf'],
-		'b' : ['mt', 'rp'],
-		'c' : ['db', 'sp'],
-		'd' : ['rw', 'rt'],
-		'e' : ['lb']
-		}
+		
 		
 	def getTeamForNumber(self, num):
 		for team in self.comp.teams:
@@ -226,10 +220,27 @@ class Calculator(object):
 			else:
 				print "ERROR: team not in match."
 
+	def totalDefenseCategoryCrossingsForAlliance(alliance, defenseCategory):
+		totalCrossesForCategory = 0
+		numberOfDataPointsInCategory = 0
+		varianceArray = []
+		for team in alliance:
+			for defense in defenseCategory:
+				numberOfDataPointsInCategory += 1
+				totalCrossesForCategory += team.avgTimesCrossedDefensesAuto[defenseCategory][defense] + team.avgTimesCrossedDefensesTele[defenseCategory][defense]
+				varianceArray.append(team.avgTimesCrossedDefensesAuto[defenseCategory][defense])
+				varianceArray.append(team.avgTimesCrossedDefensesTele[defenseCategory[defense]])
+		avgCrossesForCategory = totalCrossesForCategory / numberOfDataPointsInCategory
+
+
+
+
+
+
 	def numScaleAndChallengePointsForTeam(self, team):
 		return 5 * team.calculatedData.challengePercentage * self.getPlayedTIMDsForTeam(team) + 15 * team.calculatedData.scalePercentage * self.getPlayedTIMDsForTeam(team)
 
-	def avgNumberOfTimesDefenseCrossedByAlliance(self, alliance, defense):
+	'''def avgNumberOfTimesDefenseCrossedByAlliance(self, alliance, defense):
 		totalAvg = 0
 		for team in alliance:
 			avgTimesDefenseCrossedForTeam = 0
@@ -256,19 +267,18 @@ class Calculator(object):
 			betas.append(self.predictedScoreBeta(alliance, a, category))
 		betas = sorted(betas)
 		return betas[0] + betas[1] + betas[2] + betas[3]
-	
-	def totalAvgNumShotPointsForTeam(self, team):
-		return 5 * team.calculatedData.avgHighShotsTele + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
-	
+
 	def createCrossingsArray(self, alliance, a):
 		betaA = self.predictedScoreBeta(alliance, a, 'a')
 		betaB = self.predictedScoreBeta(alliance, a, 'b')
 		betaC = self.predictedScoreBeta(alliance, a, 'c')
 		betaD = self.predictedScoreBeta(alliance, a, 'd')
 		betaE = self.predictedScoreBeta(alliance, a, 'e')
-		return sorted([betaA, betaA, betaB, betaB, betaC, betaC, betaD, betaD]) #low to high
-
-
+		return sorted([betaA, betaA, betaB, betaB, betaC, betaC, betaD, betaD]) #low to high'''
+	
+	def totalAvgNumShotPointsForTeam(self, team):
+		return 5 * team.calculatedData.avgHighShotsTele + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
+	
 	def totalAvgNumShotsForAlliance(self, alliance):
 		totalAvgNumShots = 0
 		for team in alliance:
@@ -291,7 +301,7 @@ class Calculator(object):
 		for team in alliance:
 			reachPoints += 2 * team.calculatedData.reachPercentage
 		return reachPoints
-		
+
 	#Matches Metrics
 	def predictedScoreForMatch(self, match):
 		predictedScoreForMatch = {'blue': 0, 'red': 0}
@@ -329,7 +339,7 @@ class Calculator(object):
 		predictedScoreForMatch['blue'] += self.reachPointsForAlliance(blueTeams)
 
 		# Red Alliance Next
-		totalAvgNumShots = 0
+		'''totalAvgNumShots = 0
 		redTeams = []
 		for teamNumber in match.redAllianceTeamNumbers:
 			team = self.getTeamForNumber(teamNumber)
@@ -358,7 +368,7 @@ class Calculator(object):
 			predictedScoreForMatch['red'] += 5
 		
 		predictedScoreForMatch['red'] -= self.blockedShotPointsForAlliance(redTeams, blueTeams)
-		predictedScoreForMatch['red'] += self.reachPointsForAlliance(redTeams)
+		predictedScoreForMatch['red'] += self.reachPointsForAlliance(redTeams)'''
 
 
 		return predictedScoreForMatch
@@ -516,7 +526,7 @@ class Calculator(object):
 			for team in self.comp.teams:
 				timds = self.getPlayedTIMDsForTeam(team)
 				if len(timds) <= 0:
-					print "No Complete TIMDs for " + str(team.number) + ", " + team.name
+					print "No Complete TIMDs for team:" + str(team.number) + ", " + team.name
 				else:
 					#Super Scout Averages
 					team.calculatedData.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')
