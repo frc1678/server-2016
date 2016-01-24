@@ -2,7 +2,7 @@
 import utils
 import random
 import firebaseCommunicator
-import Math
+import math
 
 class Calculator(object):
 	"""docstring for Calculator"""
@@ -221,14 +221,33 @@ class Calculator(object):
 			else:
 				print "ERROR: team not in match."
 
-	def totalDefenseCategoryCrossingsForAlliance(alliance, defenseCategory):
+	def totalAvgDefenseCategoryCrossingsForAlliance(self, alliance, defenseCategory):
 		totalCrossesForCategory = 0
 		numberOfDataPointsInCategory = 0
 		for team in alliance:
 			for defense in defenseCategory:
 				numberOfDataPointsInCategory += 1
-				totalCrossesForCategory += team.avgTimesCrossedDefensesAuto[defenseCategory][defense] + team.avgTimesCrossedDefensesTele[defenseCategory][defense]
+				totalCrossesForCategory += team.calculatedData.avgTimesCrossedDefensesAuto[defenseCategory][defense] + team.calculatedData.avgTimesCrossedDefensesTele[defenseCategory][defense]
 		return totalCrossesForCategory
+
+	def stanDevSumForDefenseCategory(self, alliance, defenseCategory):
+		varianceValues = []
+		stanDevSum = 0
+		for team in alliance:
+			difOfAvgSquaresTele = 0
+			difOfAvgSquaresAuto = 0 
+			timds = getPlayedTIMDsForTeam(team)
+			for timd in timds:
+				for defense in defenseCategory:
+					difOfAvgSquaresTele += (team.calculatedData.avgTimesCrossedDefensesTele[defenseCategory][defense] - timd.timesDefensesCrossedTele[defenseCategory][defense])**2 
+					difOfAvgSquaresAuto += (team.calculatedData.avgTimesCrossedDefensesAuto[defenseCategory][defense] - timd.timesDefensesCrossedAuto[defenseCategory][defense])**2 
+			difOfAvgSquaresTele /= (len(timds) - 1)
+			difOfAvgSquaresAuto /= (len(timds) - 1)
+			varianceValues.append(difOfAvgSquaresTele)
+			varianceValues.append(difOfAvgSquaresAuto)
+		for i in varianceValues:
+			stanDevSum += i
+		return math.sqrt(stanDevSum)
 
 
 	def numScaleAndChallengePointsForTeam(self, team):
@@ -296,16 +315,37 @@ class Calculator(object):
 			reachPoints += 2 * team.calculatedData.reachPercentage
 		return reachPoints
 
+	def calculatePercentage(self, x, u, o):
+		return (1 / (math.sqrt(2 * math.pi ) * o)) * (math.e)**(-1.0 * ((x - u)**2) / (2 * o**2))
 
-	def calculatePercentage(self, x, u, b):
-		return 1/(Math.sqrt(2 * Math.pi ) * b)
-
-	def standardDevOfShotsForAlliance(self, alliance):
+	def sumOfStandardDeviationsOfShotsForAlliance(self, alliance):
+		sumOfStandardDeviationsOfShotsForAlliance = 0
 		shotVariances = []
 		for team in alliance:
+			autoHighShotVariance = 0
+			autoLowShotVariance = 0
+			teleHighShotVariance = 0
+			teleleLowShotVariance = 0
 			timds = getPlayedTIMDsForTeam(team)
 			for timd in timds:
-				distFromAvgSquaredHighAuto = (team.calculatedData.avgHighShotsAuto - timd.numHighShotsMadeAuto)**2
+				if timd.numHighShotsMadeAuto > -1:
+					autoHighShotVariance += (team.calculatedData.avgHighShotsAuto - timd.numHighShotsMadeAuto)**2
+					autoLowShotVariance += (team.calculatedData.avgLowShotsAuto - timd.numLowShotsMadeAuto)**2
+					teleHighShotLowance += (team.calculatedData.avgHighShotsTele - timd.numHighShotsMadeTele)**2
+					teleLowShotVariance += (team.calculatedData.avgLowShotsTele - timd.numLowShotsMadeTele)**2
+			autoHighShotVariance /= (len(timds) - 1)
+			autoLowShotVariance /= (len(timds) - 1)
+			teleHighShotVariance /= (len(timds) - 1)
+			teleLowShotVariance /= (len(timds) - 1)
+			shotVariances.append(autoHighShotVariance)
+			shotVariances.append(autoLowShotVariance)
+			shotVariances.append(teleHighShotVariance)
+			shotVariances.append(teleLowShotVariance)				
+		for i in shotVariances:
+			sumOfStandardDeviationsOfShotsForAlliance += i
+		return math.sqrt(sumOfStandardDeviationsOfShotsForAlliance)
+
+
 
 
 
@@ -330,7 +370,7 @@ class Calculator(object):
 				challengeAndScale *= team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
 			predictedScoreForMatch['blue']['score'] += 25 * challengeAndScale
 			predictedScoreForMatch['blue']['score'] += a
-		if self.sumOf4SmallestBetas(blueTeams, a) < 135: predictedScoreForMatch['blue'][score] += 20
+		
 
 		crossings = self.createCrossingsArray(alliance, a)
 
@@ -342,12 +382,23 @@ class Calculator(object):
 		predictedScoreForMatch['blue']['score'] += self.reachPointsForAlliance(blueTeams)
 		productOfScaleAndChallengePercentages = 1
 
+		standardDevCategories = []
+
 		for team in blueTeams:
 			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
-		predictedScoreForMatch['blue']['RPs'] += (self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.standardDevOfShotsForAlliance(blueTeams)) * productOfScaleAndChallengePercentages)
+		predictedScoreForMatch['blue']['RPs'] += (self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.varianceOfShotsForAlliance(blueTeams)) * productOfScaleAndChallengePercentages)
+		
+		breachPercentage = 1
+
+		for defenseCategory in blueTeams[0].calculatedData.avgDefenseCrossingEffectiveness:
+			standardDevCategories.append(self.stanDevSumForDefenseCategory(blueTeams, defenseCategory))
+		standardDevCategories = sorted(standardDevCategories)
+
+		for category in range(1, len(standardDevCategories) + 1):
+			breachPercentage *= calculatePercentage(2.0, totalAvgDefenseCategoryCrossingsForAlliance(blueTeams, category), stanDevSumForDefenseCategory(blueTeams, category))
 
 
-
+		predictedScoreForMatch['blue']['RPs'] += breachPercentage
 		# Red Alliance Next
 		'''totalAvgNumShots = 0
 		redTeams = []
@@ -489,7 +540,16 @@ class Calculator(object):
 					teamsArray[i] = teamsArray[i + 1]
 					teamsArray[i + 1] = temp
 		return teamsArray
-				
+	
+	def predictedScoreTwoTeams(self, team1, team):
+		firstPickTeams = []
+		for team in self.comp.teams:
+			if team.number != 1678:
+				firstPickTeams.append(team)
+
+
+
+
 
 	def firstPickAbility(self, competition):
 		teamsArray = []
@@ -561,7 +621,6 @@ class Calculator(object):
 					team.calculatedData.highShotAccuracyAuto = self.highShotAccuracy(team, True)
 					team.calculatedData.lowShotAccuracyAuto = self.lowShotAccuracy(team, True)
 					team.calculatedData.avgMidlineBallsIntakedAuto = self.averageArrays(self.makeArrayOfArrays(team, 'ballsIntakedAuto'))
-					team.calculatedData.avgTimesCrossedDefensesAuto = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedAuto'))
 					team.calculatedData.numAutoPoints = self.numAutoPointsForTeam(team)
 
 					#Tele
@@ -579,7 +638,7 @@ class Calculator(object):
 					team.calculatedData.siegeConsistency = self.siegeConsistency(team)
 					team.calculatedData.siegeAbility = self.siegeAbility(team)
 					team.calculatedData.siegePower = self.siegePower(team)
-					team.calculatedData.avgTimesCrossedDefensesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesDefensesCrossedTele'))
+					
 
 					team.calculatedData.numRPs = self.numRPsForTeam(team)
 					team.calculatedData.numScaleAndChallengePoints = self.numScaleAndChallengePointsForTeam(team)
