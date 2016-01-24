@@ -2,6 +2,7 @@
 import utils
 import random
 import firebaseCommunicator
+import Math
 
 class Calculator(object):
 	"""docstring for Calculator"""
@@ -223,18 +224,11 @@ class Calculator(object):
 	def totalDefenseCategoryCrossingsForAlliance(alliance, defenseCategory):
 		totalCrossesForCategory = 0
 		numberOfDataPointsInCategory = 0
-		varianceArray = []
 		for team in alliance:
 			for defense in defenseCategory:
 				numberOfDataPointsInCategory += 1
 				totalCrossesForCategory += team.avgTimesCrossedDefensesAuto[defenseCategory][defense] + team.avgTimesCrossedDefensesTele[defenseCategory][defense]
-				varianceArray.append(team.avgTimesCrossedDefensesAuto[defenseCategory][defense])
-				varianceArray.append(team.avgTimesCrossedDefensesTele[defenseCategory[defense]])
-		avgCrossesForCategory = totalCrossesForCategory / numberOfDataPointsInCategory
-
-
-
-
+		return totalCrossesForCategory
 
 
 	def numScaleAndChallengePointsForTeam(self, team):
@@ -302,9 +296,22 @@ class Calculator(object):
 			reachPoints += 2 * team.calculatedData.reachPercentage
 		return reachPoints
 
+
+	def calculatePercentage(self, x, u, b):
+		return 1/(Math.sqrt(2 * Math.pi ) * b)
+
+	def standardDevOfShotsForAlliance(self, alliance):
+		shotVariances = []
+		for team in alliance:
+			timds = getPlayedTIMDsForTeam(team)
+			for timd in timds:
+				distFromAvgSquaredHighAuto = (team.calculatedData.avgHighShotsAuto - timd.numHighShotsMadeAuto)**2
+
+
+
 	#Matches Metrics
 	def predictedScoreForMatch(self, match):
-		predictedScoreForMatch = {'blue': 0, 'red': 0}
+		predictedScoreForMatch = {'blue': {'score' : 0, 'RP' : 0}, 'red': {'score' : 0, 'RP' : 0}}
 
 		# Blue Alliance First
 		totalAvgNumShots = 0
@@ -312,31 +319,34 @@ class Calculator(object):
 		for teamNumber in match.blueAllianceTeamNumbers:
 			team = self.getTeamForNumber(teamNumber)
 			blueTeams.append(team)
-			predictedScoreForMatch['blue'] += self.totalAvgNumShotPointsForTeam(team)
+			predictedScoreForMatch['blue']['score'] += self.totalAvgNumShotPointsForTeam(team)
+		
 		if self.totalAvgNumShotsForAlliance(blueTeams) >= 8: 
 			challengeAndScale = 1
 			a = 0
 			for team in blueTeams:
-				predictedScoreForMatch['blue'] += self.totalAvgNumShotPointsForTeam(team)
+				predictedScoreForMatch['blue']['score'] += self.totalAvgNumShotPointsForTeam(team)
 				a += 10 * team.calculatedData.avgTimesCrossedDefensesAuto
 				challengeAndScale *= team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
-			predictedScoreForMatch['blue'] += 25 * challengeAndScale
-			predictedScoreForMatch['blue'] += a
-		if self.sumOf4SmallestBetas(blueTeams, a) < 135: predictedScoreForMatch['blue'] += 20
+			predictedScoreForMatch['blue']['score'] += 25 * challengeAndScale
+			predictedScoreForMatch['blue']['score'] += a
+		if self.sumOf4SmallestBetas(blueTeams, a) < 135: predictedScoreForMatch['blue'][score] += 20
 
 		crossings = self.createCrossingsArray(alliance, a)
 
 		redTeams = []
 		for teamNumber in match.redAllianceTeamNumbers:
 			redTeams.append(self.getTeamForNumber(teamNumber))
-		for defenseCategory in crossings:
-			if timeUsed > 135:
-				break
-			timeUsed += crossings.pop(0)
-			predictedScoreForMatch['blue'] += 5
 		
-		predictedScoreForMatch['blue'] -= self.blockedShotPointsForAlliance(blueTeams, redTeams)
-		predictedScoreForMatch['blue'] += self.reachPointsForAlliance(blueTeams)
+		predictedScoreForMatch['blue']['score'] -= self.blockedShotPointsForAlliance(blueTeams, redTeams)
+		predictedScoreForMatch['blue']['score'] += self.reachPointsForAlliance(blueTeams)
+		productOfScaleAndChallengePercentages = 1
+
+		for team in blueTeams:
+			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
+		predictedScoreForMatch['blue']['RPs'] += (self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.standardDevOfShotsForAlliance(blueTeams)) * productOfScaleAndChallengePercentages)
+
+
 
 		# Red Alliance Next
 		'''totalAvgNumShots = 0
@@ -478,9 +488,14 @@ class Calculator(object):
 					temp = teamsArray[i]
 					teamsArray[i] = teamsArray[i + 1]
 					teamsArray[i + 1] = temp
+		return teamsArray
 				
 
-		
+	def firstPickAbility(self, competition):
+		teamsArray = []
+		for team in self.comp.teams:
+			teamsArray.append(team)
+
 
 	def RPsGainedFromMatch(self, match):
 		blueRPs = 0
