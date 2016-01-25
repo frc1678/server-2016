@@ -93,6 +93,12 @@ class FirebaseCommunicator(object):
 		
 		self.competition.averageScore = -1
 
+	def wipeDatabase(self):
+		FBLocation = "/"
+		firebase.put(FBLocation, Teams, [])
+		firebase.put(FBLocation, Matches, [])
+		firebase.put(FBLocation, TeamInMatchDatas, [])
+
 def getPythonObjectForFirebaseDataAtLocation(location):
 	# The location will be a key path, like '/' for the root (entire) object.
 	result = firebase.get(location, None)

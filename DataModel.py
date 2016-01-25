@@ -74,8 +74,17 @@ class CalculatedTeamData(object):
 		self.numRPs = -1
 		self.numAutoPoints = -1
 		self.numScaleAndChallengePoints = -1
-
-
+		self.sdHighShotsAuto = -1
+		self.sdHighShotsTele = -1
+		self.sdLowShotsAuto = -1
+		self.sdLowShotsTele = -1
+		self.sdGroundIntakes = -1
+		self.sdShotsBlocked = -1
+		self.sdMidlineBallsIntakedAuto = -1
+		self.sdBallsKnockedOffMidlineAuto = -1
+		self.sd1 = -1
+		self.sd2 = -1
+		self.sd3 = -1
 		self.__dict__.update(args)
 
 		
@@ -89,6 +98,18 @@ class Team(object):
 		self.matches = []
 		self.teamInMatchDatas = []
 		self.calculatedData = CalculatedTeamData()
+		self.selectedImageUrl = '-1'
+		self.otherImageUrls = ['-1']
+		self.pitLowBarCapability = -1
+		self.pitPotentialLowBarCapability = -1
+		self.pitPotentialCDFAndPCCapability = -1
+		self.pitPotentialMidLineBallCheesecake = -1
+		self.pitFrontBumperWidth = -1.0
+		self.pitPotentialNoodleShotBlockerCapability = -1
+		self.pitNotes = "-1"
+		self.pitOrganization = ""
+		self.pitNumberOfWheels = -1
+		self.pitHeightOfRobot = -1
 		self.__dict__.update(args)
 
 class CalculatedMatchData(object):
@@ -116,6 +137,7 @@ class Match(object):
 		self.blueDefensePositions = ['', '', '', '']
 		self.redAllianceDidCapture = False
 		self.blueAllianceDidCapture = False
+		self.scoutName = ''
 		self.__dict__.update(args)
 		
 class TeamInMatchData(object):
