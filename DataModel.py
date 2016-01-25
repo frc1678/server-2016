@@ -23,7 +23,10 @@ class CalculatedTeamData(object):
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.firstPickAbility = -1.0
-		self.secondPickAbility = -1.0
+		self.secondPickAbility = {
+			1678 : -1.0
+
+		}
 		self.driverAbility = -1.0
 		self.highShotAccuracyAuto = -1.0
 		self.lowShotAccuracyAuto = -1.0
@@ -107,24 +110,25 @@ class Team(object):
 	"""An FRC Team object"""
 	def __init__(self, **args):
 		super(Team, self).__init__()
-		self.name = "noName"
+		self.name = ""
 		self.number = -1
 		self.matches = []
 		self.teamInMatchDatas = []
 		self.calculatedData = CalculatedTeamData()
-		self.selectedImageUrl = '-1'
-		self.otherImageUrls = ['-1']
-		self.pitLowBarCapability = -1
-		self.pitPotentialLowBarCapability = -1
-		self.pitPotentialCDFAndPCCapability = -1
-		self.pitPotentialMidLineBallCheesecake = -1
+		self.selectedImageUrl = ''
+		self.otherImageUrls = ['']
+		self.pitLowBarCapability = False
+		self.pitPotentialLowBarCapability = False
+		self.pitPotentialCDFAndPCCapability = False
+		self.pitPotentialMidlineBallCapability = False
 		self.pitFrontBumperWidth = -1.0
-		self.pitPotentialNoodleShotBlockerCapability = -1
-		self.pitNotes = "-1"
-		self.pitOrganization = ""
+		self.pitPotentialShotBlockerCapability = False
+		self.pitNotes = ""
+		self.pitOrganization = -1
 		self.pitNumberOfWheels = -1
 		self.pitHeightOfRobot = -1
 		self.__dict__.update(args)
+
 
 class CalculatedMatchData(object):
 	"""docstring for CalculatedMatchData"""
@@ -134,8 +138,12 @@ class CalculatedMatchData(object):
 		self.predictedBlueScore = -1.0	
 		self.numDefensesCrossedByBlue = -1
 		self.numDefensesCrossedByRed = -1 
-		self.blueRPs = -1
-		self.redRPs = -1	
+		self.predictedBlueRPs = -1.0
+		self.actualBlueRPs = -1
+		self.predictedRedRPs = -1.0
+		self.actualRedRPs = -1	
+		self.redAllianceDidBreach = False
+		self.blueAllianceDidBreach = False
 
 class Match(object):
 	"""An FRC Match Object"""
@@ -147,11 +155,10 @@ class Match(object):
 		self.blueAllianceTeamNumbers = []
 		self.redScore = -1
 		self.blueScore = -1
-		self.redDefensePositions = ['', '', '', '']
-		self.blueDefensePositions = ['', '', '', '']
+		self.redDefensePositions = ['lb', '', '', '', '']
+		self.blueDefensePositions = ['lb', '', '', '', '']
 		self.redAllianceDidCapture = False
 		self.blueAllianceDidCapture = False
-		self.scoutName = ''
 		self.__dict__.update(args)
 		
 class TeamInMatchData(object):
@@ -160,6 +167,7 @@ class TeamInMatchData(object):
 		super(TeamInMatchData, self).__init__()
 		self.teamNumber = -1
 		self.matchNumber = -1
+		self.scoutName = ''
 
 		self.didGetIncapacitated = False
 		self.didGetDisabled = False
