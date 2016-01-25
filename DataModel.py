@@ -76,9 +76,29 @@ class CalculatedTeamData(object):
 		self.sdShotsBlocked = -1
 		self.sdMidlineBallsIntakedAuto = -1
 		self.sdBallsKnockedOffMidlineAuto = -1
-		self.sd1 = -1
-		self.sd2 = -1
-		self.sd3 = -1
+		self.sdDefenseCrossesAuto = {
+			'pc' : -1,
+			'cdf' : -1,
+			'mt' : -1,
+			'rp' : -1,
+			'db' : -1,
+			'sp' : -1,
+			'rw' : -1,
+			'rt' : -1,
+			'lb' : -1
+		}
+		self.sdDefenseCrossesTele = {
+			'pc' : -1,
+			'cdf' : -1,
+			'mt' : -1,
+			'rp' : -1,
+			'db' : -1,
+			'sp' : -1,
+			'rw' : -1,
+			'rt' : -1,
+			'lb' : -1
+
+		}
 		self.__dict__.update(args)
 
 		
@@ -159,6 +179,7 @@ class TeamInMatchData(object):
 			'd' : {'rw' : -1, 'rt' : -1},
 			'e' : {'lb' : -1}
 		}
+
 		self.numHighShotsMadeAuto = -1
 		self.numLowShotsMadeAuto = -1
 		self.numHighShotsMissedAuto = -1
