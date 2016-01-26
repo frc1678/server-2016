@@ -56,6 +56,15 @@ class Calculator(object):
 			 total = total + utils.makeDictFromTIMD(timd)[key]
 		return total/len(timds)
 
+	def standardDeviationObjectOverAllMatches(self, team, key):
+		timds = self.getPlayedTIMDsForTeam(team)
+		if len(timds) == 0:
+			return -1
+		total = 0.0
+		for timd in timds:
+			total += (team.calculatedData.averageTIMDObjectOverAllMatches(team, key) - utils.makeDictFromTIMD(key)) ** 2
+		return math.sqrt(total)
+
 	def percentagesOverAllTIMDs(self, team, key, coefficient = 1):
 		 timds = self.getPlayedTIMDsForTeam(team)
 		 if len(timds) == 0:
@@ -231,7 +240,7 @@ class Calculator(object):
 		return totalCrossesForCategory
 
 	def stanDevSumForDefenseCategory(self, alliance, defenseCategory):
-		varianceValues = []
+		varianceValues = []			#add variance  for each data point to array
 		stanDevSum = 0
 		for team in alliance:
 			difOfAvgSquaresTele = 0
@@ -241,7 +250,7 @@ class Calculator(object):
 				for defense in defenseCategory:
 					difOfAvgSquaresTele += (team.calculatedData.avgTimesCrossedDefensesTele[defenseCategory][defense] - timd.timesDefensesCrossedTele[defenseCategory][defense])**2 
 					difOfAvgSquaresAuto += (team.calculatedData.avgTimesCrossedDefensesAuto[defenseCategory][defense] - timd.timesDefensesCrossedAuto[defenseCategory][defense])**2 
-			difOfAvgSquaresTele /= (len(timds) - 1)
+			difOfAvgSquaresTele /= (len(timds) - 1)			#divide difference from average squared by n - 1
 			difOfAvgSquaresAuto /= (len(timds) - 1)
 			varianceValues.append(difOfAvgSquaresTele)
 			varianceValues.append(difOfAvgSquaresAuto)
