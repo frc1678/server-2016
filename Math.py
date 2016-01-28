@@ -3,6 +3,7 @@ import utils
 import random
 import firebaseCommunicator
 import math
+import numpy as np
 
 class Calculator(object):
 	"""docstring for Calculator"""
@@ -151,21 +152,20 @@ class Calculator(object):
 				outputArray.append(totalForIndex/numPlayed)
 		return outputArray
 
-	def averageDictionaries(self, array):
-		if array == -1:
-			return -1
-		outputArray = []
-		numPlayed = 0
-		for dictionary in array:
-			if dictionary[0] > -1:
-				numPlayed += 1
-		for key in dictionary:
-			totalForKey = 0
-			for dictionary in array:
-				if dictionary[key] > -1:
-					totalForKey += dictionary[key]
-				outputArray.append(totalForKey/numPlayed)
-		return totalForKey
+	def defenseAverageCrosses(self, team, key):
+		defenseCrossDictArray = []
+		timds = getPlayedTIMDsForTeam(team)
+		for timd in timds:
+			dic = utils.makeDictFromTIMD(timd)[key]
+			if array[0] > -1:
+				defenseCrossDictArray.append(dic)
+		for defCrossDict in defenseCrossDictArray:
+			for defenseCategory in defCrossDict:
+				for defense in defenseCategory:
+					pass
+
+
+
 
 	def makeArrayOfArrays(self, team, key):
 		timds = self.getPlayedTIMDsForTeam(team)
@@ -177,17 +177,6 @@ class Calculator(object):
 			if array[0] > -1:
 				arrayOfArrays.append(array)
 		return arrayOfArrays
-
-	def makeArrayOfDictionaries(self, team, key): 
-				timds = self.getPlayedTIMDsForTeam(team)
-				arrayOfDictionaries = [] 
-				if len(timds) == 0:
-					return -1
-				for timd in timds:
-					dictionary = utils.makeDictFromTIMD(timd)[key]
-					if dictionary[0] > -1:
-						arrayOfDictionaries.append(dictionary) 
-				return arrayOfDictionaries 
 
 
 	def blockingAbility(self, team):
@@ -257,6 +246,7 @@ class Calculator(object):
 		for i in varianceValues:
 			stanDevSum += i
 		return math.sqrt(stanDevSum)
+
 
 
 	def numScaleAndChallengePointsForTeam(self, team):
@@ -370,19 +360,6 @@ class Calculator(object):
 			blueTeams.append(team)
 			predictedScoreForMatch['blue']['score'] += self.totalAvgNumShotPointsForTeam(team)
 		
-		if self.totalAvgNumShotsForAlliance(blueTeams) >= 8: 
-			challengeAndScale = 1
-			a = 0
-			for team in blueTeams:
-				predictedScoreForMatch['blue']['score'] += self.totalAvgNumShotPointsForTeam(team)
-				a += 10 * team.calculatedData.avgTimesCrossedDefensesAuto
-				challengeAndScale *= team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
-			predictedScoreForMatch['blue']['score'] += 25 * challengeAndScale
-			predictedScoreForMatch['blue']['score'] += a
-		
-
-		crossings = self.createCrossingsArray(alliance, a)
-
 		redTeams = []
 		for teamNumber in match.redAllianceTeamNumbers:
 			redTeams.append(self.getTeamForNumber(teamNumber))
@@ -408,6 +385,7 @@ class Calculator(object):
 
 
 		predictedScoreForMatch['blue']['RPs'] += breachPercentage
+
 		# Red Alliance Next
 		'''totalAvgNumShots = 0
 		redTeams = []
@@ -506,16 +484,15 @@ class Calculator(object):
 					overallChallengeAndScalePercentage += team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
 					overallBreachPercentage += team.calculatedData.breachPercentage
 
-				if self.calculatedData.predictedScoreForMatch(match)['red'] > self.calculatedData.predictedScoreForMatch(match)['blue']:
+				if self.calculatedData.predictedScoreForMatch(match)['red']['score'] > self.calculatedData.predictedScoreForMatch(match)['blue']['score']:
 					totalRPForTeam += 2
-				elif self.calculatedData.predictedScoreForMatch(match)['red'] == self.calculatedData.predictedScoreForMatch(match)['blue']:
+				elif self.calculatedData.predictedScoreForMatch(match)['red']['score'] == self.calculatedData.predictedScoreForMatch(match)['blue']['score']:
 					totalRPForTeam += 1
 
 				if totalChallengeAndScalePercentage > randomNum:
 					totalRPsForTeam += 1
 				if totalBreachPercentage > randomNum:
 					totalRPForTeam += 1
-
 
 			elif team.number in match.blueAllianceTeamNumbers and match.blueScore == -1:
 				matchesToBePlayedCounter += 1
@@ -524,9 +501,9 @@ class Calculator(object):
 					overallChallengeAndScalePercentage += team.calculatedData.challengePercentage + team.calculatedData.scalePercentage
 					overallBreachPercentage += team.calculatedData.breachPercentage
 
-				if self.calculatedData.predictedScoreForMatch(match)['blue'] > self.calculatedData.predictedScoreForMatch(match)['red']:
+				if self.calculatedData.predictedScoreForMatch(match)['blue']['score'] > self.calculatedData.predictedScoreForMatch(match)['red']['score']:
 					totalRPForTeam += 2
-				elif self.calculatedData.predictedScoreForMatch(match)['red'] == self.calculatedData.predictedScoreForMatch(match)['blue']:
+				elif self.calculatedData.predictedScoreForMatch(match)['red']['score'] == self.calculatedData.predictedScoreForMatch(match)['blue']['score']:
 					totalRPForTeam += 1
 
 			else:
@@ -550,20 +527,91 @@ class Calculator(object):
 					teamsArray[i + 1] = temp
 		return teamsArray
 	
-	def predictedScoreTwoTeams(self, team1, team):
-		firstPickTeams = []
-		for team in self.comp.teams:
-			if team.number != 1678:
-				firstPickTeams.append(team)
+	def predictedScoreCustomAlliance(self, teamNum, team1Num, team2Num, numTeams):
+		predictedScoreCustomAlliance = 0
+		team = self.getTeamForNumber(teamNum)
+		team1 = self.getTeamForNumber(team1Num)
+		team2 = self.getTeamForNumber(team2Num)
+		totalAvgNumShots = 0
+		if numTeams == 1:
+			pickTeams = [team]
+		elif numTeams == 2:
+			pickTeams = [team, team1]
+		elif numTeams == 3:
+			pickTeams = [team, team1, team2]		
+
+		predictedScoreCustomAlliance += self.reachPointsForAlliance(pickTeams)
+		productOfScaleAndChallengePercentages = 1
+
+		standardDevCategories = []
+
+		for team in pickTeams:
+			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
+		predictedScoreCustomAlliance += 25 * (self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(pickTeams), self.varianceOfShotsForAlliance(pickTeams)) * productOfScaleAndChallengePercentages)
+		
+		breachPercentage = 1
+
+		for defenseCategory in pickTeams[0].calculatedData.avgDefenseCrossingEffectiveness:
+			standardDevCategories.append(self.stanDevSumForDefenseCategory(pickTeams, defenseCategory))
+		standardDevCategories = sorted(standardDevCategories)
+
+		for category in range(1, len(standardDevCategories) + 1):
+			breachPercentage *= calculatePercentage(2.0, totalAvgDefenseCategoryCrossingsForAlliance(pickTeams, category), stanDevSumForDefenseCategory(pickTeams, category))
 
 
+		predictedScoreCustomAlliance += 20 * breachPercentage
+
+		return predictedScoreCustomAlliance
 
 
+	def firstPickAbility(self, team):
+		return predictedScoreCustomAlliance(1678, team.number, 8, 2) 
 
-	def firstPickAbility(self, competition):
+	
+	def secondPickAbility(self, team):
+		gamma = 0.5
+		matrixOfMatches = np.array([])
 		teamsArray = []
-		for team in self.comp.teams:
-			teamsArray.append(team)
+		secondPickAbility = {}
+		for team1 in self.comp.teams:
+			occurrence = 0
+			teamsArray.append(team1)
+			for team2 in self.comp.teams:
+				for match in self.comp.matches:
+					if (team1.number in match.blueAllianceTeamNumbers and team2.number in match.blueAllianceTeamNumbers) or (team1.number in match.redAllianceTeamNumbers and team2.number in match.redAllianceTeamNumbers):
+						occurrence += 1
+			matrixOfMatches.append(occurrence)
+
+		matrixOfMatches.shape = (len(self.comp.teams), len(self.comp.teams))
+		inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatches)
+		teamDeltas = np.array([])
+		oppositionPredictedScore = 0
+		oppositionActualScore = 0
+		for team1 in self.comp.teams:
+			oppositionPredictedScore = 0
+			oppositionActualScore = 0
+			for match in self.team.matches:
+				if team1.number in match.blueAllianceTeamNumbers:
+					oppositionPredictedScore += self.predictedScoreForMatch(match)['red']['score']
+					oppositionActualScore += match.redScore
+				elif team1.number in match.redAllianceTeamNumbers:
+					oppositionPredictedScore += self.predictedScoreForMatch(match)['blue']['score']
+					oppositionActualScore += match.blueScore
+			teamDelta = oppositionPredictedScore - oppositionActualScore
+			teamDeltas.append(teamDelta)
+			teamDeltas.shape = (len(self.comp.teams), 1)
+		teamDeltas.shape = (len(self.comp.teams), 1)
+		citrusDPRMatrix = np.multiply(inverseMatrixOfMatchOccurrences, teamDeltas)
+
+		for team1 in teamsArray:
+			citrusDPR = citrusDPRMatrix[teamsArray.index(team1)]
+			scoreContribution = predictedScoreCustomAlliance(1678, team.number, team1.number, 3) - predictedScoreCustomAlliance(team1.number, 1678, 8, 1)
+			secondPickAbility[team1.number] = gamma * scoreContribution * (1 - gamma) * citrusDPR
+
+		return secondPickAbility
+
+
+
 
 
 	def RPsGainedFromMatch(self, match):
@@ -651,6 +699,9 @@ class Calculator(object):
 
 					team.calculatedData.numRPs = self.numRPsForTeam(team)
 					team.calculatedData.numScaleAndChallengePoints = self.numScaleAndChallengePointsForTeam(team)
+
+					team.calculatedData.firstPickAbility = self.firstPickAbility(team)
+					team.calculatedData.secondPickAbility = self.secondPickAbility(team)
 
 					FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 			
