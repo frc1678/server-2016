@@ -23,7 +23,7 @@ class CalculatedTeamData(object):
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.firstPickAbility = -1.0
-		self.secondPickAbility = {}
+		self.secondPickAbility = { 1678 : -1.0}
 		self.driverAbility = -1.0
 		self.highShotAccuracyAuto = -1.0
 		self.lowShotAccuracyAuto = -1.0

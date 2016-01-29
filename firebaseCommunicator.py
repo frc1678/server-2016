@@ -39,6 +39,7 @@ class FirebaseCommunicator(object):
 	def updateFirebaseWithTIMD(self, timd):
 		timdDict = utils.makeDictFromTIMD(timd)
 		FBLocation = "/TeamInMatchDatas"
+		print timdDict
 		result = firebase.put(FBLocation, str(timd.teamNumber) + "Q" + str(timd.matchNumber), timdDict)
 
 	def addCalculatedTeamDataToFirebase(self, teamNumber, calculatedTeamData):
