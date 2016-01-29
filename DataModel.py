@@ -23,10 +23,7 @@ class CalculatedTeamData(object):
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.firstPickAbility = -1.0
-		self.secondPickAbility = {
-			1678 : -1.0
-
-		}
+		self.secondPickAbility = {}
 		self.driverAbility = -1.0
 		self.highShotAccuracyAuto = -1.0
 		self.lowShotAccuracyAuto = -1.0
@@ -51,14 +48,28 @@ class CalculatedTeamData(object):
 		self.incapacitatedPercentage = -1.0
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
-		self.avgTimesCrossedDefensesAuto = {
+		self.avgSuccessfulTimesCrossedDefensesAuto = {
 		 	'a' : {'pc' : -1, 'cdf' : -1},
 			'b' : {'mt' : -1, 'rp' : -1},
 			'c' : {'db' : -1, 'sp' : -1},
 			'd' : {'rw' : -1, 'rt' : -1},
 			'e' : {'lb' : -1}
 		}
-		self.avgTimesCrossedDefensesTele = {
+		self.avgSuccessfulTimesCrossedDefensesTele = {
+		 	'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
+		}
+		self.avgFailedTimesCrossedDefensesAuto = {
+		 	'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
+		}
+		self.avgFailedTimesCrossedDefensesTele = {
 		 	'a' : {'pc' : -1, 'cdf' : -1},
 			'b' : {'mt' : -1, 'rp' : -1},
 			'c' : {'db' : -1, 'sp' : -1},
@@ -79,29 +90,37 @@ class CalculatedTeamData(object):
 		self.sdShotsBlocked = -1
 		self.sdMidlineBallsIntakedAuto = -1
 		self.sdBallsKnockedOffMidlineAuto = -1
-		self.sdDefenseCrossesAuto = {
-			'pc' : -1,
-			'cdf' : -1,
-			'mt' : -1,
-			'rp' : -1,
-			'db' : -1,
-			'sp' : -1,
-			'rw' : -1,
-			'rt' : -1,
-			'lb' : -1
+		self.sdSuccessfulDefenseCrossesAuto = {
+			'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
 		}
-		self.sdDefenseCrossesTele = {
-			'pc' : -1,
-			'cdf' : -1,
-			'mt' : -1,
-			'rp' : -1,
-			'db' : -1,
-			'sp' : -1,
-			'rw' : -1,
-			'rt' : -1,
-			'lb' : -1
+		self.sdSuccessfulDefenseCrossesTele = {
+			'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
+		}
+		self.sdFailedDefenseCrossesAuto = {
+			'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
+		}
+		self.sdFailedDefenseCrossesTele = {
+			'a' : {'pc' : -1, 'cdf' : -1},
+			'b' : {'mt' : -1, 'rp' : -1},
+			'c' : {'db' : -1, 'sp' : -1},
+			'd' : {'rw' : -1, 'rt' : -1},
+			'e' : {'lb' : -1}
+		}
 
-		}
+		self.predictedSeed = -1
+		self.actualSeed = -1
 		self.__dict__.update(args)
 
 		
@@ -138,6 +157,20 @@ class CalculatedMatchData(object):
 		self.predictedBlueScore = -1.0	
 		self.numDefensesCrossedByBlue = -1
 		self.numDefensesCrossedByRed = -1 
+		self.redScoresForDefenses = {}
+		self.redWinningChanceForDefenses = {}
+		self.redBreachChanceForDefenses = {}
+		self.redRPsForDefenses = {}
+		self.blueScoresForDefenses = {}
+		self.blueWinningChanceForDefenses = {}
+		self.blueBreachChanceForDefenses = {}
+		self.blueRPsForDefenses = {}
+		self.redWinChance = -1.0
+		self.redBreachChance = -1.0
+		self.redCaptureChance = -1.0
+		self.blueWinChance = -1.0
+		self.blueBreachChance = -1.0
+		self.blueCaptureChance = -1.0
 		self.predictedBlueRPs = -1.0
 		self.actualBlueRPs = -1
 		self.predictedRedRPs = -1.0
