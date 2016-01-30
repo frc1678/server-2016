@@ -23,7 +23,9 @@ class CalculatedTeamData(object):
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.firstPickAbility = -1.0
-		self.secondPickAbility = { 1678 : -1.0}
+		self.secondPickAbility = {
+			1678 : -1.0
+		}
 		self.driverAbility = -1.0
 		self.highShotAccuracyAuto = -1.0
 		self.lowShotAccuracyAuto = -1.0
@@ -214,11 +216,11 @@ class TeamInMatchData(object):
 		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
 		self.timesCrossedDefensesAuto = {
-			'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+			'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
+			'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
+			'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
+			'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
+			'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
 		}
 
 		self.numHighShotsMadeAuto = -1
@@ -237,11 +239,11 @@ class TeamInMatchData(object):
 		self.didScaleTele = False
 		self.didChallengeTele = False
 		self.timesCrossedDefensesTele = {
-			'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+			'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
+			'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
+			'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
+			'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
+			'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
 		}
 		
 
