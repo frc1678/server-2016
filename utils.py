@@ -33,6 +33,7 @@ def readJSONFileToObj(fileName):
 
 def makeMatchFromDict(d):
 	match = DataModel.Match(**d) #I have no idea why this works
+	match.calculatedData = DataModel.CalculatedMatchData(**d['calculatedData'])
 	return match
 
 

@@ -16,6 +16,10 @@ class Competition(object):
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
 	def updateTIMDsFromFirebase(self):
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
+		for team in self.teams:
+			for TIMD in self.TIMDs:
+				if TIMD.teamNumber == team.number:
+					team.teamInMatchDatas.append(TIMD)
 		
 
 class CalculatedTeamData(object):
@@ -153,7 +157,7 @@ class Team(object):
 
 class CalculatedMatchData(object):
 	"""docstring for CalculatedMatchData"""
-	def __init__(self):
+	def __init__(self, **args):
 		super(CalculatedMatchData, self).__init__()
 		self.predictedRedScore = -1.0
 		self.predictedBlueScore = -1.0	
@@ -179,6 +183,9 @@ class CalculatedMatchData(object):
 		self.actualRedRPs = -1	
 		self.redAllianceDidBreach = False
 		self.blueAllianceDidBreach = False
+		
+		self.__dict__.update(args)
+
 
 class Match(object):
 	"""An FRC Match Object"""
@@ -194,6 +201,8 @@ class Match(object):
 		self.blueDefensePositions = ['lb', '', '', '', '']
 		self.redAllianceDidCapture = False
 		self.blueAllianceDidCapture = False
+		self.blueAllianceDidBreach = False
+		self.redAllianceDidBreach = False
 		self.__dict__.update(args)
 		
 class TeamInMatchData(object):
