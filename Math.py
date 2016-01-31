@@ -5,6 +5,9 @@ import firebaseCommunicator
 import math
 import numpy as np
 
+import sys, traceback
+
+
 class Calculator(object):
 	"""docstring for Calculator"""
 	def __init__(self, competition):
@@ -182,21 +185,41 @@ class Calculator(object):
  				arrayOfDictionaries.append(dictionary) 
  		return arrayOfDictionaries 
 
+
  	def averageDictionaries(self, array):
- 		if array == -1:
- 			return -1
- 		outputArray = []
- 		numPlayed = 0
+ 		outputDict = {}
  		for dictionary in array:
- 			if dictionary[0] > -1:
- 				numPlayed += 1
-	 		for key in dictionary:
-	 			totalForKey = 0
-	 			for dictionary in array:
-	 				if dictionary[key] > -1:
-	 					totalForKey += dictionary[key]
-	 				outputArray.append(totalForKey/numPlayed)
- 		return outputArray
+ 			for key, value in dictionary.items():
+ 				subOutputDict = {}
+ 				for key, value in value.items():
+ 					avg = 0
+ 					for v in eval(str(value)):
+ 						avg += float(v)
+ 					avg /= len(value)
+ 					subOutputDict[key] = avg
+ 				outputDict[key] = subOutputDict
+ 		return outputDict
+
+
+ 	# def averageDictionaries(self, array):
+ 	# 	if array == -1:
+ 	# 		return -1
+ 	# 	outputArray = []
+ 	# 	numPlayed = 0
+ 	# 	print array
+ 	# 	for dictionary in array:
+ 	# 		for d in dictionary.values():
+	 # 			for outcome in d.values():
+	 # 				if outcome[0] == -1:
+	 # 					numPlayed += 1
+	 # 		for key in dictionary:
+	 # 			totalForKey = 0
+	 # 			for dictionary in array:
+	 				
+	 # 					print dictionary
+	 # 					totalForKey += dictionary[key]
+	 # 				outputArray.append(totalForKey/numPlayed)
+ 	# 	return outputArray
 
 	def defenseAverageCrosses(self, array):
 		if array == -1:
@@ -264,24 +287,23 @@ class Calculator(object):
 		return totalCrossesForCategory
 
 	def avgDefenseCategoryCrossingsForTeam(self, team, key, defenseCategory):	#Use in standard deviation calculation for each defenseCategory
-		timds = getPlayedTIMDsForTeam(team)
-		category =  utils.makeDictFromTIMD(timd)
+		category = utils.makeDictFromTeam(team)["calculatedData"][key][defenseCategory].values()
 		total = 0
-		for timd in timds:
-			category =  utils.makeDictFromTIMD(timd)[key][defenseCategory]
-			total += sum(category.values())
-
-		return total/len(timds)
+		for value in category:
+			total += value
+		return total / len(category)
+		
 
 	def stanDevSumForDefenseCategory(self, alliance, defenseCategory):
 		varianceValues = []			#add variance for each data point to array
 		stanDevSum = 0
 
 		for team in alliance:
-			timds = getPlayedTIMDsForTeam(team)
+			timds = self.getPlayedTIMDsForTeam(team)
 			difOfAvgSquaresTele = 0
 			difOfAvgSquaresAuto = 0
 			for timd in timds:	#find the variances for a team's crosses in the specified category in auto, and then the same in tele
+				print("skdfdsfljsdlk: " + str(self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesTele',  defenseCategory)))
 				difOfAvgSquaresTele += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesTele',  defenseCategory) - sum(timd.timesCrossedDefensesTele[defenseCategory].values()))**2 
 				difOfAvgSquaresAuto += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesAuto',  defenseCategory) - sum(timd.timesCrossedDefensesAuto[defenseCategory].values()))**2 
 			difOfAvgSquaresTele /= (len(timds))			#divide difference from average squared by n
@@ -338,6 +360,7 @@ class Calculator(object):
 		totalAvgNumShots = 0
 		for team in alliance:
 			totalAvgNumShots += team.calculatedData.avgHighShotsAuto + team.calculatedData.avgHighShotsTele + team.calculatedData.avgLowShotsTele + team.calculatedData.avgLowShotsAuto
+		return totalAvgNumShots	
 
 	def highShotAccuracyForAlliance(self, alliance):
 		overallHighShotAccuracy = 0
@@ -358,7 +381,7 @@ class Calculator(object):
 		return reachPoints
 
 	def calculatePercentage(self, x, u, o):
-		return (1 / (math.sqrt(2 * math.pi ) * o)) * (math.e)**(-1.0 * ((x - u)**2) / (2 * o**2)) #calculate percentage of a breach or capture 
+		return (1 / (math.sqrt(2 * math.pi ) * o) * (math.e)**(-1.0 * ((x - u)**2) / (2 * o**2))) #calculate percentage of a breach or capture 
 
 	def sumOfStandardDeviationsOfShotsForAlliance(self, alliance):
 		sumOfStandardDeviationsOfShotsForAlliance = 0
@@ -367,7 +390,7 @@ class Calculator(object):
 			autoHighShotVariance = 0
 			autoLowShotVariance = 0
 			teleHighShotVariance = 0
-			teleleLowShotVariance = 0
+			teleLowShotVariance = 0
 			timds = self.getPlayedTIMDsForTeam(team)
 			if len(timds) == 0 and team.number == 1678:
 				return("1678 has insufficient data")
@@ -375,7 +398,7 @@ class Calculator(object):
 				if timd.numHighShotsMadeAuto > -1:
 					autoHighShotVariance += (team.calculatedData.avgHighShotsAuto - timd.numHighShotsMadeAuto)**2	#For all shot data points, add all differences
 					autoLowShotVariance += (team.calculatedData.avgLowShotsAuto - timd.numLowShotsMadeAuto)**2		#of the average for that data point minus
-					teleHighShotLowance += (team.calculatedData.avgHighShotsTele - timd.numHighShotsMadeTele)**2	#each individual data point, divide by n
+					teleHighShotVariance += (team.calculatedData.avgHighShotsTele - timd.numHighShotsMadeTele)**2	#each individual data point, divide by n
 					teleLowShotVariance += (team.calculatedData.avgLowShotsTele - timd.numLowShotsMadeTele)**2		
 			autoHighShotVariance /= len(timds)
 			autoLowShotVariance /= len(timds)
@@ -569,17 +592,18 @@ class Calculator(object):
 		productOfScaleAndChallengePercentages = 1
 
 		standardDevCategories = []
+		print ("v" + str(self.calculatePercentage(2.0,1.0,3.0)))
 
-		for team in alliance:
-			sdSum = self.sumOfStandardDeviationsOfShotsForAlliance(alliance)
-			if sdSum == "1678 has insufficient data":
-				return -1
-			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
-		predictedScoreCustomAlliance += 25 * (self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(alliance), sdSum) * productOfScaleAndChallengePercentages)
 		
+		sdSum = self.sumOfStandardDeviationsOfShotsForAlliance(alliance)
+		if sdSum == "1678 has insufficient data":
+			return -1
+		for team in alliance:
+			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
+		predictedScoreCustomAlliance += 25 * self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(alliance), sdSum) * productOfScaleAndChallengePercentages
 		breachPercentage = 1
 
-		for defenseCategory in alliance[0].calculatedData.avgDefenseCrossingEffectiveness:
+		for defenseCategory in alliance[0].calculatedData.avgSuccessfulTimesCrossedDefensesAuto:
 			standardDevCategories.append(self.stanDevSumForDefenseCategory(alliance, defenseCategory))
 		standardDevCategories = sorted(standardDevCategories)
 
@@ -600,23 +624,22 @@ class Calculator(object):
 	
 	def secondPickAbility(self, team):
 		gamma = 0.5
-		matrixOfMatches = np.array([])
+		matrixOfMatches = np.zeros((len(self.comp.teams), len(self.comp.teams)))
+		print matrixOfMatches
 		teamsArray = []
 		secondPickAbility = {}
 		citrusC = self.getTeamForNumber(1678)
 		for team1 in self.comp.teams:	#Create an array where the values correspond to how many matches two teams played together in the same alliance
-			occurrence = 0
 			teamsArray.append(team1)
 			for team2 in self.comp.teams:
+				occurrence = 0
 				for match in self.comp.matches:
 					if (team1.number in match.blueAllianceTeamNumbers and team2.number in match.blueAllianceTeamNumbers) or (team1.number in match.redAllianceTeamNumbers and team2.number in match.redAllianceTeamNumbers):
 						occurrence += 1
-				matrixOfMatches = np.append(matrixOfMatches, occurrence)
+				matrixOfMatches[self.comp.teams.index(team2), self.comp.teams.index(team1)] = occurrence
 
 		# Create an array where the values correspond to how many matches two teams played together in the same alliance, and then shape it into a matrix
 	
-		print("Current Shape: " + str(matrixOfMatches.shape) + ", newShape: " + str((len(self.comp.teams), len(self.comp.teams))))
-		matrixOfMatches.shape = (len(self.comp.teams), len(self.comp.teams))	
 		inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatches)	#Find the inverse of the matrix
 		teamDeltas = np.array([])
 		oppositionPredictedScore = 0
