@@ -85,6 +85,7 @@ class CalculatedTeamData(object):
 		self.siegePower = -1.0
 		self.siegeConsistency = -1.0
 		self.siegeAbility = -1.0
+		self.predictedNumRPs = -1.0
 		self.numRPs = -1
 		self.numAutoPoints = -1
 		self.numScaleAndChallengePoints = -1

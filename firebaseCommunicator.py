@@ -75,6 +75,23 @@ class FirebaseCommunicator(object):
 			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
 			self.updateFirebaseWithMatch(m)
 
+	def addScorelessMatchesToFirebase(self):
+		print "\nSetting Match Scores to -1..."
+		for match in self.JSONmatches:
+			#if match["match_number"] == 14: #DEBUG
+			#	break
+			if match["comp_level"] != "qm":
+				continue # goes to next loop iteration
+			m = DataModel.Match()
+			alliancesDict = match["alliances"]
+			m.number = match["match_number"]
+			print str(m.number) + ",",
+			m.blueScore = -1
+			m.redScore = -1
+			m.blueAllianceTeamNumbers = alliancesDict["blue"]["teams"]
+			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
+			self.updateFirebaseWithMatch(m)
+
 	def addTIMDsToFirebase(self, matches):
 		print "Doing TIMDs...\n"
 		for match in matches:

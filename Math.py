@@ -375,7 +375,7 @@ class Calculator(object):
 				if timd.numHighShotsMadeAuto > -1:
 					autoHighShotVariance += (team.calculatedData.avgHighShotsAuto - timd.numHighShotsMadeAuto)**2	#For all shot data points, add all differences
 					autoLowShotVariance += (team.calculatedData.avgLowShotsAuto - timd.numLowShotsMadeAuto)**2		#of the average for that data point minus
-					teleHighShotLowance += (team.calculatedData.avgHighShotsTele - timd.numHighShotsMadeTele)**2	#each individual data point, divide by n-1
+					teleHighShotLowance += (team.calculatedData.avgHighShotsTele - timd.numHighShotsMadeTele)**2	#each individual data point, divide by n
 					teleLowShotVariance += (team.calculatedData.avgLowShotsTele - timd.numLowShotsMadeTele)**2		
 			autoHighShotVariance /= len(timds)
 			autoLowShotVariance /= len(timds)
@@ -455,7 +455,7 @@ class Calculator(object):
 		predictedScoreForMatch['red']['RPs'] += (self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(redTeams), self.sumOfStandardDeviationsOfShotsForAlliance(redTeams) * productOfScaleAndChallengePercentages))
 		
 		breachPercentage = 1
-
+								#Using a dictionary already sorted by category to loop through the defense categories
 		for defenseCategory in redTeams[0].calculatedData.avgDefenseCrossingEffectiveness:	#Find chance of a breach, award that many RPs
 			standardDevCategories.append(self.stanDevSumForDefenseCategory(redTeams, defenseCategory))	#Add standard deviation of crosses per category to array
 		standardDevCategories = sorted(standardDevCategories)
@@ -529,11 +529,6 @@ class Calculator(object):
 				elif self.calculatedData.predictedScoreForMatch(match)['red']['score'] == self.calculatedData.predictedScoreForMatch(match)['blue']['score']:
 					totalRPForTeam += 1
 
-				if totalChallengeAndScalePercentage > randomNum:
-					totalRPsForTeam += 1
-				if totalBreachPercentage > randomNum:
-					totalRPForTeam += 1
-
 			elif team.number in match.blueAllianceTeamNumbers and match.blueScore == -1:
 				matchesToBePlayedCounter += 1
 				for teamNumber in match.blueAllianceTeamNumbers:
@@ -555,7 +550,7 @@ class Calculator(object):
 		return totalRPForTeam + numRPsForTeam(team)
 
 
-	def predictedSeeding(self, competition):
+	def predictedSeeding(self):
 		teamsArray = []
 		for team in self.comp.teams:
 			teamsArray.append(team)
