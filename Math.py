@@ -616,10 +616,10 @@ class Calculator(object):
 				for match in self.comp.matches:
 					if (team1.number in match.blueAllianceTeamNumbers and team2.number in match.blueAllianceTeamNumbers) or (team1.number in match.redAllianceTeamNumbers and team2.number in match.redAllianceTeamNumbers):
 						occurrence += 1
-			matrixOfMatches = np.append(matrixOfMatches, occurrence)
+				matrixOfMatches = np.append(matrixOfMatches, occurrence)
 
 		# Create an array where the values correspond to how many matches two teams played together in the same alliance, and then shape it into a matrix
-		# The "area" of the new matrix must be the same as that of the old one. COLIN + ABHI, HELP!
+	
 		print("Current Shape: " + str(matrixOfMatches.shape) + ", newShape: " + str((len(self.comp.teams), len(self.comp.teams))))
 		matrixOfMatches.shape = (len(self.comp.teams), len(self.comp.teams))	
 		inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatches)	#Find the inverse of the matrix
