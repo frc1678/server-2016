@@ -181,7 +181,7 @@ class Calculator(object):
  		for timd in timds:
  			dictionary = utils.makeDictFromTIMD(timd)[key]
  			dictionary = self.flattenDictionary(dictionary)
- 			if dictionary["rt"]['successes'][0] > -1:
+ 			if dictionary['rt'] > -1:
  				arrayOfDictionaries.append(dictionary) 
  		return arrayOfDictionaries 
 
@@ -277,20 +277,17 @@ class Calculator(object):
 			else:
 				print "ERROR: team not in match."
 
-	def totalAvgDefenseCategoryCrossingsForAlliance(self, alliance, defenseCategory):
-		totalCrossesForCategory = 0
-		numberOfDataPointsInCategory = 0
+	def totalAvgDefenseCategoryCrossingsForAlliance(self, alliance, key, defenseCategory):
+		totalAvgDefenseCategoryCrossings = 0
 		for team in alliance:
-			for defense in defenseCategory:
-				numberOfDataPointsInCategory += 1
-				totalCrossesForCategory += team.calculatedData.avgTimesCrossedDefensesAuto[defenseCategory][defense] + team.calculatedData.avgTimesCrossedDefensesTele[defenseCategory][defense]
-		return totalCrossesForCategory
+			totalAvgDefenseCategoryCrossings += self.avgDefenseCategoryCrossingsForTeam(team, key, defenseCategory)
+		return totalAvgDefenseCategoryCrossings / 3
 
 	def avgDefenseCategoryCrossingsForTeam(self, team, key, defenseCategory):	#Use in standard deviation calculation for each defenseCategory
 		category = utils.makeDictFromTeam(team)["calculatedData"][key][defenseCategory].values()
 		total = 0
 		for value in category:
-			total += value
+			total += len(value)
 		return total / len(category)
 		
 
@@ -303,9 +300,16 @@ class Calculator(object):
 			difOfAvgSquaresTele = 0
 			difOfAvgSquaresAuto = 0
 			for timd in timds:	#find the variances for a team's crosses in the specified category in auto, and then the same in tele
-				print("skdfdsfljsdlk: " + str(self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesTele',  defenseCategory)))
-				difOfAvgSquaresTele += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesTele',  defenseCategory) - sum(timd.timesCrossedDefensesTele[defenseCategory].values()))**2 
-				difOfAvgSquaresAuto += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesAuto',  defenseCategory) - sum(timd.timesCrossedDefensesAuto[defenseCategory].values()))**2 
+				
+				numCrossesForDefenseCategoryInMatchTele = 0
+				numCrossesForDefenseCategoryInMatchAuto = 0
+				for value in timd.timesSuccessfulCrossedDefensesTele[defenseCategory].values():
+					numCrossesForDefenseCategoryInMatchTele += len(value)
+				for value in timd.timesSuccessfulCrossedDefensesAuto[defenseCategory].values():
+					numCrossesForDefenseCategoryInMatchAuto += len(value)
+
+				difOfAvgSquaresTele += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesTele',  defenseCategory) - numCrossesForDefenseCategoryInMatchTele)**2 
+				difOfAvgSquaresAuto += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesAuto',  defenseCategory) - numCrossesForDefenseCategoryInMatchAuto)**2 
 			difOfAvgSquaresTele /= (len(timds))			#divide difference from average squared by n
 			difOfAvgSquaresAuto /= (len(timds))
 			varianceValues.append(difOfAvgSquaresTele)
@@ -512,22 +516,18 @@ class Calculator(object):
 		blueAllianceCrosses = 0
 		for teamNum in match.blueAllianceTeamNumbers:
 			timd = self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
-			for dictionary in timd.timesCrossedDefensesTele.values():
-				for defense in dictionary.keys():
-					blueAllianceCrosses += len(dictionary[defense]["successes"])
-			for dictionary in timd.timesCrossedDefensesAuto.values():
-				for defense in dictionary.keys():
-					blueAllianceCrosses += len(dictionary[defense]["successes"])
+			for defense in timd.timesSuccessfulCrossedDefensesTele.values():
+				blueAllianceCrosses += len(defense)
+			for defense in timd.timesSuccessfulCrossedDefensesAuto.values():
+				blueAllianceCrosses += len(defense)
 		numDefensesCrossedInMatch['blue'] = blueAllianceCrosses
 		redAllianceCrosses = 0
 		for teamNum in match.redAllianceTeamNumbers:
 			timd = self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
-			for dictionary in timd.timesCrossedDefensesTele.values():
-				for defense in dictionary.keys():
-					redAllianceCrosses += len(dictionary[defense]["successes"])
-			for dictionary in timd.timesCrossedDefensesAuto.values():
-				for defense in dictionary.keys():
-					redAllianceCrosses += len(dictionary[defense]["successes"])
+			for defense in timd.timesSuccessfulCrossedDefensesTele.values():
+				redAllianceCrosses += len(defense)
+			for defense in timd.timesSuccessfulCrossedDefensesAuto.values():
+				redAllianceCrosses += len(defense)
 		numDefensesCrossedInMatch['red'] = redAllianceCrosses
 
 		return numDefensesCrossedInMatch
@@ -608,7 +608,7 @@ class Calculator(object):
 		standardDevCategories = sorted(standardDevCategories)
 
 		for category in range(1, len(standardDevCategories) + 1):
-			breachPercentage *= calculatePercentage(2.0, totalAvgDefenseCategoryCrossingsForAlliance(alliance, category), stanDevSumForDefenseCategory(alliance, category))
+			breachPercentage *= self.calculatePercentage(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(alliance, category), self.stanDevSumForDefenseCategory(alliance, category))
 
 
 		predictedScoreCustomAlliance += 20 * breachPercentage
@@ -753,7 +753,7 @@ class Calculator(object):
 					team.calculatedData.siegeConsistency = self.siegeConsistency(team)
 					team.calculatedData.siegeAbility = self.siegeAbility(team)
 					team.calculatedData.siegePower = self.siegePower(team)
-					avgDefensesCrossesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesCrossedDefensesTele'))
+					avgDefensesCrossesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesSuccessfulCrossedDefensesTele'))
 					
 
 					team.calculatedData.numRPs = self.numRPsForTeam(team)

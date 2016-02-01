@@ -225,12 +225,28 @@ class TeamInMatchData(object):
 		#Auto
 		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
 		self.numBallsKnockedOffMidlineAuto = -1
-		self.timesCrossedDefensesAuto = {
-			'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
-			'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
-			'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
-			'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
-			'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
+		# self.timesCrossedDefensesAuto = {
+		# 	'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
+		# }
+
+		self.timesSuccessfulCrossedDefensesAuto = {
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
+		}
+
+		self.timesFailedCrossedDefensesAuto = {
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
 		}
 
 		self.numHighShotsMadeAuto = -1
@@ -248,12 +264,28 @@ class TeamInMatchData(object):
 		self.numShotsBlockedTele = -1
 		self.didScaleTele = False
 		self.didChallengeTele = False
-		self.timesCrossedDefensesTele = {
-			'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
-			'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
-			'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
-			'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
-			'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
+		# self.timesCrossedDefensesTele = {
+		# 	'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
+		# 	'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
+		# }
+
+		self.timesSuccessfulCrossedDefensesTele = {
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
+		}
+
+		self.timesFailedCrossedDefensesTele = {
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
 		}
 		
 
