@@ -360,6 +360,9 @@ class Calculator(object):
 	def totalAvgNumShotPointsForTeam(self, team):
 		return 5 * team.calculatedData.avgHighShotsTele + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
 	
+	def totalSDShotPointsForTeam(self, team):
+		pass
+
 	def totalAvgNumShotsForAlliance(self, alliance):
 		totalAvgNumShots = 0
 		for team in alliance:
@@ -416,8 +419,9 @@ class Calculator(object):
 			sumOfStandardDeviationsOfShotsForAlliance += i
 		return math.sqrt(sumOfStandardDeviationsOfShotsForAlliance)
 
-
-
+	def sdPredictedScoreForMatch(self, match):
+		sdPredictedScoreForMatch = {'blue' : 0, 'red' : 0}
+		totalSDNumShots = 0
 
 
 	#Matches Metrics
@@ -572,6 +576,11 @@ class Calculator(object):
 
 		return totalRPForTeam + numRPsForTeam(team)
 
+	def actualSeeding(self):
+		rankedTeams = []
+		for team in self.comp.teams:
+			for team1 in range(0, self.comp.teams.index(team)):
+				pass
 
 	def predictedSeeding(self):
 		teamsArray = []
