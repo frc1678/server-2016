@@ -636,7 +636,7 @@ class Calculator(object):
 				for match in self.comp.matches:
 					if (team1.number in match.blueAllianceTeamNumbers and team2.number in match.blueAllianceTeamNumbers) or (team1.number in match.redAllianceTeamNumbers and team2.number in match.redAllianceTeamNumbers):
 						occurrence += 1
-				matrixOfMatches[self.comp.teams.index(team2), self.comp.teams.index(team1)] = occurrence
+				matrixOfMatches[self.comp.teams.index(team1), self.comp.teams.index(team2)] = occurrence
 
 		# Create an array where the values correspond to how many matches two teams played together in the same alliance, and then shape it into a matrix
 	
