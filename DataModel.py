@@ -223,7 +223,7 @@ class TeamInMatchData(object):
 		self.rankBallControl = -1
 
 		#Auto
-		self.ballsIntakedAuto = [-1, -1, -1, -1, -1, -1]
+		self.ballsIntakedAuto = []
 		self.numBallsKnockedOffMidlineAuto = -1
 		# self.timesCrossedDefensesAuto = {
 		# 	'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
