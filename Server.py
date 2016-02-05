@@ -9,6 +9,7 @@ import utils
 import firebaseCommunicator
 import Math
 import unicodedata
+import time
 
 
 
@@ -19,7 +20,11 @@ comp.updateTIMDsFromFirebase()
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 
 calculator = Math.Calculator(comp)
-calculator.doCalculations(FBC)
+
+while(1):
+	calculator.doCalculations(FBC)
+	time.sleep(10)
+	print("Calcs...")
 
 
 ''' # DEBUG

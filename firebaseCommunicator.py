@@ -39,6 +39,7 @@ class FirebaseCommunicator(object):
 	def updateFirebaseWithTIMD(self, timd):
 		timdDict = utils.makeDictFromTIMD(timd)
 		FBLocation = "/TeamInMatchDatas"
+		print timdDict
 		result = firebase.put(FBLocation, str(timd.teamNumber) + "Q" + str(timd.matchNumber), timdDict)
 
 	def addCalculatedTeamDataToFirebase(self, teamNumber, calculatedTeamData):
@@ -74,6 +75,23 @@ class FirebaseCommunicator(object):
 			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
 			self.updateFirebaseWithMatch(m)
 
+	def addScorelessMatchesToFirebase(self):
+		print "\nSetting Match Scores to -1..."
+		for match in self.JSONmatches:
+			#if match["match_number"] == 14: #DEBUG
+			#	break
+			if match["comp_level"] != "qm":
+				continue # goes to next loop iteration
+			m = DataModel.Match()
+			alliancesDict = match["alliances"]
+			m.number = match["match_number"]
+			print str(m.number) + ",",
+			m.blueScore = -1
+			m.redScore = -1
+			m.blueAllianceTeamNumbers = alliancesDict["blue"]["teams"]
+			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
+			self.updateFirebaseWithMatch(m)
+
 	def addTIMDsToFirebase(self, matches):
 		print "Doing TIMDs...\n"
 		for match in matches:
@@ -94,10 +112,11 @@ class FirebaseCommunicator(object):
 		self.competition.averageScore = -1
 
 	def wipeDatabase(self):
+		print "Wiping Firebase..."
 		FBLocation = "/"
-		firebase.put(FBLocation, Teams, [])
-		firebase.put(FBLocation, Matches, [])
-		firebase.put(FBLocation, TeamInMatchDatas, [])
+		firebase.put(FBLocation, 'Teams', [])
+		firebase.put(FBLocation, 'Matches', [])
+		firebase.put(FBLocation, 'TeamInMatchDatas', [])
 
 def getPythonObjectForFirebaseDataAtLocation(location):
 	# The location will be a key path, like '/' for the root (entire) object.

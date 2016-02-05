@@ -31,10 +31,11 @@ def makeFakeDatabase(eventCode='casj', year=2015):
 	FBC = firebaseCommunicator.FirebaseCommunicator(competition)
 	FBC.JSONteams = utils.readJSONFromString(makeEventTeamsRequest(eventCode, year))
 	FBC.JSONmatches = utils.readJSONFromString(makeRequest(makeYearEventKeyRequestURL(year, eventCode, 'matches')))
+	FBC.wipeDatabase()
 	FBC.addTeamsToFirebase()
-	FBC.addMatchesToFirebase()
+	FBC.addScorelessMatchesToFirebase()
 	competition.updateTeamsAndMatchesFromFirebase()
 	FBC.addTIMDsToFirebase(competition.matches) #You need to create the matches and teams before you call this
-	
+
 
 makeFakeDatabase()
