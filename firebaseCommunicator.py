@@ -3,11 +3,12 @@ import utils
 import json
 from firebase import firebase as fb
 import unicodedata
+import random
 
 superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc"
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
-firebase = fb.FirebaseApplication('https://1678-dev-2016.firebaseio.com/', auth)
+firebase = fb.FirebaseApplication('https://1678-dev2-2016.firebaseio.com/', auth)
 
 class FirebaseCommunicator(object):
 	"""docstring for FirebaseCommunicator"""

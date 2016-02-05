@@ -1,5 +1,6 @@
 import firebaseCommunicator
 import utils
+import random
 # Classes That Reflect Firebase Data Structure
 
 class Competition(object):
@@ -55,32 +56,32 @@ class CalculatedTeamData(object):
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
 		self.avgSuccessfulTimesCrossedDefensesAuto = {
-		 	'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+		  	'a' : {'pc' : -1.0, 'cdf' : -1.0},
+			'b' : {'mt' : -1.0, 'rp' : -1.0},
+			'c' : {'db' : -1.0, 'sp' : -1.0},
+			'd' : {'rw' : -1.0, 'rt' : -1.0},
+			'e' : {'lb' : -1.0}
 		}
 		self.avgSuccessfulTimesCrossedDefensesTele = {
-		 	'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+		  	'a' : {'pc' : -1.0, 'cdf' : -1.0},
+			'b' : {'mt' : -1.0, 'rp' : -1.0},
+			'c' : {'db' : -1.0, 'sp' : -1.0},
+			'd' : {'rw' : -1.0, 'rt' : -1.0},
+			'e' : {'lb' : -1.0}
 		}
 		self.avgFailedTimesCrossedDefensesAuto = {
-		 	'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+		 	'a' : {'pc' : -1.0, 'cdf' : -1.0},
+			'b' : {'mt' : -1.0, 'rp' : -1.0},
+			'c' : {'db' : -1.0, 'sp' : -1.0},
+			'd' : {'rw' : -1.0, 'rt' : -1.0},
+			'e' : {'lb' : -1.0}
 		}
 		self.avgFailedTimesCrossedDefensesTele = {
-		 	'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+		 	'a' : {'pc' : -1.0, 'cdf' : -1.0},
+			'b' : {'mt' : -1.0, 'rp' : -1.0},
+			'c' : {'db' : -1.0, 'sp' : -1.0},
+			'd' : {'rw' : -1.0, 'rt' : -1.0},
+			'e' : {'lb' : -1.0}
 		}
 		self.siegePower = -1.0
 		self.siegeConsistency = -1.0
@@ -253,7 +254,7 @@ class TeamInMatchData(object):
 		self.numLowShotsMadeAuto = -1
 		self.numHighShotsMissedAuto = -1
 		self.numLowShotsMissedAuto = -1
-		self.didReachAuto = False
+		self.didReachAuto = True
 
 		#Tele
 		self.numHighShotsMadeTele = -1
@@ -262,7 +263,7 @@ class TeamInMatchData(object):
 		self.numLowShotsMissedTele = -1
 		self.numGroundIntakesTele = -1
 		self.numShotsBlockedTele = -1
-		self.didScaleTele = False
+		self.didScaleTele = True
 		self.didChallengeTele = False
 		# self.timesCrossedDefensesTele = {
 		# 	'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
