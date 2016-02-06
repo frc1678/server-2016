@@ -5,10 +5,13 @@ from firebase import firebase as fb
 import unicodedata
 import random
 
-superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc"
+#superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc" #dev
+#superSecret = "hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u" #dev2
+superSecret = "AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq" #dev3
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
-firebase = fb.FirebaseApplication('https://1678-dev-2016.firebaseio.com/', auth)
+
+firebase = fb.FirebaseApplication('https://1678-dev3-2016.firebaseio.com/', auth)
 
 class FirebaseCommunicator(object):
 	"""docstring for FirebaseCommunicator"""
@@ -40,7 +43,7 @@ class FirebaseCommunicator(object):
 	def updateFirebaseWithTIMD(self, timd):
 		timdDict = utils.makeDictFromTIMD(timd)
 		FBLocation = "/TeamInMatchDatas"
-		print timdDict
+		print(str(timd.teamNumber) + "Q" + str(timd.matchNumber))
 		result = firebase.put(FBLocation, str(timd.teamNumber) + "Q" + str(timd.matchNumber), timdDict)
 
 	def addCalculatedTeamDataToFirebase(self, teamNumber, calculatedTeamData):

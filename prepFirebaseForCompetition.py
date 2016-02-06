@@ -6,7 +6,7 @@ import utils
 ############# Getting TBA Data ###################
 basicURL = "http://www.thebluealliance.com/api/v2/"
 headerKey = "X-TBA-App-Id"
-headerValue = "blm:serverProof1678:003" # set to "<your initials>:TBA_communicator:0"
+headerValue = "blm:serverProof1678:004" # set to "<your initials>:TBA_communicator:0"
 eventCode = 'casj'
 year = 2015
 
@@ -31,7 +31,7 @@ def makeFakeDatabase(eventCode='casj', year=2015):
 	FBC = firebaseCommunicator.FirebaseCommunicator(competition)
 	FBC.JSONteams = utils.readJSONFromString(makeEventTeamsRequest(eventCode, year))
 	FBC.JSONmatches = utils.readJSONFromString(makeRequest(makeYearEventKeyRequestURL(year, eventCode, 'matches')))
-	#FBC.wipeDatabase()
+	FBC.wipeDatabase()
 	FBC.addTeamsToFirebase()
 	FBC.addScorelessMatchesToFirebase()
 	competition.updateTeamsAndMatchesFromFirebase()

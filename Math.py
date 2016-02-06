@@ -4,6 +4,7 @@ import random
 import firebaseCommunicator
 import math
 import numpy as np
+import DataModel
 
 import sys, traceback
 
@@ -13,11 +14,13 @@ class Calculator(object):
 	def __init__(self, competition):
 		super(Calculator, self).__init__()
 		self.comp = competition
+		self.categories = ['a', 'b', 'c', 'd', 'e']
 		
 		
 	def getTeamForNumber(self, num):
 		for team in self.comp.teams:
 			if team.number == num:
+				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 				return team
 
 	def getMatchForNumber(self, num):
@@ -34,11 +37,11 @@ class Calculator(object):
 
 	def getPlayedTIMDsForTeam(self, team):
 		timds = []
-		print("t: " + str(team.number))
+		#print("t: " + str(team.number))
 		for timd in team.teamInMatchDatas:
 			if timd.numLowShotsMissedAuto > -1:
 				timds.append(timd)
-		print("timds: " + str(timds))
+		#print("timds: " + str(timds))
 		return timds
 
 	def getTIMDForTeamNumberAndMatchNumber(self, teamNumber, matchNumber): # Match number is an int
@@ -272,12 +275,12 @@ class Calculator(object):
 		return totalAvgDefenseCategoryCrossings / 3
 
 	def avgDefenseCategoryCrossingsForTeam(self, team, defenseCategory):	#Use in standard deviation calculation for each defenseCategory
-		print utils.makeDictFromTeam(team)['calculatedData']['avgSuccessfulTimesCrossedDefensesAuto']
+		#print utils.makeDictFromTeam(team)['calculatedData']['avgSuccessfulTimesCrossedDefensesAuto']
 		category = utils.makeDictFromTeam(team)["calculatedData"]['avgSuccessfulTimesCrossedDefensesAuto'][defenseCategory]
-		print category
+		#print category
 		total = 0
 		for value in category.values():
-			print "TESTING" + str(value)
+			#print "TESTING" + str(value)
 			total += value
 		return total / len(category)
 		
@@ -351,7 +354,8 @@ class Calculator(object):
 		return sorted([betaA, betaA, betaB, betaB, betaC, betaC, betaD, betaD]) #low to high'''
 	
 	def totalAvgNumShotPointsForTeam(self, team):
-		print "TESTING" + str(team.calculatedData)
+		#print "TESTING" + str(team.calculatedData)
+		if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData)
 		return 5 * (team.calculatedData.avgHighShotsTele) + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
 	
 	def totalSDShotPointsForTeam(self, team):
@@ -468,7 +472,7 @@ class Calculator(object):
 
 		standardDevCategories = []
 
-		print "TESTING" + str(self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.sumOfStandardDeviationsOfShotsForAlliance(blueTeams)))
+		#print "TESTING" + str(self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.sumOfStandardDeviationsOfShotsForAlliance(blueTeams)))
 
 		for team in blueTeams:
 			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
@@ -511,13 +515,13 @@ class Calculator(object):
 		
 		breachPercentage = 1
 								#Using a dictionary already sorted by category to loop through the defense categories
-		for defenseCategory in redTeams[0].calculatedData.avgDefenseCrossingEffectiveness:	#Find chance of a breach, award that many RPs
+		for defenseCategory in redTeams[0].calculatedData.avgFailedTimesCrossedDefensesAuto:	#Find chance of a breach, award that many RPs, this is an arbitrary database locaiton, being used only for it's keys
 			standardDevCategories.append(self.stanDevSumForDefenseCategory(redTeams, defenseCategory))	#Add standard deviation of crosses per category to array
 		standardDevCategories = sorted(standardDevCategories)
 
 		for category in range(1, len(standardDevCategories) + 1):	#Sort and calculate breach chance using max 4 categories
-			breachPercentage *= calculatePercentage(2.0, totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), stanDevSumForDefenseCategory(redTeams, category))
-
+			category = self.categories[category - 1]
+			breachPercentage *= self.calculatePercentage(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
 
 		predictedScoreForMatch['red']['RP'] += breachPercentage
 
@@ -654,7 +658,7 @@ class Calculator(object):
 		productOfScaleAndChallengePercentages = 1
 
 		standardDevCategories = []
-		print ("v" + str(self.calculatePercentage(2.0,1.0,3.0)))
+		#print ("v" + str(self.calculatePercentage(2.0,1.0,3.0)))
 
 		
 		sdSum = self.sumOfStandardDeviationsOfShotsForAlliance(alliance)
@@ -770,7 +774,7 @@ class Calculator(object):
 	def numPlayedMatchesInCompetition(self):
 		numPlayedMatches = 0
 		for match in self.comp.matches:
-			if match.redScore > -1 and match.blueScore > -1:
+			if match.redScore > -0.5 and match.blueScore > -0.5:
 				numPlayedMatches += 1
 		return numPlayedMatches
 
@@ -839,13 +843,14 @@ class Calculator(object):
 
 				team.calculatedData.firstPickAbility = self.firstPickAbility(team)
 				team.calculatedData.secondPickAbility = self.secondPickAbility(team)
-				print team.calculatedData.secondPickAbility
+				#print team.calculatedData.secondPickAbility
 				team.calculatedData.predictedSeed = self.getRankingForTeam(team)
 				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 				print("Putting calculations for team " + str(team.number) + " to Firebase.")
 		
 		#Match Metrics
 		for match in self.comp.matches:
+			if isinstance(match.calculatedData, {}.__class__): match.calculatedData = DataModel.CalculatedTeamData(**match.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 			match.calculatedData.predictedBlueScore = self.predictedScoreForMatch(match)['blue']
 			match.calculatedData.predictedRedScore = self.predictedScoreForMatch(match)['red']
 			numDefenseCrosses = self.numDefensesCrossedInMatch(match)
@@ -857,6 +862,7 @@ class Calculator(object):
 
 
 		#Competition metrics
-		self.comp.averageScore = self.avgCompScore()
+		if self.numPlayedMatchesInCompetition() > 0:
+			self.comp.averageScore = self.avgCompScore()
 			
 

@@ -20,7 +20,11 @@ class Competition(object):
 		for team in self.teams:
 			for TIMD in self.TIMDs:
 				if TIMD.teamNumber == team.number:
-					team.teamInMatchDatas.append(TIMD)
+					team.teamInMatchDatas.append(TIMD) #These loops are nested too far, but not a lot we can do about it.
+		for match in self.matches:
+			for TIMD in self.TIMDs:
+				if TIMD.matchNumber == match.number:
+					match.TIMDs.append(TIMD)
 		
 
 class CalculatedTeamData(object):
@@ -142,18 +146,21 @@ class Team(object):
 		self.matches = []
 		self.teamInMatchDatas = []
 		self.calculatedData = CalculatedTeamData()
-		self.selectedImageUrl = ''
-		self.otherImageUrls = ['']
+		self.selectedImageUrl = '-1'
+		self.otherImageUrls = ['-1']
 		self.pitLowBarCapability = False
 		self.pitPotentialLowBarCapability = False
-		self.pitPotentialCDFAndPCCapability = False
+		#self.pitPotentialCDFAndPCCapability = False
 		self.pitPotentialMidlineBallCapability = False
-		self.pitFrontBumperWidth = -1.0
+		#self.pitFrontBumperWidth = -1.0
+		self.pitDriveBaseWidth = -1.0
+		self.pitDriveBaseLength = -1.0
+		self.pitBumperHeight = -1.0
 		self.pitPotentialShotBlockerCapability = False
-		self.pitNotes = ""
+		self.pitNotes = "-1"
 		self.pitOrganization = -1
 		self.pitNumberOfWheels = -1
-		self.pitHeightOfRobot = -1
+		#self.pitHeightOfRobot = -1
 		self.__dict__.update(args)
 
 
@@ -205,6 +212,7 @@ class Match(object):
 		self.blueAllianceDidCapture = False
 		self.blueAllianceDidBreach = False
 		self.redAllianceDidBreach = False
+		self.TIMDs = []
 		self.__dict__.update(args)
 		
 class TeamInMatchData(object):
@@ -213,7 +221,7 @@ class TeamInMatchData(object):
 		super(TeamInMatchData, self).__init__()
 		self.teamNumber = -1
 		self.matchNumber = -1
-		self.scoutName = ''
+		self.scoutName = 'no_name'
 
 		self.didGetIncapacitated = False
 		self.didGetDisabled = False
