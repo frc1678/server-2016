@@ -92,7 +92,7 @@ class DataValidator(object):
 			match = utils.makeDictFromMatch(match)
 			if match["redScore"] > -0.5 or match["blueScore"] > -0.5:
 				for timd in match["TIMDs"]:
-					if timd["rankTorque"] < 0:
-						problems.append("TIMD: " + str(timd["teamNumber"]) + "Q" + str(timd["matchNumber"]) + " should be played but isn't.\n")
+					if timd.rankTorque < 0:
+						problems.append("TIMD: " + str(timd.teamNumber) + "Q" + str(timd.matchNumber) + " should be played but isn't.\n")
 
 

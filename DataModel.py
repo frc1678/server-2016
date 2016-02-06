@@ -36,18 +36,18 @@ class CalculatedTeamData(object):
 			1678 : -1.0
 		}
 		self.driverAbility = -1.0
-		self.highShotAccuracyAuto = -1.0
-		self.lowShotAccuracyAuto = -1.0
-		self.highShotAccuracyTele = -1.0
-		self.lowShotAccuracyTele = -1.0
-		self.avgGroundIntakes = -1.0
-		self.avgHighShotsTele = -1.0
-		self.avgLowShotsTele = -1.0
-		self.avgShotsBlocked = -1.0
-		self.avgHighShotsAuto = -1.0
-		self.avgLowShotsAuto = -1.0
-		self.avgMidlineBallsIntakedAuto = -1.0
-		self.avgBallsKnockedOffMidlineAuto = -1.0
+		self.highShotAccuracyAuto = -1.0 #Works
+		self.lowShotAccuracyAuto = -1.0 #Works
+		self.highShotAccuracyTele = -1.0 #Works
+		self.lowShotAccuracyTele = -1.0 #Works
+		self.avgGroundIntakes = -1.0 #Works
+		self.avgHighShotsTele = -1.0 #Works
+		self.avgLowShotsTele = -1.0 #Works
+		self.avgShotsBlocked = -1.0 #Works
+		self.avgHighShotsAuto = -1.0 #Works
+		self.avgLowShotsAuto = -1.0 #Works
+		self.avgMidlineBallsIntakedAuto = -1.0 #Works
+		self.avgBallsKnockedOffMidlineAuto = -1.0 #Works
 		self.avgTorque = -1.0
 		self.avgSpeed = -1.0
 		self.avgEvasion = -1.0
@@ -59,14 +59,14 @@ class CalculatedTeamData(object):
 		self.incapacitatedPercentage = -1.0
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
-		self.avgSuccessfulTimesCrossedDefensesAuto = {
+		self.avgSuccessfulTimesCrossedDefensesAuto = { #Works
 		  	'a' : {'pc' : -1.0, 'cdf' : -1.0},
 			'b' : {'mt' : -1.0, 'rp' : -1.0},
 			'c' : {'db' : -1.0, 'sp' : -1.0},
 			'd' : {'rw' : -1.0, 'rt' : -1.0},
 			'e' : {'lb' : -1.0}
 		}
-		self.avgSuccessfulTimesCrossedDefensesTele = {
+		self.avgSuccessfulTimesCrossedDefensesTele = { #Works
 		  	'a' : {'pc' : -1.0, 'cdf' : -1.0},
 			'b' : {'mt' : -1.0, 'rp' : -1.0},
 			'c' : {'db' : -1.0, 'sp' : -1.0},
@@ -192,7 +192,9 @@ class CalculatedMatchData(object):
 		self.actualRedRPs = -1	
 		self.redAllianceDidBreach = False
 		self.blueAllianceDidBreach = False
-		
+		self.optimalRedDefenses = ['pc', 'mt', 'sp', 'rw']
+		self.optimalBlueDefenses = ['pc', 'mt', 'sp', 'rw']
+
 		self.__dict__.update(args)
 
 
@@ -211,6 +213,8 @@ class Match(object):
 		self.redAllianceDidCapture = False
 		self.blueAllianceDidCapture = False
 		self.blueAllianceDidBreach = False
+		self.RSNotes = '-1'
+		self.BSNotes = '-1'
 		self.redAllianceDidBreach = False
 		self.TIMDs = []
 		self.__dict__.update(args)
@@ -243,19 +247,19 @@ class TeamInMatchData(object):
 		# }
 
 		self.timesSuccessfulCrossedDefensesAuto = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : [], 'cdf' : []},
+			'b' : {'mt' : [], 'rp' : []},
+			'c' : {'db' : [], 'sp' : []},
+			'd' : {'rw' : [], 'rt' : []},
+			'e' : {'lb' : []}
 		}
 
 		self.timesFailedCrossedDefensesAuto = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : [], 'cdf' : []},
+			'b' : {'mt' : [], 'rp' : []},
+			'c' : {'db' : [], 'sp' : []},
+			'd' : {'rw' : [], 'rt' : []},
+			'e' : {'lb' : []}
 		}
 
 		self.numHighShotsMadeAuto = -1
@@ -274,27 +278,27 @@ class TeamInMatchData(object):
 		self.didScaleTele = True
 		self.didChallengeTele = False
 		# self.timesCrossedDefensesTele = {
-		# 	'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
+	 # 		'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
+	 # 		'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
+	 # 		'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
+	 # 		'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
 		# 	'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
-		# }
+		#  }
 
 		self.timesSuccessfulCrossedDefensesTele = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : [], 'cdf' : []},
+			'b' : {'mt' : [], 'rp' : []},
+			'c' : {'db' : [], 'sp' : []},
+			'd' : {'rw' : [], 'rt' : []},
+			'e' : {'lb' : []}
 		}
 
 		self.timesFailedCrossedDefensesTele = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : [], 'cdf' : []},
+			'b' : {'mt' : [], 'rp' : []},
+			'c' : {'db' : [], 'sp' : []},
+			'd' : {'rw' : [], 'rt' : []},
+			'e' : {'lb' : []}
 		}
 		
 

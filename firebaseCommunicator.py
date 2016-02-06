@@ -6,7 +6,7 @@ import unicodedata
 import random
 
 #superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc" #dev
-#superSecret = "hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u" #dev2
+# superSecret = "hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u" #dev2
 superSecret = "AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq" #dev3
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
@@ -43,7 +43,7 @@ class FirebaseCommunicator(object):
 	def updateFirebaseWithTIMD(self, timd):
 		timdDict = utils.makeDictFromTIMD(timd)
 		FBLocation = "/TeamInMatchDatas"
-		print(str(timd.teamNumber) + "Q" + str(timd.matchNumber))
+		print(str(timd.teamNumber) + "Q" + str(timd.matchNumber)) + "," ,
 		result = firebase.put(FBLocation, str(timd.teamNumber) + "Q" + str(timd.matchNumber), timdDict)
 
 	def addCalculatedTeamDataToFirebase(self, teamNumber, calculatedTeamData):
@@ -97,7 +97,7 @@ class FirebaseCommunicator(object):
 			self.updateFirebaseWithMatch(m)
 
 	def addTIMDsToFirebase(self, matches):
-		print "Doing TIMDs...\n"
+		print "\nDoing TIMDs..."
 		for match in matches:
 			for teamNum in match.redAllianceTeamNumbers:
 				#teamNumber = int(teamNum.replace("frc", ""))
