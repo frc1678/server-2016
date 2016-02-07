@@ -247,19 +247,19 @@ class TeamInMatchData(object):
 		# }
 
 		self.timesSuccessfulCrossedDefensesAuto = {
-			'a' : {'pc' : [], 'cdf' : []},
-			'b' : {'mt' : [], 'rp' : []},
-			'c' : {'db' : [], 'sp' : []},
-			'd' : {'rw' : [], 'rt' : []},
-			'e' : {'lb' : []}
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
 		}
 
 		self.timesFailedCrossedDefensesAuto = {
-			'a' : {'pc' : [], 'cdf' : []},
-			'b' : {'mt' : [], 'rp' : []},
-			'c' : {'db' : [], 'sp' : []},
-			'd' : {'rw' : [], 'rt' : []},
-			'e' : {'lb' : []}
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
 		}
 
 		self.numHighShotsMadeAuto = -1
@@ -286,19 +286,19 @@ class TeamInMatchData(object):
 		#  }
 
 		self.timesSuccessfulCrossedDefensesTele = {
-			'a' : {'pc' : [], 'cdf' : []},
-			'b' : {'mt' : [], 'rp' : []},
-			'c' : {'db' : [], 'sp' : []},
-			'd' : {'rw' : [], 'rt' : []},
-			'e' : {'lb' : []}
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
 		}
 
 		self.timesFailedCrossedDefensesTele = {
-			'a' : {'pc' : [], 'cdf' : []},
-			'b' : {'mt' : [], 'rp' : []},
-			'c' : {'db' : [], 'sp' : []},
-			'd' : {'rw' : [], 'rt' : []},
-			'e' : {'lb' : []}
+			'a' : {'pc' : [-1], 'cdf' : [-1]},
+			'b' : {'mt' : [-1], 'rp' : [-1]},
+			'c' : {'db' : [-1], 'sp' : [-1]},
+			'd' : {'rw' : [-1], 'rt' : [-1]},
+			'e' : {'lb' : [-1]}
 		}
 		
 

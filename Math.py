@@ -173,8 +173,9 @@ class Calculator(object):
  		for timd in timds:
  			dictionary = utils.makeDictFromTIMD(timd)[key]
  			dictionary = self.flattenDictionary(dictionary)
- 			if dictionary['rw'] > -1:
- 				arrayOfDictionaries.append(dictionary) 
+ 			for d in dictionary:
+ 				if dictionary[d] > -1:
+ 					arrayOfDictionaries.append(dictionary) 
   		return arrayOfDictionaries 
 
 
@@ -189,9 +190,9 @@ class Calculator(object):
 				for dictionary in array:
 					print key
 					if key in dictionary.keys():
-						avg += len(dictionary[key])
+						avg += len(dictionary[key]) - 1
 					#print "avg for " + str(key) + " is " + str(avg)
-				avg /= len(array)
+				avg /= len(array) 
 				outputDict[key] = avg
 			
  		#print outputDict
@@ -291,9 +292,9 @@ class Calculator(object):
 		category = utils.makeDictFromTeam(team)["calculatedData"][key][defenseCategory]
 		#print category
 		total = 0
-		for value in category.values():
+		for defense in category:
 			#print "TESTING" + str(value)
-			total += value
+			total += len(defense)
 		return total / len(category)
 		
 
@@ -308,14 +309,12 @@ class Calculator(object):
 				difOfAvgSquaresTele = 0
 				difOfAvgSquaresAuto = 0
 				for timd in timds:	#find the variances for a team's crosses in the specified category in auto, and then the same in tele
-					
 					numCrossesForDefenseCategoryInMatchTele = 0
 					numCrossesForDefenseCategoryInMatchAuto = 0
 					for value in timd.timesSuccessfulCrossedDefensesTele[defenseCategory].values():
-						numCrossesForDefenseCategoryInMatchTele += len(value)
+						numCrossesForDefenseCategoryInMatchTele += len(value) - 1
 					for value in timd.timesSuccessfulCrossedDefensesAuto[defenseCategory].values():
-						numCrossesForDefenseCategoryInMatchAuto += len(value)
-
+						numCrossesForDefenseCategoryInMatchAuto += len(value) - 1
 					difOfAvgSquaresTele += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesTele',  defenseCategory) - numCrossesForDefenseCategoryInMatchTele)**2 
 					difOfAvgSquaresAuto += (self.avgDefenseCategoryCrossingsForTeam(team, 'avgSuccessfulTimesCrossedDefensesAuto',  defenseCategory) - numCrossesForDefenseCategoryInMatchAuto)**2 
 				difOfAvgSquaresTele /= (len(timds))			#divide difference from average squared by n
@@ -414,9 +413,9 @@ class Calculator(object):
 		sumOfStandardDeviationsOfShotsForAlliance = 0
 		shotVariances = []
 		for team in alliance:
-			autoHighShotVariance = 0
-			autoLowShotVariance = 0
-			teleHighShotVariance = 0
+			autoHighShotVariance = 0.0
+			autoLowShotVariance = 0.0
+			teleHighShotVariance = 0.0
 			teleLowShotVariance = 0.0
 			timds = self.getPlayedTIMDsForTeam(team)
 			if len(timds) == 0:
@@ -436,9 +435,7 @@ class Calculator(object):
 				shotVariances.append(autoLowShotVariance)
 				shotVariances.append(teleHighShotVariance)
 				shotVariances.append(teleLowShotVariance)				
-			for i in shotVariances:
-				sumOfStandardDeviationsOfShotsForAlliance += i
-			return math.sqrt(sumOfStandardDeviationsOfShotsForAlliance)
+		return math.sqrt(sum(shotVariances))
 
 	def timesDefensesFacedInAllMatches(self):
 		outputDict = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
@@ -461,23 +458,36 @@ class Calculator(object):
 				for d in outputDict:
 					if d in match.redDefensePositions:
 						outputDict[d] += 1
-
+		return outputDict
 
 	def predictedCrosses(self, team, defense):
-		allTIMDs = []
 		timesDefenseFacedAllBots = 0
 		timesDefenseFacedOneBot = 0
 		avgCrossesDefenseAcrossComp = 0.0
+		Xa = 0
+		Xobs = self.timesDefensesFacedInAllMatches()[defense]
+		Fobs = self.timesDefensesFacedInAllMatchesForTeam(team)[defense]
 		timdsForTeam = self.getPlayedTIMDsForTeam(team)
 		for team1 in self.comp.teams:
-			allTIMDs.append(self.getPlayedTIMDsForTeam(team1))
 			for dC, d in team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto.items():
 				if d == defense:
-					avgCrossesDefensesAcrossComp += team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[dC][d] + team.calculatedData.avgSuccessfulTimesCrossedDefensesTele[dC][d]
+					avgCrossesDefenseAcrossComp += team.calculatedData.avgSuccessfulTimesCrossedDefensesTele[dC][d]
 		avgCrossesDefenseAcrossComp /= (len(self.comp.teams) * 2)
-		Xprop = self.timesDefensesFacedInAllMatches()[defense]/sum(self.timesDefensesFacedInAllMatches().values())
-		Fprop = self.timesDefensesFacedInAllMatchesForTeam(team)[defense]/sum(self.timesDefensesFacedInAllMatchesForTeam(team).values())
+		Xprop = Xobs / sum(self.timesDefensesFacedInAllMatches().values())
+		Fprop = Fobs / sum(self.timesDefensesFacedInAllMatchesForTeam(team).values())
+		for dC, d in team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto.items():
+			if d == defense:
+				Xa += team.calculatedData.avgSuccessfulTimesCrossedDefensesTele[dC][d] 
+		alphaForDefense = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
+		for d in alphaForDefense:
+			alphaForDefense[d] = (self.timesDefensesFacedInAllMatches()[d]/sum(self.timesDefensesFacedInAllMatches().values())) + (self.timesDefensesFacedInAllMatchesForTeam(team)[d]/sum(self.timesDefensesFacedInAllMatchesForTeam(team).values()))
+		betaForDefense = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
+		for d in betaForDefense:
+			betaForDefense[d] = alphaForDefense[d] / sum(alphaForDefense.values())
+		thetaForDefense = sum(betaForDefense.values())
+		predictedCrossesForDefense = ((avgCrossesDefenseAcrossComp * thetaForDefense) + (Xa * Xobs)) / (Xobs + 1)
 
+	
 	def sdOfRValuesAcrossCompetition(self):
 		avgOfAllRValues = 0.0
 		allTIMDS = []
@@ -499,10 +509,10 @@ class Calculator(object):
 		return math.sqrt(sdOfRValues)
 
 	def RScore(self, team, key):
-		avgRValue = averageTIMDObjectOverMatches(team, key)
+		avgRValue = self.averageTIMDObjectOverMatches(team, key)
 		averageRValuesOverComp = 0.0
 		for team1 in self.comp.teams:
-			averageRValuesOverComp += averageTIMDObjectOverMatches(team, key)
+			averageRValuesOverComp += self.averageTIMDObjectOverMatches(team, key)
 		averageRValuesOverComp /= len(self.comp.teams)
 		sdOfRValues = self.sdOfRValuesAcrossCompetition()
 		RScore = 2 * self.probabilityDensity(avgRValue, averageRValuesOverComp, sdOfRValues)
@@ -524,11 +534,10 @@ class Calculator(object):
 		predictedScoreForMatch['blue'] += self.reachPointsForAlliance(blueTeams)
 		crossPointsForAlliance = 0
 		for team in blueTeams:
-			for defenseCategory in team.calculatedData.timesSuccessfulCrossedDefensesTele:
-				crossPointsForAlliance += min(sum(team.calculatedData.timesSuccessfulCrossedDefensesTele[defenseCategory].values()), 2)
-				crossPointsForAlliance += min(sum(team.calculatedData.timesSuccessfulCrossedDefensesAuto[defenseCategory].values()), 2)
+			for defenseCategory in team.calculatedData.avgSuccessfulCrossedDefensesTele:
+				crossPointsForAlliance += min(sum(team.calculatedData.avgSuccessfulCrossedDefensesTele[defenseCategory].values()), 2)
+				crossPointsForAlliance += min(sum(team.calculatedData.avgSuccessfulCrossedDefensesAuto[defenseCategory].values()), 2)
 		predictedScoreForMatch['blue'] += crossPointsForAlliance
-
 
 	#Matches Metrics
 	def predictedScoreForMatch(self, match):
@@ -630,17 +639,17 @@ class Calculator(object):
 		for teamNum in match.blueAllianceTeamNumbers:
 			timd = self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
 			for defense in timd.timesSuccessfulCrossedDefensesTele.values():
-				blueAllianceCrosses += len(defense)
+				blueAllianceCrosses += len(defense) - 1
 			for defense in timd.timesSuccessfulCrossedDefensesAuto.values():
-				blueAllianceCrosses += len(defense)
+				blueAllianceCrosses += len(defense) - 1
 		numDefensesCrossedInMatch['blue'] = blueAllianceCrosses
 		redAllianceCrosses = 0
 		for teamNum in match.redAllianceTeamNumbers:
 			timd = self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number)
 			for defense in timd.timesSuccessfulCrossedDefensesTele.values():
-				redAllianceCrosses += len(defense)
+				redAllianceCrosses += len(defense) - 1
 			for defense in timd.timesSuccessfulCrossedDefensesAuto.values():
-				redAllianceCrosses += len(defense)
+				redAllianceCrosses += len(defense) - 1
 		numDefensesCrossedInMatch['red'] = redAllianceCrosses
 
 		return numDefensesCrossedInMatch
@@ -945,7 +954,8 @@ class Calculator(object):
 				print "lowaccauto "  + str(team.calculatedData.lowShotAccuracyAuto)
 				print "telecross " + str(avgDefensesCrossesTele)
 				print "shotsblocked " + str(team.calculatedData.avgShotsBlocked)
-
+				print "RscoreTORQUE" + str(self.RScore(team, 'rankTorque'))
+				print "predictedCrossesPC" + str(self.predictedCrosses(team, 'pc'))
 
 				team.calculatedData.numRPs = self.numRPsForTeam(team)
 				team.calculatedData.numScaleAndChallengePoints = self.numScaleAndChallengePointsForTeam(team)
@@ -955,9 +965,9 @@ class Calculator(object):
 				# team.calculatedData.firstPickAbility = self.firstPickAbility(team)
 				# team.calculatedData.secondPickAbility = self.secondPickAbility(team)
 				# #print team.calculatedData.secondPickAbility
-		# 		team.calculatedData.predictedSeed = self.getRankingForTeam(team)
-		# 		FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
-		# 		print("Putting calculations for team " + str(team.number) + " to Firebase.")
+				#team.calculatedData.predictedSeed = self.getRankingForTeam(team)
+				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
+				print("Putting calculations for team " + str(team.number) + " to Firebase.")
 		
 		#Match Metrics
 		for match in self.comp.matches:
