@@ -1,3 +1,4 @@
+
 # Math.py
 import utils
 import random
@@ -43,7 +44,7 @@ class Calculator(object):
 		timds = []
 		#print("t: " + str(team.number))
 		for timd in team.teamInMatchDatas:
-			if timd.numLowShotsMissedAuto > -1:
+			if timd.rankTorque > -1:
 				timds.append(timd)
 		print("timds: " + str(timds))
 		return timds
@@ -403,7 +404,7 @@ class Calculator(object):
 			reachPoints += 2 * team.calculatedData.reachPercentage
 		return reachPoints
 
-	def calculatePercentage(self, x, u, o):
+	def probabilityDensity(self, x, u, o):
 		if o == "1678 has insufficient data" or o == 0.0:
 			return -1
 		else:	
@@ -416,7 +417,7 @@ class Calculator(object):
 			autoHighShotVariance = 0
 			autoLowShotVariance = 0
 			teleHighShotVariance = 0
-			teleLowShotVariance = 0
+			teleLowShotVariance = 0.0
 			timds = self.getPlayedTIMDsForTeam(team)
 			if len(timds) == 0:
 				return -1
@@ -438,6 +439,74 @@ class Calculator(object):
 			for i in shotVariances:
 				sumOfStandardDeviationsOfShotsForAlliance += i
 			return math.sqrt(sumOfStandardDeviationsOfShotsForAlliance)
+
+	def timesDefensesFacedInAllMatches(self):
+		outputDict = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
+		for match in self.comp.matches:
+			for d in outputDict:
+				if d in match.blueDefensePositions:
+					outputDict[d] += 3
+				if d in match.redDefensePositions:
+					outputDict[d] += 3
+		return outputDict
+
+	def timesDefensesFacedInAllMatchesForTeam(self, team):
+		outputDict = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
+		for match in self.comp.matches:
+			if team.number in match.redAllianceTeamNumbers:
+				for d in outputDict:
+					if d in match.blueDefensePositions:
+						outputDict[d] += 1
+			elif team.number in match.blueAllianceTeamNumbers:
+				for d in outputDict:
+					if d in match.redDefensePositions:
+						outputDict[d] += 1
+
+
+	def predictedCrosses(self, team, defense):
+		allTIMDs = []
+		timesDefenseFacedAllBots = 0
+		timesDefenseFacedOneBot = 0
+		avgCrossesDefenseAcrossComp = 0.0
+		timdsForTeam = self.getPlayedTIMDsForTeam(team)
+		for team1 in self.comp.teams:
+			allTIMDs.append(self.getPlayedTIMDsForTeam(team1))
+			for dC, d in team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto.items():
+				if d == defense:
+					avgCrossesDefensesAcrossComp += team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[dC][d] + team.calculatedData.avgSuccessfulTimesCrossedDefensesTele[dC][d]
+		avgCrossesDefenseAcrossComp /= (len(self.comp.teams) * 2)
+		Xprop = self.timesDefensesFacedInAllMatches()[defense]/sum(self.timesDefensesFacedInAllMatches().values())
+		Fprop = self.timesDefensesFacedInAllMatchesForTeam(team)[defense]/sum(self.timesDefensesFacedInAllMatchesForTeam(team).values())
+
+	def sdOfRValuesAcrossCompetition(self):
+		avgOfAllRValues = 0.0
+		allTIMDS = []
+		sdOfRValues = 0.0
+		for team in self.comp.teams:
+			allTIMDS.append(self.getPlayedTIMDsForTeam(team))
+			avgOfAllRValues += team.calculatedData.avgTorque + team.calculatedData.avgSpeed + team.calculatedData.avgEvasion + team.calculatedData.avgDefense + team.calculatedData.avgBallControl
+		avgOfAllRValues /= (len(self.comp.teams) * 5)
+		numberOfTIMDObjects = 0
+		for timds in allTIMDS:
+			for timd in timds:
+				numberOfTIMDObjects += 1
+				sdOfRValues += (avgOfAllRValues - timd.rankTorque)**2
+				sdOfRValues += (avgOfAllRValues - timd.rankSpeed)**2
+				sdOfRValues += (avgOfAllRValues - timd.rankEvasion)**2
+				sdOfRValues += (avgOfAllRValues - timd.rankDefense)**2
+				sdOfRValues += (avgOfAllRValues - timd.rankBallControl)**2
+		sdOfRValues /= (numberOfTIMDObjects * 5)
+		return math.sqrt(sdOfRValues)
+
+	def RScore(self, team, key):
+		avgRValue = averageTIMDObjectOverMatches(team, key)
+		averageRValuesOverComp = 0.0
+		for team1 in self.comp.teams:
+			averageRValuesOverComp += averageTIMDObjectOverMatches(team, key)
+		averageRValuesOverComp /= len(self.comp.teams)
+		sdOfRValues = self.sdOfRValuesAcrossCompetition()
+		RScore = 2 * self.probabilityDensity(avgRValue, averageRValuesOverComp, sdOfRValues)
+		return RScore
 
 	def sdPredictedScoreForMatch(self, match):
 		sdPredictedScoreForMatch = {'blue' : 0, 'red' : 0}
@@ -487,7 +556,7 @@ class Calculator(object):
 
 		for team in blueTeams:
 			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
-		predictedScoreForMatch['blue']['RP'] += self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.sumOfStandardDeviationsOfShotsForAlliance(blueTeams)) * productOfScaleAndChallengePercentages
+		predictedScoreForMatch['blue']['RP'] += self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.sumOfStandardDeviationsOfShotsForAlliance(blueTeams)) * productOfScaleAndChallengePercentages
 		
 		breachPercentage = 1
 
@@ -497,7 +566,7 @@ class Calculator(object):
 
 		for category in range(1, len(standardDevCategories) + 1):	#Sort and calculate breach chance using max 4 categories
 			category = self.categories[category - 1]
-			breachPercentage *= self.calculatePercentage(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
+			breachPercentage *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
 
 
 		predictedScoreForMatch['blue']['RP'] += breachPercentage
@@ -523,7 +592,7 @@ class Calculator(object):
 		for team in redTeams:	#Find chance of a capture, award that many RPs
 			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
 
-		predictedScoreForMatch['red']['RP'] += (self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(redTeams), self.sumOfStandardDeviationsOfShotsForAlliance(redTeams) * productOfScaleAndChallengePercentages))
+		predictedScoreForMatch['red']['RP'] += (self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(redTeams), self.sumOfStandardDeviationsOfShotsForAlliance(redTeams) * productOfScaleAndChallengePercentages))
 		
 		breachPercentage = 1
 								#Using a dictionary already sorted by category to loop through the defense categories
@@ -533,7 +602,7 @@ class Calculator(object):
 
 		for category in range(1, len(standardDevCategories) + 1):	#Sort and calculate breach chance using max 4 categories
 			category = self.categories[category - 1]
-			breachPercentage *= self.calculatePercentage(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
+			breachPercentage *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
 
 		predictedScoreForMatch['red']['RP'] += breachPercentage
 
@@ -678,7 +747,7 @@ class Calculator(object):
 			return -1
 		for team in alliance:
 			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
-		predictedScoreCustomAlliance += 25 * self.calculatePercentage(8.0, self.totalAvgNumShotsForAlliance(alliance), sdSum) * productOfScaleAndChallengePercentages
+		predictedScoreCustomAlliance += 25 * self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(alliance), sdSum) * productOfScaleAndChallengePercentages
 		breachPercentage = 1
 
 		for defenseCategory in alliance[0].calculatedData.avgSuccessfulTimesCrossedDefensesAuto:
@@ -687,7 +756,7 @@ class Calculator(object):
 
 		for category in range(1, len(standardDevCategories) + 1):
 			category = self.categories[category - 1]
-			breachPercentage *= self.calculatePercentage(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(alliance, category), self.stanDevSumForDefenseCategory(alliance, category))
+			breachPercentage *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(alliance, category), self.stanDevSumForDefenseCategory(alliance, category))
 
 
 		predictedScoreCustomAlliance += 20 * breachPercentage
@@ -807,7 +876,6 @@ class Calculator(object):
 				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 
 				team.calculatedData.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')
-				
 				team.calculatedData.avgSpeed = self.averageTIMDObjectOverMatches(team, 'rankSpeed')
 				team.calculatedData.avgEvasion = self.averageTIMDObjectOverMatches(team, 'rankEvasion')
 				team.calculatedData.avgDefense = self.averageTIMDObjectOverMatches(team, 'rankDefense')

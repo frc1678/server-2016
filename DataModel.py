@@ -149,14 +149,14 @@ class Team(object):
 		self.selectedImageUrl = '-1'
 		self.otherImageUrls = ['-1']
 		self.pitLowBarCapability = False
-		self.pitPotentialLowBarCapability = False
-		#self.pitPotentialCDFAndPCCapability = False
-		self.pitPotentialMidlineBallCapability = False
+		self.pitPotentialLowBarCapability = -1
+		#self.pitPotentialCDFAndPCCapability = -1
+		self.pitPotentialMidlineBallCapability = -1
 		#self.pitFrontBumperWidth = -1.0
 		self.pitDriveBaseWidth = -1.0
 		self.pitDriveBaseLength = -1.0
 		self.pitBumperHeight = -1.0
-		self.pitPotentialShotBlockerCapability = False
+		self.pitPotentialShotBlockerCapability = -1
 		self.pitNotes = "-1"
 		self.pitOrganization = -1
 		self.pitNumberOfWheels = -1
@@ -303,7 +303,7 @@ class TeamInMatchData(object):
 		
 
 		self.__dict__.update(args)		
-'''Making Fake Type safety is very much NOT A PYTHON PRACTICE, but may be needed. 
+#Making Fake Type safety is very much NOT A PYTHON PRACTICE, but may be needed. 
 class TeamList(list):
     def __init__(self, iterable=None):
         """Override initializer which can accept iterable"""
@@ -335,4 +335,3 @@ class TeamList(list):
             super(TeamList, self).__iadd__(item)
         else:
             raise ValueError('Teams allowed only')
-'''
