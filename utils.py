@@ -40,6 +40,7 @@ def makeMatchFromDict(d):
 def makeTeamFromDict(d):
 	team = DataModel.Team(**d) #I have no idea why this works
 	team.calculatedData = DataModel.CalculatedTeamData(**d['calculatedData'])
+	print("tn: " + str(team.number) + str(d['number']))
 	return team
 
 

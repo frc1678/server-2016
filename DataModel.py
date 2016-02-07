@@ -8,7 +8,7 @@ class Competition(object):
 	def __init__(self):
 		super(Competition, self).__init__()
 		self.code = ""
-		self.teams = []
+		self.teams = TeamList([])
 		self.matches = []
 		self.TIMDs = []
 		self.averageScore = -1
@@ -133,7 +133,7 @@ class CalculatedTeamData(object):
 
 		self.predictedSeed = -1
 		self.actualSeed = -1
-		self.__dict__.update(args)
+		#self.__dict__.update(args)
 
 		
 
@@ -303,4 +303,36 @@ class TeamInMatchData(object):
 		
 
 		self.__dict__.update(args)		
+'''Making Fake Type safety is very much NOT A PYTHON PRACTICE, but may be needed. 
+class TeamList(list):
+    def __init__(self, iterable=None):
+        """Override initializer which can accept iterable"""
+        super(TeamList, self).__init__()
+        if iterable:
+            for item in iterable:
+                self.append(item)
 
+    def append(self, item):
+        if isinstance(item, Team):
+            super(TeamList, self).append(item)
+        else:
+            raise ValueError('Teams allowed only')
+
+    def insert(self, index, item):
+        if isinstance(item, Team):
+            super(TeamList, self).insert(index, item)
+        else:
+            raise ValueError('Teams allowed only')
+
+    def __add__(self, item):
+        if isinstance(item, Team):
+            super(TeamList, self).__add__(item)
+        else:
+            raise ValueError('Teams allowed only')
+
+    def __iadd__(self, item):
+        if isinstance(item, Team):
+            super(TeamList, self).__iadd__(item)
+        else:
+            raise ValueError('Teams allowed only')
+'''

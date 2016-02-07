@@ -18,10 +18,14 @@ class Calculator(object):
 		
 		
 	def getTeamForNumber(self, num):
+		num = int(num)
+		for t in self.comp.teams: print t.number
 		for team in self.comp.teams:
 			if team.number == num:
 				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+				print("TCD: " + str(team.calculatedData))
 				return team
+		print "NO TEAM FOR NUMBER: " + str(num)
 
 	def getMatchForNumber(self, num):
 		for match in self.comp.matches:
@@ -41,7 +45,7 @@ class Calculator(object):
 		for timd in team.teamInMatchDatas:
 			if timd.numLowShotsMissedAuto > -1:
 				timds.append(timd)
-		#print("timds: " + str(timds))
+		print("timds: " + str(timds))
 		return timds
 
 	def getTIMDForTeamNumberAndMatchNumber(self, teamNumber, matchNumber): # Match number is an int
@@ -144,6 +148,7 @@ class Calculator(object):
 					return 0
 				else:
 					return totalLowShotsMade / (totalLowShotsMade + totalLowShotsMissed)
+		return -1
 
 	def avgBallsIntaked(self, team, key):
 		timds = self.getPlayedTIMDsForTeam(team)
@@ -798,7 +803,11 @@ class Calculator(object):
 				print("Beginning calculations for team: " + str(team.number) + ", " + team.name)
 
 				#Super Scout Averages
+				
+				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+
 				team.calculatedData.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')
+				
 				team.calculatedData.avgSpeed = self.averageTIMDObjectOverMatches(team, 'rankSpeed')
 				team.calculatedData.avgEvasion = self.averageTIMDObjectOverMatches(team, 'rankEvasion')
 				team.calculatedData.avgDefense = self.averageTIMDObjectOverMatches(team, 'rankDefense')
@@ -821,6 +830,7 @@ class Calculator(object):
 				team.calculatedData.sdBallsKnockedOffMidlineAuto = self.standardDeviationObjectOverAllMatches(team, 'numBallsKnockedOffMidlineAuto')
 				
 
+				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 
 
 				#Tele
@@ -830,9 +840,20 @@ class Calculator(object):
 				team.calculatedData.avgBallsKnockedOffMidlineAuto = self.averageTIMDObjectOverMatches(team, 'numBallsKnockedOffMidlineAuto')
 				team.calculatedData.avgShotsBlocked = self.averageTIMDObjectOverMatches(team, 'numShotsBlockedTele')
 				team.calculatedData.avgHighShotsTele = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeTele')
+				
+				#dddd
 				team.calculatedData.avgLowShotsTele = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeTele')
+				
+				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+
 				team.calculatedData.highShotAccuracyTele = self.highShotAccuracy(team, False)
+				
+				#dddd
 				team.calculatedData.lowShotAccuracyTele = self.lowShotAccuracy(team, False)
+
+				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+				print("THE TEAM Calc: " + str(team.calculatedData))
+
 				team.calculatedData.blockingAbility = self.blockingAbility(team)
 				team.calculatedData.teleopShotAbility = self.teleopShotAbility(team)
 				team.calculatedData.siegeConsistency = self.siegeConsistency(team)
@@ -872,7 +893,7 @@ class Calculator(object):
 		
 		#Match Metrics
 		for match in self.comp.matches:
-			if isinstance(match.calculatedData, {}.__class__): match.calculatedData = DataModel.CalculatedTeamData(**match.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+			if isinstance(match.calculatedData, {"d":"d"}.__class__): match.calculatedData = DataModel.CalculatedTeamData(**match.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 			match.calculatedData.predictedBlueScore = self.predictedScoreForMatch(match)['blue']
 			match.calculatedData.predictedRedScore = self.predictedScoreForMatch(match)['red']
 			print "\nMatch " + str(match.number) + ':' + ' Blue: ' + str(match.calculatedData.predictedBlueScore) + ' Red: ' + str(match.calculatedData.predictedRedScore) 
