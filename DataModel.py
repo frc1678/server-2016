@@ -12,6 +12,8 @@ class Competition(object):
 		self.matches = []
 		self.TIMDs = []
 		self.averageScore = -1
+		self.predictedSeeding = []
+		self.actualSeeding = []
 	def updateTeamsAndMatchesFromFirebase(self):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
@@ -35,6 +37,8 @@ class CalculatedTeamData(object):
 		self.secondPickAbility = {
 			1678 : -1.0
 		}
+		self.scoreContribution = -1.0
+		self.citrusDPR = -1.0
 		self.driverAbility = -1.0
 		self.highShotAccuracyAuto = -1.0 #Works
 		self.lowShotAccuracyAuto = -1.0 #Works
@@ -130,7 +134,11 @@ class CalculatedTeamData(object):
 			'd' : {'rw' : -1, 'rt' : -1},
 			'e' : {'lb' : -1}
 		}
-
+		self.RScoreTorque = -1.0
+		RScoreSpeed = -1.0
+		RScoreEvasion = -1.0		
+		RScoreDefense = -1.0
+		RScoreBallControl = -1.0
 		self.predictedSeed = -1
 		self.actualSeed = -1
 		#self.__dict__.update(args)
@@ -147,7 +155,9 @@ class Team(object):
 		self.teamInMatchDatas = []
 		self.calculatedData = CalculatedTeamData()
 		self.selectedImageUrl = '-1'
-		self.otherImageUrls = ['-1']
+		self.otherImageUrls = {
+			 'not0' : '-1'
+		}
 		self.pitLowBarCapability = False
 		self.pitPotentialLowBarCapability = -1
 		#self.pitPotentialCDFAndPCCapability = -1
@@ -170,6 +180,7 @@ class CalculatedMatchData(object):
 		super(CalculatedMatchData, self).__init__()
 		self.predictedRedScore = -1.0
 		self.predictedBlueScore = -1.0	
+
 		self.numDefensesCrossedByBlue = -1
 		self.numDefensesCrossedByRed = -1 
 		self.redScoresForDefenses = {}
@@ -213,8 +224,6 @@ class Match(object):
 		self.redAllianceDidCapture = False
 		self.blueAllianceDidCapture = False
 		self.blueAllianceDidBreach = False
-		self.RSNotes = '-1'
-		self.BSNotes = '-1'
 		self.redAllianceDidBreach = False
 		self.TIMDs = []
 		self.__dict__.update(args)
@@ -301,6 +310,7 @@ class TeamInMatchData(object):
 			'e' : {'lb' : [-1]}
 		}
 		
+		self.superNotes = '-1'
 
 		self.__dict__.update(args)		
 #Making Fake Type safety is very much NOT A PYTHON PRACTICE, but may be needed. 
