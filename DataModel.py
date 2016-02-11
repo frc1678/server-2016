@@ -63,6 +63,7 @@ class CalculatedTeamData(object):
 		self.incapacitatedPercentage = -1.0
 		self.scalePercentage = -1.0
 		self.challengePercentage = -1.0
+		self.breachPercentage = -1.0
 		self.avgSuccessfulTimesCrossedDefensesAuto = { #Works
 		  	'a' : {'pc' : -1.0, 'cdf' : -1.0},
 			'b' : {'mt' : -1.0, 'rp' : -1.0},
@@ -311,8 +312,6 @@ class TeamInMatchData(object):
 			'd' : {'rw' : [-1], 'rt' : [-1]},
 			'e' : {'lb' : [-1]}
 		}
-		self.scoreContribution = -1.0
-		
 		self.superNotes = '-1'
 
 		self.__dict__.update(args)		
@@ -341,6 +340,8 @@ class CalculatedTeamInMatchData(object):
 		self.secondPickAbility = [-1]
 		self.overallSecondPickAbility = -1.0
 		self.scoreContribution = -1.0
+
+		self.__dict__.update(args)
 
 #Making Fake Type safety is very much NOT A PYTHON PRACTICE, but may be needed. 
 class TeamList(list):

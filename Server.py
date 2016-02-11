@@ -1,3 +1,4 @@
+				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 # by Bryton Moeller (2015-2016)
 
 import json

@@ -46,6 +46,7 @@ def makeTeamFromDict(d):
 
 def makeTIMDFromDict(d):
 	TIMD = DataModel.TeamInMatchData(**d)
+	TIMD.calculatedData = DataModel.CalculatedTeamInMatchData(**d['calculatedData'])
 	return TIMD
 
 
@@ -81,8 +82,9 @@ def makeDictFromMatch(m):
 
 def makeDictFromTIMD(timd):
 	d = timd.__dict__
+	if not isinstance(timd.calculatedData, dict):
+		d["calculatedData"] = timd.calculatedData.__dict__
 	return d
-
 
 def makeDictFromCalculatedTeamData(calculatedData):
 	return calculatedData.__dict__
