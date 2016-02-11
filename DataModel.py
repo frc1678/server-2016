@@ -37,7 +37,7 @@ class CalculatedTeamData(object):
 		self.secondPickAbility = {
 			1678 : -1.0
 		}
-		self.scoreContribution = -1.0
+		self.overallSecondPickAbility = -1.0
 		self.citrusDPR = -1.0
 		self.driverAbility = -1.0
 		self.highShotAccuracyAuto = -1.0 #Works
@@ -135,10 +135,10 @@ class CalculatedTeamData(object):
 			'e' : {'lb' : -1}
 		}
 		self.RScoreTorque = -1.0
-		RScoreSpeed = -1.0
-		RScoreEvasion = -1.0		
-		RScoreDefense = -1.0
-		RScoreBallControl = -1.0
+		self.RScoreSpeed = -1.0
+		self.RScoreEvasion = -1.0		
+		self.RScoreDefense = -1.0
+		self.RScoreBallControl = -1.0
 		self.predictedSeed = -1
 		self.actualSeed = -1
 		#self.__dict__.update(args)
@@ -158,6 +158,7 @@ class Team(object):
 		self.otherImageUrls = {
 			 'not0' : '-1'
 		}
+		self.pitHeightOfBallLeavingShooter = -1.0
 		self.pitLowBarCapability = False
 		self.pitPotentialLowBarCapability = -1
 		#self.pitPotentialCDFAndPCCapability = -1
@@ -232,6 +233,7 @@ class TeamInMatchData(object):
 	"""An FRC TeamInMatchData Object"""
 	def __init__(self, **args):
 		super(TeamInMatchData, self).__init__()
+		self.calculatedData = CalculatedTeamInMatchData()
 		self.teamNumber = -1
 		self.matchNumber = -1
 		self.scoutName = 'no_name'
@@ -309,10 +311,37 @@ class TeamInMatchData(object):
 			'd' : {'rw' : [-1], 'rt' : [-1]},
 			'e' : {'lb' : [-1]}
 		}
+		self.scoreContribution = -1.0
 		
 		self.superNotes = '-1'
 
 		self.__dict__.update(args)		
+
+class CalculatedTeamInMatchData(object):
+	"""docstring for CalculatedTeamInMatchData"""
+	def __init__(self, **args):
+		super(CalculatedTeamInMatchData, self).__init__()
+		self.highShotAccuracyAuto = -1.0 
+		self.lowShotAccuracyAuto = -1.0 
+		self.highShotAccuracyTele = -1.0 
+		self.lowShotAccuracyTele = -1.0 
+		self.siegeAbility = -1.0
+		self.siegePower = -1.0
+		self.numRPs = -1
+		self.numAutoPoints = -1
+		self.numScaleAndChallengePoints = -1
+		self.RScoreTorque = -1.0
+		self.RScoreSpeed = -1.0
+		self.RScoreEvasion = -1.0		
+		self.RScoreDefense = -1.0
+		self.RScoreBallControl = -1.0
+		self.citrusDPR = -1.0
+		self.driverAbility = -1.0
+		self.firstPickAbility = -1.0
+		self.secondPickAbility = [-1]
+		self.overallSecondPickAbility = -1.0
+		self.scoreContribution = -1.0
+
 #Making Fake Type safety is very much NOT A PYTHON PRACTICE, but may be needed. 
 class TeamList(list):
     def __init__(self, iterable=None):

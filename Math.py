@@ -209,6 +209,15 @@ class Calculator(object):
  		#print outputDict
  		return outputDict
 
+ 	def twoBallAutoAccuracy(self, team):
+ 		timds = self.getPlayedTIMDsForTeam(team)
+ 		twoBallAutoCompleted = 0
+ 		for timd in timds:
+ 			totalNumShots = timd.numHighShotsMadeAuto + timd.numLowShotsMadeAuto + timd.numHighShotsMissedAuto + timd.numLowShotsMissedAuto
+ 			if totalNumShots > 2:
+ 				twoBallAutoCompleted += 1
+ 		return twoBallAutoCompleted / len(timds)
+
 	def blockingAbility(self, team):
 		allHighShotsAccuracies = 0
 		for team in self.comp.teams:
@@ -479,6 +488,70 @@ class Calculator(object):
 				crossPointsForAlliance += min(sum(team.calculatedData.avgSuccessfulCrossedDefensesAuto[defenseCategory].values()), 2)
 		predictedScoreForMatch['blue'] += crossPointsForAlliance
 
+	def firstPickAbility(self, team):
+		citrusC = self.getTeamForNumber(1678)
+		alliance = [citrusC, team]
+		return self.predictedScoreCustomAlliance(alliance) 
+
+	
+	def secondPickAbility(self, team):
+		gamma = 0.5
+		teamsWithMatchesPlayed = []
+		for team in self.comp.teams:
+			if len(self.getPlayedMatchesForTeam(team)) > 0:
+				teamsWithMatchesPlayed.append(team)
+		matrixOfMatches = np.zeros((len(teamsWithMatchesPlayed), len(teamsWithMatchesPlayed)))
+		teamsArray = []
+		secondPickAbility = {}
+		citrusC = self.getTeamForNumber(1678)
+		for team1 in teamsWithMatchesPlayed:	#Create an array where the values correspond to how many matches two teams played together in the same alliance
+			teamsArray.append(team1)
+			for team2 in teamsWithMatchesPlayed:
+				occurrence = 0
+				for match in self.comp.matches:
+					if (team1.number in match.blueAllianceTeamNumbers and team2.number in match.blueAllianceTeamNumbers) or (team1.number in match.redAllianceTeamNumbers and team2.number in match.redAllianceTeamNumbers):
+						occurrence += 1
+				matrixOfMatches[teamsWithMatchesPlayed.index(team1), teamsWithMatchesPlayed.index(team2)] = occurrence
+
+		# Create an array where the values correspond to how many matches two teams played together in the same alliance, and then shape it into a matrix
+	
+		inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatches)	#Find the inverse of the matrix
+		teamDeltas = np.array([])
+		oppositionPredictedScore = 0
+		oppositionActualScore = 0
+		for team1 in teamsWithMatchesPlayed:
+			oppositionPredictedScore = 0
+			oppositionActualScore = 0
+			for match in self.getPlayedMatchesForTeam(team):
+				if team1.number in match.blueAllianceTeamNumbers:
+					oppositionPredictedScore += match.calculatedData.predictedRedScore  
+					oppositionActualScore += match.redScore
+				elif team1.number in match.redAllianceTeamNumbers:
+					oppositionPredictedScore += match.calculatedData.predictedBlueScore
+					oppositionActualScore += match.blueScore
+			teamDelta = oppositionPredictedScore - oppositionActualScore
+			teamDeltas = np.append(teamDeltas, teamDelta)	#Calculate delta of each team (delta(team) = sum of predicted scores - sum of actual scores)
+		teamDeltas.shape = (len(teamsWithMatchesPlayed), 1)	#Shape into a 1x(number of teams) matrix
+		citrusDPRMatrix = np.multiply(inverseMatrixOfMatchOccurrences, teamDeltas)	#Multiply deltas matrix by InverseMatchOccurrences matrix to get citrusDPR
+
+		for team1 in teamsArray:
+			if team1.number != 1678 and team1.number != team.number:	#Loop through all of the teams and find the score contribution of the team whose
+				citrusDPR = citrusDPRMatrix[teamsArray.index(team1)]	#second pick ability you are calculating for
+				alliance3Robots = [citrusC, team, team1]				
+				alliance2Robots = [citrusC, team1]
+				scoreContribution = self.predictedScoreCustomAlliance(alliance3Robots) - self.predictedScoreCustomAlliance(alliance2Robots)
+				secondPickAbility[team1.number] = gamma * scoreContribution * (1 - gamma) * int(citrusDPR)		#gamma is a constant
+
+		return secondPickAbility
+
+	def overallSecondPickAbility(self, team):
+		firstPickAbilityArray = []
+		for teamNumber in team.calculatedData.secondPickAbility:
+			team = getTeamForNumber(teamNumber)
+			if teamNumber != 1678:
+				firstPickAbilityArray.append(team)
+		firstPickAbilityArray = sorted(firstPickAbilityArray)
+
 	#Matches Metrics
 	def predictedScoreForMatch(self, match):
 		predictedScoreForMatch = {'blue': {'score' : 0, 'RP' : 0}, 'red': {'score' : 0, 'RP' : 0}}
@@ -717,62 +790,6 @@ class Calculator(object):
 			if match.redScore > -0.5 and match.blueScore > -0.5:
 				numPlayedMatches += 1
 		return numPlayedMatches
-		
-	def firstPickAbility(self, team):
-		citrusC = self.getTeamForNumber(1678)
-		alliance = [citrusC, team]
-		return self.predictedScoreCustomAlliance(alliance) 
-
-	
-	def secondPickAbility(self, team):
-		gamma = 0.5
-		teamsWithMatchesPlayed = []
-		for team in self.comp.teams:
-			if len(self.getPlayedMatchesForTeam(team)) > 0:
-				teamsWithMatchesPlayed.append(team)
-		matrixOfMatches = np.zeros((len(teamsWithMatchesPlayed), len(teamsWithMatchesPlayed)))
-		teamsArray = []
-		secondPickAbility = {}
-		citrusC = self.getTeamForNumber(1678)
-		for team1 in teamsWithMatchesPlayed:	#Create an array where the values correspond to how many matches two teams played together in the same alliance
-			teamsArray.append(team1)
-			for team2 in teamsWithMatchesPlayed:
-				occurrence = 0
-				for match in self.comp.matches:
-					if (team1.number in match.blueAllianceTeamNumbers and team2.number in match.blueAllianceTeamNumbers) or (team1.number in match.redAllianceTeamNumbers and team2.number in match.redAllianceTeamNumbers):
-						occurrence += 1
-				matrixOfMatches[teamsWithMatchesPlayed.index(team1), teamsWithMatchesPlayed.index(team2)] = occurrence
-
-		# Create an array where the values correspond to how many matches two teams played together in the same alliance, and then shape it into a matrix
-	
-		inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatches)	#Find the inverse of the matrix
-		teamDeltas = np.array([])
-		oppositionPredictedScore = 0
-		oppositionActualScore = 0
-		for team1 in teamsWithMatchesPlayed:
-			oppositionPredictedScore = 0
-			oppositionActualScore = 0
-			for match in self.getPlayedMatchesForTeam(team):
-				if team1.number in match.blueAllianceTeamNumbers:
-					oppositionPredictedScore += match.calculatedData.predictedRedScore  
-					oppositionActualScore += match.redScore
-				elif team1.number in match.redAllianceTeamNumbers:
-					oppositionPredictedScore += match.calculatedData.predictedBlueScore
-					oppositionActualScore += match.blueScore
-			teamDelta = oppositionPredictedScore - oppositionActualScore
-			teamDeltas = np.append(teamDeltas, teamDelta)	#Calculate delta of each team (delta(team) = sum of predicted scores - sum of actual scores)
-		teamDeltas.shape = (len(teamsWithMatchesPlayed), 1)	#Shape into a 1x(number of teams) matrix
-		citrusDPRMatrix = np.multiply(inverseMatrixOfMatchOccurrences, teamDeltas)	#Multiply deltas matrix by InverseMatchOccurrences matrix to get citrusDPR
-
-		for team1 in teamsArray:
-			if team1.number != 1678 and team1.number != team.number:	#Loop through all of the teams and find the score contribution of the team whose
-				citrusDPR = citrusDPRMatrix[teamsArray.index(team1)]	#second pick ability you are calculating for
-				alliance3Robots = [citrusC, team, team1]				
-				alliance2Robots = [citrusC, team1]
-				scoreContribution = self.predictedScoreCustomAlliance(alliance3Robots) - self.predictedScoreCustomAlliance(alliance2Robots)
-				secondPickAbility[team1.number] = gamma * scoreContribution * (1 - gamma) * int(citrusDPR)		#gamma is a constant
-
-		return secondPickAbility
 
 	def actualSeeding(self):
 		rankedTeams = []
