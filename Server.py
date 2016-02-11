@@ -11,11 +11,14 @@ import Math
 import unicodedata
 import time
 import DataValidator
-
+import CSVExporter
 
 comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()
+
+CSVExporter.TSVExport(comp)
+'''
 dv = DataValidator.DataValidator(comp)
 
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
@@ -27,7 +30,7 @@ while(1):
 	dv.validateFirebase()
 	time.sleep(10)
 	print("Calcs...")
-
+'''
 
 ''' # DEBUG
 teams = []
