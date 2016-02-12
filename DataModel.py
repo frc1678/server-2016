@@ -33,13 +33,12 @@ class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
-		self.firstPickAbility = -1.0
 		self.secondPickAbility = {
 			1678 : -1.0
 		}
+		self.firstPickAbility = -1.0
 		self.overallSecondPickAbility = -1.0
 		self.citrusDPR = -1.0
-		self.driverAbility = -1.0
 		self.highShotAccuracyAuto = -1.0 #Works
 		self.lowShotAccuracyAuto = -1.0 #Works
 		self.highShotAccuracyTele = -1.0 #Works
@@ -234,6 +233,7 @@ class TeamInMatchData(object):
 	"""An FRC TeamInMatchData Object"""
 	def __init__(self, **args):
 		super(TeamInMatchData, self).__init__()
+		
 		self.calculatedData = CalculatedTeamInMatchData()
 		self.teamNumber = -1
 		self.matchNumber = -1
@@ -320,6 +320,7 @@ class CalculatedTeamInMatchData(object):
 	"""docstring for CalculatedTeamInMatchData"""
 	def __init__(self, **args):
 		super(CalculatedTeamInMatchData, self).__init__()
+		self.drivingAbility = -1.0
 		self.highShotAccuracyAuto = -1.0 
 		self.lowShotAccuracyAuto = -1.0 
 		self.highShotAccuracyTele = -1.0 

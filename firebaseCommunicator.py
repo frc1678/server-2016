@@ -5,7 +5,7 @@ from firebase import firebase as fb
 import unicodedata
 import random
 
-#superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc" #dev
+superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc" #dev
 #superSecret = "hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u" #dev2
 #superSecret = "AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq" #dev3
 
