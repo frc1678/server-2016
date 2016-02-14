@@ -21,11 +21,11 @@ class Calculator(object):
 		
 	def getTeamForNumber(self, num):
 		num = int(num)
-		for t in self.comp.teams: print t.number
+		# for t in self.comp.teams: print t.number
 		for team in self.comp.teams:
 			if team.number == num:
-				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-				print("TCD: " + str(team.calculatedData))
+				# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+				# print("TCD: " + str(team.calculatedData))
 				return team
 		print "NO TEAM FOR NUMBER: " + str(num)
 
@@ -47,7 +47,7 @@ class Calculator(object):
 		for timd in team.teamInMatchDatas:
 			if timd.numLowShotsMadeAuto > -1:
 				timds.append(timd)
-		print("timds: " + str(timds))
+		# print("timds: " + str(timds))
 		return timds
 
 	def getTIMDForTeamNumberAndMatchNumber(self, teamNumber, matchNumber): # Match number is an int
@@ -205,7 +205,7 @@ class Calculator(object):
 				avg = 0.0
 				#print "val " + str(value)
 				for dictionary in array:
-					print key
+					# print key
 					if key in dictionary.keys():
 						avg += len(dictionary[key]) - 1
 					#print "avg for " + str(key) + " is " + str(avg)
@@ -242,7 +242,10 @@ class Calculator(object):
 		return 5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked
 
 	def autoAbility(self, team): 
-		if team.calculatedData.avgHighShotsAuto != 0 and team.calculatedData.avgLowShotsAuto != 0:
+		avgHighShotsMissedAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMissedAuto')
+		avgLowShotsMissedAuto = self.averageTIMDObjectOverMatches(team, 'numLowShotsMissedAuto')
+
+		if (team.calculatedData.avgHighShotsAuto != 0 or team.calculatedData.avgLowShotsAuto != 0) and (avgHighShotsMissedAuto != 0 or avgLowShotsMissedAuto != 0):
 			return 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.reachPercentage + 10 
 		else:
 			return 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.reachPercentage
@@ -252,7 +255,7 @@ class Calculator(object):
 	def siegeAbility(self, team): return (15 * team.calculatedData.scalePercentage + 5 * team.calculatedData.challengePercentage)
 
 	def siegeConsistency(self, team): 
-		if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData)
+		# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData)
 		return (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
 
 	def siegePower(self, team): return (team.calculatedData.siegeConsistency * team.calculatedData.siegeAbility)
@@ -291,7 +294,12 @@ class Calculator(object):
 
 	def avgDefenseCategoryCrossingsForTeam(self, team, key, defenseCategory):	#Use in standard deviation calculation for each defenseCategory
 		#print utils.makeDictFromTeam(team)['calculatedData']['avgSuccessfulTimesCrossedDefensesAuto'][defenseCategory]
-		category = utils.makeDictFromTeam(team)["calculatedData"][key][defenseCategory]
+		#print team.calculatedData
+		#print team.calculatedData
+		category = team.__dict__["calculatedData"].__dict__[key][defenseCategory]
+		#utils.makeTeamFromDict(d)
+
+		print team.calculatedData
 		#print category
 		total = 0
 		for defense in category:
@@ -334,7 +342,7 @@ class Calculator(object):
 
 	def totalAvgNumShotPointsForTeam(self, team):
 		#print "TESTING" + str(team.calculatedData)
-		if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData)
+		# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData)
 		return 5 * (team.calculatedData.avgHighShotsTele) + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
 	
 	def totalSDShotPointsForTeam(self, team):
@@ -398,7 +406,6 @@ class Calculator(object):
 				if len(timds) > 1:
 					sumVar += sp.stats.tvar(aHS) + sp.stats.tvar(aLS) + np.var(tHS) + sp.stats.tvar(tLS)
 		sumVar /= (len(alliance) * 4)
-		print "VARIANCE" + str(math.sqrt(sumVar))
 		return math.sqrt(sumVar)
 
 
@@ -459,7 +466,7 @@ class Calculator(object):
 		sdOfRValues = 0.0
 		for team in self.comp.teams:
 			allTIMDS.append(self.getPlayedTIMDsForTeam(team))
-			if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+			# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 			avgOfAllRValues += team.calculatedData.avgTorque + team.calculatedData.avgSpeed + team.calculatedData.avgEvasion + team.calculatedData.avgDefense + team.calculatedData.avgBallControl
 		avgOfAllRValues /= (len(self.comp.teams) * 5)
 		numberOfTIMDObjects = 0
@@ -509,7 +516,40 @@ class Calculator(object):
 		timd = self.getTIMDForTeamNumberAndMatchNumber(team, match)
 		return (1 * timd.rankTorque) + (1 * timd.rankBallControl) + (1 * timd.rankEvasion) + (1 * timd.rankDefense) + (1 * timd.rankSpeed)
 
-	def firstPick(self, team):
+	def predictedScoreCustomAlliance(self, alliance):
+		predictedScoreCustomAlliance = 0		
+		for team in alliance:
+			predictedScoreCustomAlliance += self.totalAvgNumShotPointsForTeam(team)
+		predictedScoreCustomAlliance += self.reachPointsForAlliance(alliance)
+		productOfScaleAndChallengePercentages = 1
+
+		standardDevCategories = []
+		crossPoints = 0
+		sdSum = self.sumOfStandardDeviationsOfShotsForAlliance(alliance)
+		if sdSum == "1678 has insufficient data":
+			return -1
+		for category in alliance[0].calculatedData.avgSuccessfulTimesCrossedDefensesAuto:
+			crossPoints += min(self.totalAvgDefenseCategoryCrossingsForAlliance(alliance, category) / len(category), 2)
+		predictedScoreCustomAlliance += 5 * crossPoints
+		for team in alliance:
+			productOfScaleAndChallengePercentages *= self.siegeConsistency(team)
+		predictedScoreCustomAlliance += 25 * self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(alliance), sdSum) * productOfScaleAndChallengePercentages
+		breachPercentage = 1
+
+		for defenseCategory in alliance[0].calculatedData.avgSuccessfulTimesCrossedDefensesAuto:
+			standardDevCategories.append(self.stanDevSumForDefenseCategory(alliance, defenseCategory))
+		standardDevCategories = sorted(standardDevCategories)
+
+		for category in range(1, len(standardDevCategories) + 1):
+			category = self.categories[category - 1]
+			breachPercentage *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(alliance, category), self.stanDevSumForDefenseCategory(alliance, category))
+
+
+		predictedScoreCustomAlliance += 20 * breachPercentage
+
+		return predictedScoreCustomAlliance
+	
+	def firstPickAbility(self, team):
 		citrusC = self.getTeamForNumber(1678)
 		alliance = [citrusC, team]
 		return self.predictedScoreCustomAlliance(alliance) 
@@ -534,7 +574,6 @@ class Calculator(object):
 				matrixOfMatches[teamsWithMatchesPlayed.index(team1), teamsWithMatchesPlayed.index(team2)] = occurrence
 
 		# Create an array where the values correspond to how many matches two teams played together in the same alliance, and then shape it into a matrix
-		print "A" + str(matrixOfMatches.shape)
 		inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatches)	#Find the inverse of the matrix
 		teamDeltas = np.array([])
 		oppositionPredictedScore = 0
@@ -552,20 +591,17 @@ class Calculator(object):
 			teamDelta = oppositionPredictedScore - oppositionActualScore
 			teamDeltas = np.append(teamDeltas, teamDelta)	#Calculate delta of each team (delta(team) = sum of predicted scores - sum of actual scores)
 		teamDeltas.shape = (len(teamsWithMatchesPlayed), 1)	 
-		print "B" + str(teamDeltas.shape) #Shape into a 1x(number of teams) matrix
-		print "A inverse" +str(inverseMatrixOfMatchOccurrences.shape)
 		citrusDPRMatrix = np.dot(inverseMatrixOfMatchOccurrences, teamDeltas)
-		print "X" +str(citrusDPRMatrix.shape)	#Multiply deltas matrix by InverseMatchOccurrences matrix to get citrusDPR
-		print "MATRIX" + str(citrusDPRMatrix)
+
 		for team1 in teamsArray:
 			if team1.number != 1678 and team1.number != team.number:	#Loop through all of the teams and find the score contribution of the team whose
 				citrusDPR = citrusDPRMatrix[teamsArray.index(team1)]	#second pick ability you are calculating for
-				print citrusDPR
+				# print citrusDPR
 				alliance3Robots = [citrusC, team, team1]				
 				alliance2Robots = [citrusC, team1]
 				scoreContribution = self.predictedScoreCustomAlliance(alliance3Robots) - self.predictedScoreCustomAlliance(alliance2Robots)
 				secondPickAbility[team1.number] = gamma * scoreContribution * (1 - gamma) * int(citrusDPR)		#gamma is a constant
-		print "hi" + str(secondPickAbility)
+	
 		return secondPickAbility
 
 	def overallSecondPickAbility(self, team):
@@ -575,10 +611,11 @@ class Calculator(object):
 			team = self.getTeamForNumber(teamNumber)
 			if teamNumber != 1678:
 				firstPickAbilityArray.append(team)
-		firstPickAbilityArray = sorted(firstPickAbilityArray, key = lambda team: team.calculatedData.firstPickAbility, reverse=True)
+		firstPickAbilityArray = sorted(firstPickAbilityArray, key = lambda team: team.calculatedData.firstPickAbility, reverse=True) #Sort teams by firstPickAbility
 		if len(firstPickAbilityArray) == len(team.calculatedData.secondPickAbility):
 			for index in range(0, 17):
 				overallSecondPickAbility += team.calculatedData.secondPickAbility[firstPickAbilityArray[index]]
+
 			return overallSecondPickAbility / 16
 
 	#Matches Metrics
@@ -592,19 +629,16 @@ class Calculator(object):
 			team = self.getTeamForNumber(teamNumber)
 			blueTeams.append(team)
 			predictedScoreForMatch['blue']['score'] += self.totalAvgNumShotPointsForTeam(team)
-			print "SHOT POINTS: " + str(self.totalAvgNumShotPointsForTeam(team))
 
 		redTeams = []
 		for teamNumber in match.redAllianceTeamNumbers:
 			redTeams.append(self.getTeamForNumber(teamNumber))
-		predictedScoreForMatch['blue']['score'] -=  5 * (self.blockedShotPointsForAlliance(blueTeams, redTeams)) - ((self.blockedShotPointsForAlliance(blueTeams, redTeams) + self.blockedShotPointsForAlliance(redTeams, blueTeams)) / 2)
+		# predictedScoreForMatch['blue']['score'] -=  5 * (self.blockedShotPointsForAlliance(blueTeams, redTeams)) - ((self.blockedShotPointsForAlliance(blueTeams, redTeams) + self.blockedShotPointsForAlliance(redTeams, blueTeams)) / 2)
 		predictedScoreForMatch['blue']['score'] += self.reachPointsForAlliance(blueTeams)
 		
 		for defCategory in blueTeams[0].calculatedData.avgSuccessfulTimesCrossedDefensesTele.values():
-			print defCategory
 			crossesForCategory = 0.0
 			for defense in defCategory:
-				print defense
 				for team in blueTeams:
 					crossesForCategory += self.predictedCrosses(team, defense)
 			predictedScoreForMatch['blue']['score'] += 5 * min(crossesForCategory / len(defCategory), 2)
@@ -614,21 +648,22 @@ class Calculator(object):
 		standardDevCategories = []
 		for team in blueTeams:
 			productOfScaleAndChallengePercentages *= self.siegeConsistency(team)
-		# print "TEST AVGNUMSHOTSFORALLIANCE " + str(self.totalAvgNumShotsForAlliance(blueTeams)) + " STANDEV SUM " + str(self.sumOfStandardDeviationsOfShotsForAlliance(blueTeams))
-		predictedScoreForMatch['blue']['RP'] += self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.sumOfStandardDeviationsOfShotsForAlliance(blueTeams)) * productOfScaleAndChallengePercentages
+		captureRPs = self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(blueTeams), self.sumOfStandardDeviationsOfShotsForAlliance(blueTeams)) * productOfScaleAndChallengePercentages
+		if not math.isnan(captureRPs):
+			predictedScoreForMatch['blue']['RPs'] += captureRPs
 		
-		breachPercentage = 1
-		print "MATCHNUM: " + str(match.number)
+		breachRPs = 1.0
+		# print "MATCHNUM: " + str(match.number)
 		for defenseCategory in self.categories:
 			standardDevCategories.append(self.stanDevSumForDefenseCategory(blueTeams, defenseCategory))
 		standardDevCategories = sorted(standardDevCategories)	#Sort the array of standard deviations for defense categories
 
 		for category in range(1, len(standardDevCategories) + 1):	#Sort and calculate breach chance using max 4 categories
 			category = self.categories[category - 1]
-			breachPercentage *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(blueTeams, category), self.stanDevSumForDefenseCategory(blueTeams, category))
+			breachRPs *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(blueTeams, category), self.stanDevSumForDefenseCategory(blueTeams, category))
 
-
-		predictedScoreForMatch['blue']['RP'] += breachPercentage
+		if not math.isnan(breachRPs):
+			predictedScoreForMatch['blue']['RPs'] += breachRPs			
 
 		#Red Alliance Next
 		totalAvgNumShots = 0
@@ -637,45 +672,42 @@ class Calculator(object):
 			team = self.getTeamForNumber(teamNumber)
 			redTeams.append(team)
 			predictedScoreForMatch['red']['score'] += self.totalAvgNumShotPointsForTeam(team)
+
+		redTeams = []
+		for teamNumber in match.redAllianceTeamNumbers:
+			redTeams.append(self.getTeamForNumber(teamNumber))
+		# predictedScoreForMatch['red']['score'] -=  5 * (self.blockedShotPointsForAlliance(redTeams, blueTeams)) - ((self.blockedShotPointsForAlliance(redTeams, blueTeams) + self.blockedShotPointsForAlliance(blueTeams, redTeams)) / 2)
+		predictedScoreForMatch['red']['score'] += self.reachPointsForAlliance(redTeams)
 		
-		blueTeams = []
-		for teamNumber in match.blueAllianceTeamNumbers:
-			blueTeams.append(self.getTeamForNumber(teamNumber))
-		
-		predictedScoreForMatch['red']['score'] -= self.blockedShotPointsForAlliance(blueTeams, redTeams)
-		predictedScoreForMatch['red']['score'] += self.reachPointsForAlliance(blueTeams)
-		
-		for defCategory in blueTeams[0].calculatedData.avgSuccessfulTimesCrossedDefensesTele.values():
-			print defCategory
+		for defCategory in redTeams[0].calculatedData.avgSuccessfulTimesCrossedDefensesTele.values():
 			crossesForCategory = 0.0
 			for defense in defCategory:
-				print defense
-				for team in blueTeams:
+				for team in redTeams:
 					crossesForCategory += self.predictedCrosses(team, defense)
 			predictedScoreForMatch['red']['score'] += 5 * min(crossesForCategory / len(defCategory), 2)
+
 		productOfScaleAndChallengePercentages = 1
 
 		standardDevCategories = []
-
-		for team in redTeams:	#Find chance of a capture, award that many RPs
-			productOfScaleAndChallengePercentages *= (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
-
-		predictedScoreForMatch['red']['RP'] += (self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(redTeams), self.sumOfStandardDeviationsOfShotsForAlliance(redTeams) * productOfScaleAndChallengePercentages))
-		
-		breachPercentage = 1
-								#Using a dictionary already sorted by category to loop through the defense categories
+		for team in redTeams:
+			productOfScaleAndChallengePercentages *= self.siegeConsistency(team)
+		captureRPs = self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(redTeams), self.sumOfStandardDeviationsOfShotsForAlliance(redTeams)) * productOfScaleAndChallengePercentages
+		if not math.isnan(captureRPs):
+			predictedScoreForMatch['red']['RPs'] += captureRPs
+		breachRPs = 1.0
+		# print "MATCHNUM: " + str(match.number)
 		for defenseCategory in self.categories:
 			standardDevCategories.append(self.stanDevSumForDefenseCategory(redTeams, defenseCategory))
 		standardDevCategories = sorted(standardDevCategories)	#Sort the array of standard deviations for defense categories
 
 		for category in range(1, len(standardDevCategories) + 1):	#Sort and calculate breach chance using max 4 categories
 			category = self.categories[category - 1]
-			breachPercentage *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
+			breachRPs *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
 
-		predictedScoreForMatch['red']['RP'] += breachPercentage
-		
+		if not math.isnan(breachRPs):
+			predictedScoreForMatch['red']['RPs'] += breachRPs	
+
 		return predictedScoreForMatch
-
 		
 	def breachPercentage(self, team):
 		breachPercentage = 0
@@ -750,41 +782,6 @@ class Calculator(object):
 
 		return totalRPForTeam + self.numRPsForTeam(team)
 	
-	def predictedScoreCustomAlliance(self, alliance):
-		predictedScoreCustomAlliance = 0		
-		for team in alliance:
-			predictedScoreCustomAlliance += self.totalAvgNumShotPointsForTeam(team)
-		predictedScoreCustomAlliance += self.reachPointsForAlliance(alliance)
-		productOfScaleAndChallengePercentages = 1
-
-		standardDevCategories = []
-		#print ("v" + str(self.calculatePercentage(2.0,1.0,3.0)))
-		crossPoints = 0
-		
-		sdSum = self.sumOfStandardDeviationsOfShotsForAlliance(alliance)
-		if sdSum == "1678 has insufficient data":
-			return -1
-		for category in alliance[0].calculatedData.avgSuccessfulTimesCrossedDefensesAuto:
-			crossPoints += min(self.totalAvgDefenseCategoryCrossingsForAlliance(alliance, category) / len(category), 2)
-		predictedScoreCustomAlliance += 5 * crossPoints
-		for team in alliance:
-			productOfScaleAndChallengePercentages *= self.siegeConsistency(team)
-		predictedScoreCustomAlliance += 25 * self.probabilityDensity(8.0, self.totalAvgNumShotsForAlliance(alliance), sdSum) * productOfScaleAndChallengePercentages
-		breachPercentage = 1
-
-		for defenseCategory in alliance[0].calculatedData.avgSuccessfulTimesCrossedDefensesAuto:
-			standardDevCategories.append(self.stanDevSumForDefenseCategory(alliance, defenseCategory))
-		standardDevCategories = sorted(standardDevCategories)
-
-		for category in range(1, len(standardDevCategories) + 1):
-			category = self.categories[category - 1]
-			breachPercentage *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(alliance, category), self.stanDevSumForDefenseCategory(alliance, category))
-
-
-		predictedScoreCustomAlliance += 20 * breachPercentage
-
-		return predictedScoreCustomAlliance
-
 	def scoreContribution(self, team, match):
 		individualScore = 0
 		timd = getTIMDForTeamNumberAndMatchNumber(team.number, match.number)
@@ -837,7 +834,8 @@ class Calculator(object):
 
 	def actualSeeding(self):
 		rankedTeams = []
-		for team in self.comp.teams:	#I don't know anything but bubble sorting ... :,(
+		for team in self.comp.teams:	#I don't know anything but bubble sorting ... :'(
+			# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData)
 			rankedTeams.append(team)
 		for team in range(len(rankedTeams)-1, 0, -1):
 			for i in range(team):
@@ -851,7 +849,7 @@ class Calculator(object):
 						rankedTeams[i] = rankedTeams[i + 1]
 						rankedTeams[i + 1] = temp
 					elif rankedTeams[i].calculatedData.numAutoPoints < rankedTeams[i + 1].calculatedData.numAutoPoints:
-						if rankedTeams[i].calculatedData.numScaleAndChallengePoints< rankedTeams[i + 1].calculatedData.numScaleAndChallengePoints:
+						if rankedTeams[i].calculatedData.numScaleAndChallengePoints < rankedTeams[i + 1].calculatedData.numScaleAndChallengePoints:
 							temp = rankedTeams[i]
 							rankedTeams[i] = rankedTeams[i + 1]
 							rankedTeams[i + 1] = temp
@@ -866,13 +864,13 @@ class Calculator(object):
 		teamsArray = []
 		for team in self.comp.teams:
 			teamsArray.append(team)
-		for team in range(len(teamsArray), 0, -1):
+		for team in range(len(teamsArray)-1, 0, -1):
 			for i in range(team):
-				if teamsArray[i].calculatedData.predictedNumberOfRPs < teamsArray[i + 1].calculatedData.predictedNumberOfRPs:
+				if teamsArray[i].calculatedData.predictedNumRPs < teamsArray[i + 1].calculatedData.predictedNumRPs:
 					temp = teamsArray[i]
 					teamsArray[i] = teamsArray[i + 1]
 					teamsArray[i + 1] = temp
-				elif teamsArray[i].calculatedData.predictedNumberOfRPs < teamsArray[i + 1].calculatedData.predictedNumberOfRPs:
+				elif teamsArray[i].calculatedData.predictedNumRPs == teamsArray[i + 1].calculatedData.predictedNumRPs:
 					if self.autoAbility(teamsArray[i]) < self.autoAbility(teamsArray[i + 1]):
 						temp = teamsArray[i]
 						teamsArray[i] = teamsArray[i + 1]
@@ -892,7 +890,7 @@ class Calculator(object):
 
 				#Super Scout Averages
 				
-				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+				# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 
 				team.calculatedData.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')
 				team.calculatedData.avgSpeed = self.averageTIMDObjectOverMatches(team, 'rankSpeed')
@@ -918,13 +916,13 @@ class Calculator(object):
 				team.calculatedData.avgMidlineBallsIntakedAuto = self.avgBallsIntaked(team, 'ballsIntakedAuto')
 				team.calculatedData.sdHighShotsAuto = self.standardDeviationObjectOverAllMatches(team, 'numHighShotsMadeAuto')
 				team.calculatedData.sdLowShotsAuto = self.standardDeviationObjectOverAllMatches(team, 'numLowShotsMadeAuto')
-				#team.calculatedData.sdMidlineBallsIntakedAuto = self.standardDeviationObjectOverAllMatches(team, 'ballsIntakedAuto')
+				# team.calculatedData.sdMidlineBallsIntakedAuto = self.standardDeviationObjectOverAllMatches(team, 'ballsIntakedAuto')
 				team.calculatedData.sdBallsKnockedOffMidlineAuto = self.standardDeviationObjectOverAllMatches(team, 'numBallsKnockedOffMidlineAuto')
 				team.calculatedData.avgSuccessfulCrossedDefensesAuto = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesSuccessfulCrossedDefensesAuto'))
 
 				
 
-				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+				# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 
 
 				#Tele
@@ -938,15 +936,14 @@ class Calculator(object):
 				#dddd
 				team.calculatedData.avgLowShotsTele = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeTele')
 				
-				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+				# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
 
 				team.calculatedData.highShotAccuracyTele = self.highShotAccuracy(team, False)
 				
 				#dddd
 				team.calculatedData.lowShotAccuracyTele = self.lowShotAccuracy(team, False)
 
-				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-				print("THE TEAM Calc: " + str(team.calculatedData))
+				# print("THE TEAM Calc: " + str(team.calculatedData))
 
 				team.calculatedData.blockingAbility = self.blockingAbility(team)
 				team.calculatedData.teleopShotAbility = self.teleopShotAbility(team)
@@ -960,34 +957,27 @@ class Calculator(object):
 				team.calculatedData.sdShotsBlocked = self.standardDeviationObjectOverAllMatches(team, 'numShotsBlockedTele')
 				team.calculatedData.numRPs = self.numRPsForTeam(team)
 				team.calculatedData.numScaleAndChallengePoints = self.numScaleAndChallengePointsForTeam(team)
-				#team.calculatedData.predictedNumRPs = self.predictedNumberOfRPs(team)
-				# print team.calculatedData.firstPickAbility
-				# print self.firstPickAbility(team)
-				print "hi" + str(team.calculatedData)
-				team.calculatedData.overallSecondPickAbility = self.overallSecondPickAbility(team)
-				# #print team.calculatedData.secondPickAbility
-				team.calculatedData.predictedSeed = self.getRankingForTeam(team)
-				print "TEST" + str(team.calculatedData.firstPickAbility)
-				if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-				team.calculatedData.firstPickAbility = self.firstPick(team)
+				team.calculatedData.firstPickAbility = self.firstPickAbility(team)				
 				team.calculatedData.secondPickAbility = self.secondPickAbility(team)
-
+				team.calculatedData.overallSecondPickAbility = self.overallSecondPickAbility(team)
+				team.calculatedData.predictedSeed = self.getRankingForTeam(team)
+			
 				FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 				print("Putting calculations for team " + str(team.number) + " to Firebase.")
 		
 		#Match Metrics
 		for match in self.comp.matches:
-			if isinstance(match.calculatedData, {"d":"d"}.__class__): match.calculatedData = DataModel.CalculatedTeamData(**match.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-			match.calculatedData.predictedBlueScore = self.predictedScoreForMatch(match)['blue']
-			match.calculatedData.predictedRedScore = self.predictedScoreForMatch(match)['red']
+			# if isinstance(match.calculatedData, {"d":"d"}.__class__): match.calculatedData = DataModel.CalculatedMatchData(**match.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
+			match.calculatedData.predictedBlueScore = 1 #self.predictedScoreForMatch(match)['blue']
+			match.calculatedData.predictedRedScore = 1 #self.predictedScoreForMatch(match)['red']
 			print "\nMatch " + str(match.number) + ':' + ' Blue: ' + str(match.calculatedData.predictedBlueScore) + ' Red: ' + str(match.calculatedData.predictedRedScore) 
 			numDefenseCrosses = self.numDefensesCrossedInMatch(match)
-			match.calculatedData.numDefenseCrossesByBlue = numDefenseCrosses['blue']
-			match.calculatedData.numDefenseCrossesByRed = numDefenseCrosses['red']
-			match.calculatedData.blueRPs = self.RPsGainedFromMatch(match)['blue']
-			match.calculatedData.redRPs = self.RPsGainedFromMatch(match)['red']
-			#print("Putting calculations for match " + str(match.number) + " to Firebase.")
-
+			match.calculatedData.numDefenseCrossesByBlue = self.numDefensesCrossedInMatch(match)['blue']
+			match.calculatedData.numDefenseCrossesByRed = self.numDefensesCrossedInMatch(match)['red']
+			match.calculatedData.actualBlueRPs = self.RPsGainedFromMatch(match)['blue']
+			match.calculatedData.actualRedRPs = self.RPsGainedFromMatch(match)['red']
+			FBC.addCalculatedMatchDataToFirebase(match.number, match.calculatedData)
+			print("Putting calculations for match " + str(match.number) + " to Firebase.")
 
 		#Competition metrics
 		if self.numPlayedMatchesInCompetition() > 0:

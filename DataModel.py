@@ -33,8 +33,16 @@ class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
+		self.args = args
 		self.secondPickAbility = {
 			1678 : -1.0
+		}
+		self.avgSuccessfulTimesCrossedDefenses = {
+			'a' : {'pc' : -1.0, 'cdf' : -1.0},
+			'b' : {'mt' : -1.0, 'rp' : -1.0},
+			'c' : {'db' : -1.0, 'sp' : -1.0},
+			'd' : {'rw' : -1.0, 'rt' : -1.0},
+			'e' : {'lb' : -1.0}
 		}
 		self.firstPickAbility = -1.0
 		self.overallSecondPickAbility = -1.0
@@ -139,9 +147,10 @@ class CalculatedTeamData(object):
 		self.RScoreEvasion = -1.0		
 		self.RScoreDefense = -1.0
 		self.RScoreBallControl = -1.0
+		self.RScoreDrivingAbility = -1.0
 		self.predictedSeed = -1
 		self.actualSeed = -1
-		#self.__dict__.update(args)
+		self.__dict__.update(args)
 
 		
 
@@ -184,14 +193,14 @@ class CalculatedMatchData(object):
 
 		self.numDefensesCrossedByBlue = -1
 		self.numDefensesCrossedByRed = -1 
-		self.redScoresForDefenses = {}
-		self.redWinningChanceForDefenses = {}
-		self.redBreachChanceForDefenses = {}
-		self.redRPsForDefenses = {}
-		self.blueScoresForDefenses = {}
-		self.blueWinningChanceForDefenses = {}
-		self.blueBreachChanceForDefenses = {}
-		self.blueRPsForDefenses = {}
+		self.redScoresForDefenses = {'-1' : -1}
+		self.redWinningChanceForDefenses = {'-1' : -1}
+		self.redBreachChanceForDefenses = {'-1' : -1}
+		self.redRPsForDefenses = {'-1' : -1}
+		self.blueScoresForDefenses = {'-1' : -1}
+		self.blueWinningChanceForDefenses = {'-1' : -1}
+		self.blueBreachChanceForDefenses = {'-1' : -1}
+		self.blueRPsForDefenses = {'-1': -1}
 		self.redWinChance = -1.0
 		self.redBreachChance = -1.0
 		self.redCaptureChance = -1.0
@@ -320,7 +329,6 @@ class CalculatedTeamInMatchData(object):
 	"""docstring for CalculatedTeamInMatchData"""
 	def __init__(self, **args):
 		super(CalculatedTeamInMatchData, self).__init__()
-		self.drivingAbility = -1.0
 		self.highShotAccuracyAuto = -1.0 
 		self.lowShotAccuracyAuto = -1.0 
 		self.highShotAccuracyTele = -1.0 
@@ -335,10 +343,12 @@ class CalculatedTeamInMatchData(object):
 		self.RScoreEvasion = -1.0		
 		self.RScoreDefense = -1.0
 		self.RScoreBallControl = -1.0
+		self.RScoreDrivingAbility = -1.0
 		self.citrusDPR = -1.0
-		self.driverAbility = -1.0
 		self.firstPickAbility = -1.0
-		self.secondPickAbility = [-1]
+		self.secondPickAbility = {
+			1678 : -1.0
+		}
 		self.overallSecondPickAbility = -1.0
 		self.scoreContribution = -1.0
 

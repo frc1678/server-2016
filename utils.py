@@ -39,8 +39,11 @@ def makeMatchFromDict(d):
 
 def makeTeamFromDict(d):
 	team = DataModel.Team(**d) #I have no idea why this works
+	
 	team.calculatedData = DataModel.CalculatedTeamData(**d['calculatedData'])
-	print("tn: " + str(team.number) + str(d['number']))
+	d = DataModel.Team(**d)
+	d.calculatedData = DataModel.CalculatedTeamData(**d.calculatedData)
+	# print("tn: " + str(team.number) + str(d['number']))
 	return team
 
 
@@ -65,11 +68,11 @@ def makeMatchesFromDicts(dicts):
 	return matches
 
 
-def makeDictFromTeam(t):
-	d = t.__dict__
-	if not isinstance(t.calculatedData, dict):
-		d["calculatedData"] = t.calculatedData.__dict__
-	return d
+# def makeDictFromTeam(t):
+# 	d = t.__dict__
+# 	if not isinstance(t.calculatedData, dict):
+# 		d["calculatedData"] = t.calculatedData.__dict__
+# 	return d
 
 
 def makeDictFromMatch(m):
@@ -88,6 +91,8 @@ def makeDictFromTIMD(timd):
 def makeDictFromCalculatedTeamData(calculatedData):
 	return calculatedData.__dict__
 
+def makeDictFromCalculatedMatchData(calculatedData):
+	return calculatedData.__dict__
 
 def makeTIMDsFromDicts(timds):
 	t = []
