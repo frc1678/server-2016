@@ -68,11 +68,20 @@ def makeMatchesFromDicts(dicts):
 	return matches
 
 
-# def makeDictFromTeam(t):
-# 	d = t.__dict__
-# 	if not isinstance(t.calculatedData, dict):
-# 		d["calculatedData"] = t.calculatedData.__dict__
-# 	return d
+def makeDictFromTeamOld(t):
+	d = t.__dict__
+	if not isinstance(t.calculatedData, dict):
+		d["calculatedData"] = t.calculatedData.__dict__
+	return d
+
+def makeDictFromObject(o):
+	return dict((key, value) for key, value in o.__dict__.iteritems() if not callable(value) and not key.startswith('__'))
+
+def makeDictFromTeam(t):
+	d = makeDictFromObject(t)
+	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
+	return d
+
 
 
 def makeDictFromMatch(m):

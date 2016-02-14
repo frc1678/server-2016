@@ -48,7 +48,8 @@ class FirebaseCommunicator(object):
 
 	def addCalculatedTeamDataToFirebase(self, teamNumber, calculatedTeamData):
 		calculatedTeamDataDict = utils.makeDictFromCalculatedTeamData(calculatedTeamData)
-		FBLocation = "/Teams/" + str(teamNumber) + "/calculatedData"
+		FBLocation = "/Teams/" + str(teamNumber) + 'calculatedData/'
+		print calculatedTeamDataDict
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
 
 	def addCalculatedMatchDataToFirebase(self, matchNumber, calculatedMatchData):

@@ -45,7 +45,7 @@ class Calculator(object):
 		timds = []
 		#print("t: " + str(team.number))
 		for timd in team.teamInMatchDatas:
-			if timd.numLowShotsMadeAuto > -1:
+			if timd.numLowMadeAuto > -1:
 				timds.append(timd)
 		# print("timds: " + str(timds))
 		return timds
@@ -299,7 +299,7 @@ class Calculator(object):
 		category = team.__dict__["calculatedData"].__dict__[key][defenseCategory]
 		#utils.makeTeamFromDict(d)
 
-		print team.calculatedData
+		#print team.calculatedData
 		#print category
 		total = 0
 		for defense in category:
@@ -552,13 +552,16 @@ class Calculator(object):
 	def firstPickAbility(self, team):
 		citrusC = self.getTeamForNumber(1678)
 		alliance = [citrusC, team]
+		predictedScoreCustomAlliance = self.predictedScoreCustomAlliance(alliance) 
+		if math.isnan(predictedScoreCustomAlliance):
+			return -2
 		return self.predictedScoreCustomAlliance(alliance) 
 
 	def secondPickAbility(self, team):
 		gamma = 0.5
 		teamsWithMatchesPlayed = []
 		for team in self.comp.teams:
-			if len(self.getPlayedMatchesForTeam(team)) > 0:
+			if len(self.getPlayedTIMDsForTeam(team)) > 0:
 				teamsWithMatchesPlayed.append(team)
 		matrixOfMatches = np.zeros((len(teamsWithMatchesPlayed), len(teamsWithMatchesPlayed)))
 		teamsArray = []
@@ -574,6 +577,7 @@ class Calculator(object):
 				matrixOfMatches[teamsWithMatchesPlayed.index(team1), teamsWithMatchesPlayed.index(team2)] = occurrence
 
 		# Create an array where the values correspond to how many matches two teams played together in the same alliance, and then shape it into a matrix
+		print matrixOfMatches
 		inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatches)	#Find the inverse of the matrix
 		teamDeltas = np.array([])
 		oppositionPredictedScore = 0
@@ -601,7 +605,8 @@ class Calculator(object):
 				alliance2Robots = [citrusC, team1]
 				scoreContribution = self.predictedScoreCustomAlliance(alliance3Robots) - self.predictedScoreCustomAlliance(alliance2Robots)
 				secondPickAbility[team1.number] = gamma * scoreContribution * (1 - gamma) * int(citrusDPR)		#gamma is a constant
-	
+		for key, spa in secondPickAbility.items():
+			if math.isnan(spa): secondPickAbility[key] = -2
 		return secondPickAbility
 
 	def overallSecondPickAbility(self, team):
@@ -614,7 +619,7 @@ class Calculator(object):
 		firstPickAbilityArray = sorted(firstPickAbilityArray, key = lambda team: team.calculatedData.firstPickAbility, reverse=True) #Sort teams by firstPickAbility
 		if len(firstPickAbilityArray) == len(team.calculatedData.secondPickAbility):
 			for index in range(0, 17):
-				overallSecondPickAbility += team.calculatedData.secondPickAbility[firstPickAbilityArray[index]]
+				overallSecondPickAbility += team.calculatedData.secondPickAbility[firstPickAbilityArray[index].number]
 
 			return overallSecondPickAbility / 16
 

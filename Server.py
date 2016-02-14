@@ -25,8 +25,8 @@ FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 calculator = Math.Calculator(comp)
 
 while(1):
+	dv.validateFirebase()
 	calculator.doCalculations(FBC)
-	#dv.validateFirebase()
 	time.sleep(10)
 	print("Calcs...")
 
