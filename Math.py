@@ -45,7 +45,7 @@ class Calculator(object):
 		timds = []
 		#print("t: " + str(team.number))
 		for timd in team.teamInMatchDatas:
-			if timd.numLowMadeAuto > -1:
+			if timd.numLowShotsMadeAuto > -1:
 				timds.append(timd)
 		# print("timds: " + str(timds))
 		return timds
@@ -617,7 +617,7 @@ class Calculator(object):
 			if teamNumber != 1678:
 				firstPickAbilityArray.append(team)
 		firstPickAbilityArray = sorted(firstPickAbilityArray, key = lambda team: team.calculatedData.firstPickAbility, reverse=True) #Sort teams by firstPickAbility
-		if len(firstPickAbilityArray) == len(team.calculatedData.secondPickAbility):
+		if len(firstPickAbilityArray) == len(team.calculatedData.secondPickAbility) and len(firstPickAbilityArray) >= 16:
 			for index in range(0, 17):
 				overallSecondPickAbility += team.calculatedData.secondPickAbility[firstPickAbilityArray[index].number]
 
@@ -937,19 +937,9 @@ class Calculator(object):
 				team.calculatedData.avgBallsKnockedOffMidlineAuto = self.averageTIMDObjectOverMatches(team, 'numBallsKnockedOffMidlineAuto')
 				team.calculatedData.avgShotsBlocked = self.averageTIMDObjectOverMatches(team, 'numShotsBlockedTele')
 				team.calculatedData.avgHighShotsTele = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeTele')
-				
-				#dddd
 				team.calculatedData.avgLowShotsTele = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeTele')
-				
-				# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-
 				team.calculatedData.highShotAccuracyTele = self.highShotAccuracy(team, False)
-				
-				#dddd
 				team.calculatedData.lowShotAccuracyTele = self.lowShotAccuracy(team, False)
-
-				# print("THE TEAM Calc: " + str(team.calculatedData))
-
 				team.calculatedData.blockingAbility = self.blockingAbility(team)
 				team.calculatedData.teleopShotAbility = self.teleopShotAbility(team)
 				team.calculatedData.siegeConsistency = self.siegeConsistency(team)

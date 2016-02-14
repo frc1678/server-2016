@@ -82,14 +82,16 @@ def makeDictFromTeam(t):
 	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
 	return d
 
-
-
-def makeDictFromMatch(m):
-	d = m.__dict__
-	if not isinstance(m.calculatedData, dict):
-		d["calculatedData"] = m.calculatedData.__dict__
+def makeDictFromMatchOld(t):
+ 	d = t.__dict__
+ 	if not isinstance(t.calculatedData, dict):
+ 		d["calculatedData"] = t.calculatedData.__dict__
+ 	return d
+ 
+def makeDictFromMatch(t):
+	d = makeDictFromObject(t)
+	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
 	return d
-
 
 def makeDictFromTIMD(timd):
 	d = timd.__dict__
