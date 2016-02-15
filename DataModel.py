@@ -11,7 +11,7 @@ class Competition(object):
 		self.teams = TeamList([])
 		self.matches = []
 		self.TIMDs = []
-		self.averageScore = -1
+		self.averageScore = None
 		self.predictedSeeding = []
 		self.actualSeeding = []
 	def updateTeamsAndMatchesFromFirebase(self):
@@ -22,7 +22,8 @@ class Competition(object):
 		for team in self.teams:
 			for TIMD in self.TIMDs:
 				if TIMD.teamNumber == team.number:
-					team.teamInMatchDatas.append(TIMD) #These loops are nested too far, but not a lot we can do about it.
+					if team.teamInMatchDatas != None:
+						team.teamInMatchDatas.append(TIMD) #These loops are nested too far, but not a lot we can do about it.
 		for match in self.matches:
 			for TIMD in self.TIMDs:
 				if TIMD.matchNumber == match.number:
@@ -34,122 +35,122 @@ class CalculatedTeamData(object):
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.secondPickAbility = {
-			1678 : -1.0
+			None : None
 		}
 		self.avgSuccessfulTimesCrossedDefenses = {
-			'a' : {'pc' : -1.0, 'cdf' : -1.0},
-			'b' : {'mt' : -1.0, 'rp' : -1.0},
-			'c' : {'db' : -1.0, 'sp' : -1.0},
-			'd' : {'rw' : -1.0, 'rt' : -1.0},
-			'e' : {'lb' : -1.0}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
-		self.firstPickAbility = -1.0
-		self.overallSecondPickAbility = -1.0
-		self.citrusDPR = -1.0
-		self.highShotAccuracyAuto = -1.0 #Works
-		self.lowShotAccuracyAuto = -1.0 #Works
-		self.highShotAccuracyTele = -1.0 #Works
-		self.lowShotAccuracyTele = -1.0 #Works
-		self.avgGroundIntakes = -1.0 #Works
-		self.avgHighShotsTele = -1.0 #Works
-		self.avgLowShotsTele = -1.0 #Works
-		self.avgShotsBlocked = -1.0 #Works
-		self.avgHighShotsAuto = -1.0 #Works
-		self.avgLowShotsAuto = -1.0 #Works
-		self.avgMidlineBallsIntakedAuto = -1.0 #Works
-		self.avgBallsKnockedOffMidlineAuto = -1.0 #Works
-		self.avgTorque = -1.0
-		self.avgSpeed = -1.0
-		self.avgEvasion = -1.0
-		self.avgDefense = -1.0
-		self.avgBallControl = -1.0
-		self.blockingAbility = -1.0
-		self.disfunctionalPercentage = -1.0
-		self.reachPercentage = -1.0
-		self.disabledPercentage = -1.0
-		self.incapacitatedPercentage = -1.0
-		self.scalePercentage = -1.0
-		self.challengePercentage = -1.0
-		self.breachPercentage = -1.0
+		self.firstPickAbility = None
+		self.overallSecondPickAbility = None
+		self.citrusDPR = None
+		self.highShotAccuracyAuto = None #Works
+		self.lowShotAccuracyAuto = None #Works
+		self.highShotAccuracyTele = None #Works
+		self.lowShotAccuracyTele = None #Works
+		self.avgGroundIntakes = None #Works
+		self.avgHighShotsTele = None #Works
+		self.avgLowShotsTele = None #Works
+		self.avgShotsBlocked = None #Works
+		self.avgHighShotsAuto = None #Works
+		self.avgLowShotsAuto = None #Works
+		self.avgMidlineBallsIntakedAuto = None #Works
+		self.avgBallsKnockedOffMidlineAuto = None #Works
+		self.avgTorque = None
+		self.avgSpeed = None
+		self.avgEvasion = None
+		self.avgDefense = None
+		self.avgBallControl = None
+		self.blockingAbility = None
+		self.disfunctionalPercentage = None
+		self.reachPercentage = None
+		self.disabledPercentage = None
+		self.incapacitatedPercentage = None
+		self.scalePercentage = None
+		self.challengePercentage = None
+		self.breachPercentage = None
 		self.avgSuccessfulTimesCrossedDefensesAuto = { #Works
-		  	'a' : {'pc' : -1.0, 'cdf' : -1.0},
-			'b' : {'mt' : -1.0, 'rp' : -1.0},
-			'c' : {'db' : -1.0, 'sp' : -1.0},
-			'd' : {'rw' : -1.0, 'rt' : -1.0},
-			'e' : {'lb' : -1.0}
+		  	'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 		self.avgSuccessfulTimesCrossedDefensesTele = { #Works
-		  	'a' : {'pc' : -1.0, 'cdf' : -1.0},
-			'b' : {'mt' : -1.0, 'rp' : -1.0},
-			'c' : {'db' : -1.0, 'sp' : -1.0},
-			'd' : {'rw' : -1.0, 'rt' : -1.0},
-			'e' : {'lb' : -1.0}
+		  	'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 		self.avgFailedTimesCrossedDefensesAuto = {
-		 	'a' : {'pc' : -1.0, 'cdf' : -1.0},
-			'b' : {'mt' : -1.0, 'rp' : -1.0},
-			'c' : {'db' : -1.0, 'sp' : -1.0},
-			'd' : {'rw' : -1.0, 'rt' : -1.0},
-			'e' : {'lb' : -1.0}
+		 	'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 		self.avgFailedTimesCrossedDefensesTele = {
-		 	'a' : {'pc' : -1.0, 'cdf' : -1.0},
-			'b' : {'mt' : -1.0, 'rp' : -1.0},
-			'c' : {'db' : -1.0, 'sp' : -1.0},
-			'd' : {'rw' : -1.0, 'rt' : -1.0},
-			'e' : {'lb' : -1.0}
+		 	'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
-		self.siegePower = -1.0
-		self.siegeConsistency = -1.0
-		self.siegeAbility = -1.0
-		self.predictedNumRPs = -1.0
-		self.numRPs = -1
-		self.numAutoPoints = -1
-		self.numScaleAndChallengePoints = -1
-		self.sdHighShotsAuto = -1
-		self.sdHighShotsTele = -1
-		self.sdLowShotsAuto = -1
-		self.sdLowShotsTele = -1
-		self.sdGroundIntakes = -1
-		self.sdShotsBlocked = -1
-		self.sdMidlineBallsIntakedAuto = -1
-		self.sdBallsKnockedOffMidlineAuto = -1
+		self.siegePower = None
+		self.siegeConsistency = None
+		self.siegeAbility = None
+		self.predictedNumRPs = None
+		self.numRPs = None
+		self.numAutoPoints = None
+		self.numScaleAndChallengePoints = None
+		self.sdHighShotsAuto = None
+		self.sdHighShotsTele = None
+		self.sdLowShotsAuto = None
+		self.sdLowShotsTele = None
+		self.sdGroundIntakes = None
+		self.sdShotsBlocked = None
+		self.sdMidlineBallsIntakedAuto = None
+		self.sdBallsKnockedOffMidlineAuto = None
 		self.sdSuccessfulDefenseCrossesAuto = {
-			'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 		self.sdSuccessfulDefenseCrossesTele = {
-			'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 		self.sdFailedDefenseCrossesAuto = {
-			'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 		self.sdFailedDefenseCrossesTele = {
-			'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
-		self.RScoreTorque = -1.0
-		self.RScoreSpeed = -1.0
-		self.RScoreEvasion = -1.0		
-		self.RScoreDefense = -1.0
-		self.RScoreBallControl = -1.0
-		self.RScoreDrivingAbility = -1.0
-		self.predictedSeed = -1
-		self.actualSeed = -1
+		self.RScoreTorque = None
+		self.RScoreSpeed = None
+		self.RScoreEvasion = None		
+		self.RScoreDefense = None
+		self.RScoreBallControl = None
+		self.RScoreDrivingAbility = None
+		self.predictedSeed = None
+		self.actualSeed = None
 		self.__dict__.update(args)
 
 		
@@ -158,29 +159,28 @@ class Team(object):
 	"""An FRC Team object"""
 	def __init__(self, **args):
 		super(Team, self).__init__()
-		self.name = ""
-		self.number = -1
-		self.matches = []
-		self.teamInMatchDatas = []
+		self.name = None
+		self.number = None
+		self.teamInMatchDatas = None
 		self.calculatedData = CalculatedTeamData()
-		self.selectedImageUrl = '-1'
+		self.selectedImageUrl = None
 		self.otherImageUrls = {
-			 'not0' : '-1'
+			 None : None
 		}
-		self.pitHeightOfBallLeavingShooter = -1.0
-		self.pitLowBarCapability = False
-		self.pitPotentialLowBarCapability = -1
-		#self.pitPotentialCDFAndPCCapability = -1
-		self.pitPotentialMidlineBallCapability = -1
-		#self.pitFrontBumperWidth = -1.0
-		self.pitDriveBaseWidth = -1.0
-		self.pitDriveBaseLength = -1.0
-		self.pitBumperHeight = -1.0
-		self.pitPotentialShotBlockerCapability = -1
-		self.pitNotes = "-1"
-		self.pitOrganization = -1
-		self.pitNumberOfWheels = -1
-		#self.pitHeightOfRobot = -1
+		self.pitHeightOfBallLeavingShooter = None
+		self.pitLowBarCapability = None
+		self.pitPotentialLowBarCapability = None
+		#self.pitPotentialCDFAndPCCapability = None
+		self.pitPotentialMidlineBallCapability = None
+		#self.pitFrontBumperWidth = None
+		self.pitDriveBaseWidth = None
+		self.pitDriveBaseLength = None
+		self.pitBumperHeight = None
+		self.pitPotentialShotBlockerCapability = None
+		self.pitNotes = None
+		self.pitOrganization = None
+		self.pitNumberOfWheels = None
+		#self.pitHeightOfRobot = None
 		self.__dict__.update(args)
 
 
@@ -188,33 +188,33 @@ class CalculatedMatchData(object):
 	"""docstring for CalculatedMatchData"""
 	def __init__(self, **args):
 		super(CalculatedMatchData, self).__init__()
-		self.predictedRedScore = -1.0
-		self.predictedBlueScore = -1.0	
+		self.predictedRedScore = None
+		self.predictedBlueScore = None	
 
-		self.numDefensesCrossedByBlue = -1
-		self.numDefensesCrossedByRed = -1 
-		self.redScoresForDefenses = {'-1' : -1}
-		self.redWinningChanceForDefenses = {'-1' : -1}
-		self.redBreachChanceForDefenses = {'-1' : -1}
-		self.redRPsForDefenses = {'-1' : -1}
-		self.blueScoresForDefenses = {'-1' : -1}
-		self.blueWinningChanceForDefenses = {'-1' : -1}
-		self.blueBreachChanceForDefenses = {'-1' : -1}
-		self.blueRPsForDefenses = {'-1': -1}
-		self.redWinChance = -1.0
-		self.redBreachChance = -1.0
-		self.redCaptureChance = -1.0
-		self.blueWinChance = -1.0
-		self.blueBreachChance = -1.0
-		self.blueCaptureChance = -1.0
-		self.predictedBlueRPs = -1.0
-		self.actualBlueRPs = -1
-		self.predictedRedRPs = -1.0
-		self.actualRedRPs = -1	
-		self.redAllianceDidBreach = False
-		self.blueAllianceDidBreach = False
-		self.optimalRedDefenses = ['pc', 'mt', 'sp', 'rw']
-		self.optimalBlueDefenses = ['pc', 'mt', 'sp', 'rw']
+		self.numDefensesCrossedByBlue = None
+		self.numDefensesCrossedByRed = None 
+		self.redScoresForDefenses = {None : None}
+		self.redWinningChanceForDefenses = {None : None}
+		self.redBreachChanceForDefenses = {None : None}
+		self.redRPsForDefenses = {None : None}
+		self.blueScoresForDefenses = {None : None}
+		self.blueWinningChanceForDefenses = {None : None}
+		self.blueBreachChanceForDefenses = {None : None}
+		self.blueRPsForDefenses = {None: None}
+		self.redWinChance = None
+		self.redBreachChance = None
+		self.redCaptureChance = None
+		self.blueWinChance = None
+		self.blueBreachChance = None
+		self.blueCaptureChance = None
+		self.predictedBlueRPs = None
+		self.actualBlueRPs = None
+		self.predictedRedRPs = None
+		self.actualRedRPs = None	
+		self.redAllianceDidBreach = None
+		self.blueAllianceDidBreach = None
+		self.optimalRedDefenses = None
+		self.optimalBlueDefenses = None
 
 		self.__dict__.update(args)
 
@@ -223,18 +223,18 @@ class Match(object):
 	"""An FRC Match Object"""
 	def __init__(self, **args):
 		super(Match, self).__init__()
-		self.number = -1
+		self.number = None
 		self.calculatedData = CalculatedMatchData()
-		self.redAllianceTeamNumbers = []
-		self.blueAllianceTeamNumbers = []
-		self.redScore = -1
-		self.blueScore = -1
-		self.redDefensePositions = ['lb', '', '', '', '']
-		self.blueDefensePositions = ['lb', '', '', '', '']
-		self.redAllianceDidCapture = False
-		self.blueAllianceDidCapture = False
-		self.blueAllianceDidBreach = False
-		self.redAllianceDidBreach = False
+		self.redAllianceTeamNumbers = None
+		self.blueAllianceTeamNumbers = None
+		self.redScore = None
+		self.blueScore = None
+		self.redDefensePositions = None
+		self.blueDefensePositions = None
+		self.redAllianceDidCapture = None
+		self.blueAllianceDidCapture = None
+		self.blueAllianceDidBreach = None
+		self.redAllianceDidBreach = None
 		self.TIMDs = []
 		self.__dict__.update(args)
 		
@@ -244,84 +244,84 @@ class TeamInMatchData(object):
 		super(TeamInMatchData, self).__init__()
 		
 		self.calculatedData = CalculatedTeamInMatchData()
-		self.teamNumber = -1
-		self.matchNumber = -1
-		self.scoutName = 'no_name'
+		self.teamNumber = None
+		self.matchNumber = None
+		self.scoutName = None
 
-		self.didGetIncapacitated = False
-		self.didGetDisabled = False
-		self.rankTorque = -1
-		self.rankSpeed = -1
-		self.rankEvasion = -1
-		self.rankDefense = -1
-		self.rankBallControl = -1
+		self.didGetIncapacitated = None
+		self.didGetDisabled = None
+		self.rankTorque = None
+		self.rankSpeed = None
+		self.rankEvasion = None
+		self.rankDefense = None
+		self.rankBallControl = None
 
 		#Auto
-		self.ballsIntakedAuto = []
-		self.numBallsKnockedOffMidlineAuto = -1
+		self.ballsIntakedAuto = None
+		self.numBallsKnockedOffMidlineAuto = None
 		# self.timesCrossedDefensesAuto = {
-		# 	'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
+		# 	'a' : {'pc' : {'successes' : None, 'fails' : None}, 'cdf' : {'successes' : None, 'fails' : None}},
+		# 	'b' : {'mt' : {'successes' : None, 'fails' : None}, 'rp' : {'successes' : None, 'fails' : None}},
+		# 	'c' : {'db' : {'successes' : None, 'fails' : None}, 'sp' : {'successes' : None, 'fails' : None}},
+		# 	'd' : {'rw' : {'successes' : None, 'fails' : None}, 'rt' : {'successes' : None, 'fails' : None}},
+		# 	'e' : {'lb' : {'successes' : None, 'fails' : None}}
 		# }
 
 		self.timesSuccessfulCrossedDefensesAuto = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 
 		self.timesFailedCrossedDefensesAuto = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 
-		self.numHighShotsMadeAuto = -1
-		self.numLowShotsMadeAuto = -1
-		self.numHighShotsMissedAuto = -1
-		self.numLowShotsMissedAuto = -1
-		self.didReachAuto = False
+		self.numHighShotsMadeAuto = None
+		self.numLowShotsMadeAuto = None
+		self.numHighShotsMissedAuto = None
+		self.numLowShotsMissedAuto = None
+		self.didReachAuto = None
 
 		#Tele
-		self.numHighShotsMadeTele = -1
-		self.numLowShotsMadeTele = -1
-		self.numHighShotsMissedTele = -1
-		self.numLowShotsMissedTele = -1
-		self.numGroundIntakesTele = -1
-		self.numShotsBlockedTele = -1
-		self.didScaleTele = False
-		self.didChallengeTele = False
+		self.numHighShotsMadeTele = None
+		self.numLowShotsMadeTele = None
+		self.numHighShotsMissedTele = None
+		self.numLowShotsMissedTele = None
+		self.numGroundIntakesTele = None
+		self.numShotsBlockedTele = None
+		self.didScaleTele = None
+		self.didChallengeTele = None
 		# self.timesCrossedDefensesTele = {
-	 # 		'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
-	 # 		'b' : {'mt' : {'successes' : [-1], 'fails' : [-1]}, 'rp' : {'successes' : [-1], 'fails' : [-1]}},
-	 # 		'c' : {'db' : {'successes' : [-1], 'fails' : [-1]}, 'sp' : {'successes' : [-1], 'fails' : [-1]}},
-	 # 		'd' : {'rw' : {'successes' : [-1], 'fails' : [-1]}, 'rt' : {'successes' : [-1], 'fails' : [-1]}},
-		# 	'e' : {'lb' : {'successes' : [-1], 'fails' : [-1]}}
+	 # 		'a' : {'pc' : {'successes' : None, 'fails' : None}, 'cdf' : {'successes' : None, 'fails' : None}},
+	 # 		'b' : {'mt' : {'successes' : None, 'fails' : None}, 'rp' : {'successes' : None, 'fails' : None}},
+	 # 		'c' : {'db' : {'successes' : None, 'fails' : None}, 'sp' : {'successes' : None, 'fails' : None}},
+	 # 		'd' : {'rw' : {'successes' : None, 'fails' : None}, 'rt' : {'successes' : None, 'fails' : None}},
+		# 	'e' : {'lb' : {'successes' : None, 'fails' : None}}
 		#  }
 
 		self.timesSuccessfulCrossedDefensesTele = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 
 		self.timesFailedCrossedDefensesTele = {
-			'a' : {'pc' : [-1], 'cdf' : [-1]},
-			'b' : {'mt' : [-1], 'rp' : [-1]},
-			'c' : {'db' : [-1], 'sp' : [-1]},
-			'd' : {'rw' : [-1], 'rt' : [-1]},
-			'e' : {'lb' : [-1]}
+			'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
-		self.superNotes = '-1'
+		self.superNotes = None
 
 		self.__dict__.update(args)		
 
@@ -329,28 +329,28 @@ class CalculatedTeamInMatchData(object):
 	"""docstring for CalculatedTeamInMatchData"""
 	def __init__(self, **args):
 		super(CalculatedTeamInMatchData, self).__init__()
-		self.highShotAccuracyAuto = -1.0 #
-		self.lowShotAccuracyAuto = -1.0 #
-		self.highShotAccuracyTele = -1.0 #
-		self.lowShotAccuracyTele = -1.0 #
-		self.siegeAbility = -1.0#
-		self.numRPs = -1#
-		self.numAutoPoints = -1#
-		self.numScaleAndChallengePoints = -1#
+		self.highShotAccuracyAuto = None #
+		self.lowShotAccuracyAuto = None #
+		self.highShotAccuracyTele = None #
+		self.lowShotAccuracyTele = None #
+		self.siegeAbility = None#
+		self.numRPs = None#
+		self.numAutoPoints = None#
+		self.numScaleAndChallengePoints = None#
 		
-		self.RScoreTorque = -1.0
-		self.RScoreSpeed = -1.0
-		self.RScoreEvasion = -1.0		
-		self.RScoreDefense = -1.0
-		self.RScoreBallControl = -1.0
-		self.RScoreDrivingAbility = -1.0
-		self.citrusDPR = -1.0 
-		self.firstPickAbility = -1.0
+		self.RScoreTorque = None
+		self.RScoreSpeed = None
+		self.RScoreEvasion = None		
+		self.RScoreDefense = None
+		self.RScoreBallControl = None
+		self.RScoreDrivingAbility = None
+		self.citrusDPR = None 
+		self.firstPickAbility = None
 		self.secondPickAbility = {
-			1678 : -1.0
+			None: None
 		}
-		self.overallSecondPickAbility = -1.0
-		self.scoreContribution = -1.0 #
+		self.overallSecondPickAbility = None
+		self.scoreContribution = None #
 
 		self.__dict__.update(args)
 
