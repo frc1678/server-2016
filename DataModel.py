@@ -33,7 +33,6 @@ class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
-		self.args = args
 		self.secondPickAbility = {
 			1678 : -1.0
 		}
@@ -64,6 +63,7 @@ class CalculatedTeamData(object):
 		self.avgEvasion = -1.0
 		self.avgDefense = -1.0
 		self.avgBallControl = -1.0
+		self.blockingAbility = -1.0
 		self.disfunctionalPercentage = -1.0
 		self.reachPercentage = -1.0
 		self.disabledPercentage = -1.0
@@ -287,7 +287,7 @@ class TeamInMatchData(object):
 		self.numLowShotsMadeAuto = -1
 		self.numHighShotsMissedAuto = -1
 		self.numLowShotsMissedAuto = -1
-		self.didReachAuto = True
+		self.didReachAuto = False
 
 		#Tele
 		self.numHighShotsMadeTele = -1
@@ -296,7 +296,7 @@ class TeamInMatchData(object):
 		self.numLowShotsMissedTele = -1
 		self.numGroundIntakesTele = -1
 		self.numShotsBlockedTele = -1
-		self.didScaleTele = True
+		self.didScaleTele = False
 		self.didChallengeTele = False
 		# self.timesCrossedDefensesTele = {
 	 # 		'a' : {'pc' : {'successes' : [-1], 'fails' : [-1]}, 'cdf' : {'successes' : [-1], 'fails' : [-1]}},
@@ -329,28 +329,28 @@ class CalculatedTeamInMatchData(object):
 	"""docstring for CalculatedTeamInMatchData"""
 	def __init__(self, **args):
 		super(CalculatedTeamInMatchData, self).__init__()
-		self.highShotAccuracyAuto = -1.0 
-		self.lowShotAccuracyAuto = -1.0 
-		self.highShotAccuracyTele = -1.0 
-		self.lowShotAccuracyTele = -1.0 
-		self.siegeAbility = -1.0
-		self.siegePower = -1.0
-		self.numRPs = -1
-		self.numAutoPoints = -1
-		self.numScaleAndChallengePoints = -1
+		self.highShotAccuracyAuto = -1.0 #
+		self.lowShotAccuracyAuto = -1.0 #
+		self.highShotAccuracyTele = -1.0 #
+		self.lowShotAccuracyTele = -1.0 #
+		self.siegeAbility = -1.0#
+		self.numRPs = -1#
+		self.numAutoPoints = -1#
+		self.numScaleAndChallengePoints = -1#
+		
 		self.RScoreTorque = -1.0
 		self.RScoreSpeed = -1.0
 		self.RScoreEvasion = -1.0		
 		self.RScoreDefense = -1.0
 		self.RScoreBallControl = -1.0
 		self.RScoreDrivingAbility = -1.0
-		self.citrusDPR = -1.0
+		self.citrusDPR = -1.0 
 		self.firstPickAbility = -1.0
 		self.secondPickAbility = {
 			1678 : -1.0
 		}
 		self.overallSecondPickAbility = -1.0
-		self.scoreContribution = -1.0
+		self.scoreContribution = -1.0 #
 
 		self.__dict__.update(args)
 

@@ -24,11 +24,10 @@ class DataValidator(object):
 	def validateTeams(self, teams):
 		problems = []
 		for team in teams:
-			thereHasBeenANegetive1 = False
-			thereHasBeenANonNegetive = False
+			thereHasBeenANegative1 = False
+			thereHasBeenANonNegative = False
 			t = utils.makeDictFromTeam(team).items()
 			for key, value in t:
-				
 				if key == "calculatedData":
 					ctdProblems = self.validateCalculatedTeamData(value, team.number)
 					if ctdProblems != []:
@@ -40,13 +39,12 @@ class DataValidator(object):
 					 	if timdProblems != []:
 					 		problems.append(timdProblems)
 
-				if (value in self.valueNotUploaded) or key != "name" or key != "number":
-					thereHasBeenANegetive1 = True
-				else:
-					thereHasBeenANonNegetive = True
-					print "HI T" + str(value)
-				
-				if thereHasBeenANegetive1 and thereHasBeenANonNegetive:
+				if (value in self.valueNotUploaded) and ("pit" not in key) and key != "name" and key != "number" and key != "teamInMatchDatas" and key != "calculatedData" and key != 'matches':
+					thereHasBeenANegative1 = True
+				elif (value not in self.valueNotUploaded) and key != 'name' and key != 'number' and ('pit' not in key) and key != "teamInMatchDatas" and key != "calculatedData" and key != 'matches':
+					thereHasBeenANonNegative = True  
+
+				if thereHasBeenANegative1 and thereHasBeenANonNegative:
 					problems.append(str(team.number) + ": Has a -1 in one value, but not in another.")
 					break
 		return problems
@@ -56,14 +54,13 @@ class DataValidator(object):
 		problems = []
 		calcD = CTD.items()
 		for key, value in calcD:
-			thereHasBeenANegetive1 = False
-			thereHasBeenANonNegetive = False
-			if (value in self.valueNotUploaded) or key != "name" or key != "number":
-				thereHasBeenANegetive1 = True
+			thereHasBeenANegative1 = False
+			thereHasBeenANonNegative = False
+			if (value in self.valueNotUploaded):
+				thereHasBeenANegative1 = True
 			else:
-				thereHasBeenANonNegetive = True
-				print "HI CT" + str(value)
-			if thereHasBeenANegetive1 and thereHasBeenANonNegetive:
+				thereHasBeenANonNegative = True
+			if thereHasBeenANegative1 and thereHasBeenANonNegative:
 				problems.append(str(teamNumber) + ": Has a -1 in one CALCULATED DATA value, but not in another.")
 				break
 
@@ -74,14 +71,14 @@ class DataValidator(object):
 	def validateTeamInMatchData(self, TIMD):
 		problems = []
 		for key, value in TIMD.items():
-			thereHasBeenANegetive1 = False
-			thereHasBeenANonNegetive = False
+			thereHasBeenANegative1 = False
+			thereHasBeenANonNegative = False
 			if (value in self.valueNotUploaded) or key != "name" or key != "number":
-				thereHasBeenANegetive1 = True
+				thereHasBeenANegative1 = True
 			else:
-				thereHasBeenANonNegetive = True
+				thereHasBeenANonNegative = True
 			
-			if thereHasBeenANegetive1 and thereHasBeenANonNegetive:
+			if thereHasBeenANegative1 and thereHasBeenANonNegative:
 				problems.append(str(TIMD["teamNumber"]) + ": Has a -1 in one TEAM IN MATCH DATA value, but not in another.")
 				break
 		return problems
