@@ -4,15 +4,16 @@ import json
 from firebase import firebase as fb
 import unicodedata
 import random
+from os import listdir
 
 #superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc" #dev
-#superSecret = "hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u" #dev2
+superSecret = "hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u" #dev2
 #superSecret = "AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq" #dev3
-superSecret = "qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee" #scouting
+#superSecret = "qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee" #scouting
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
 
-firebase = fb.FirebaseApplication('https://1678-scouting-2016.firebaseio.com/', auth)
+firebase = fb.FirebaseApplication('https://1678-dev2-2016.firebaseio.com/', auth)
 
 class FirebaseCommunicator(object):
 	"""docstring for FirebaseCommunicator"""
@@ -98,8 +99,8 @@ class FirebaseCommunicator(object):
 			alliancesDict = match["alliances"]
 			m.number = match["match_number"]
 			print str(m.number) + ",",
-			m.blueScore = -1
-			m.redScore = -1
+			m.blueScore = None
+			m.redScore = None
 			m.blueAllianceTeamNumbers = alliancesDict["blue"]["teams"]
 			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
 			self.updateFirebaseWithMatch(m)
@@ -130,6 +131,14 @@ class FirebaseCommunicator(object):
 		firebase.put(FBLocation, 'Matches', [])
 		firebase.put(FBLocation, 'TeamInMatchDatas', [])
 
+	def cacheFirebase(self):
+		numFiles = len(listdir("./CachedFirebases"))
+		data = json.dumps(firebase.get("/", None))
+		with open("./CachedFirebases/" + str(numFiles) + '.json', 'w') as f:
+			f.write(data)
+			f.close()
+
+
 def getPythonObjectForFirebaseDataAtLocation(location):
 	# The location will be a key path, like '/' for the root (entire) object.
 	result = firebase.get(location, None)
@@ -139,3 +148,5 @@ def getPythonObjectForFirebaseDataAtLocation(location):
 	But they will be JSON formatted get request parameters. :)
 	'''
 	return utils.readJSONFromString(json.dumps(result))
+
+

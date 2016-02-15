@@ -33,16 +33,17 @@ def readJSONFileToObj(fileName):
 
 def makeMatchFromDict(d):
 	match = DataModel.Match(**d) #I have no idea why this works
-	match.calculatedData = DataModel.CalculatedMatchData(**d['calculatedData'])
+	if 'calculatedData' in d.keys():
+		match.calculatedData = DataModel.CalculatedMatchData(**d['calculatedData'])
 	return match
 
 
 def makeTeamFromDict(d):
 	team = DataModel.Team(**d) #I have no idea why this works
-	
-	team.calculatedData = DataModel.CalculatedTeamData(**d['calculatedData'])
-	d = DataModel.Team(**d)
-	d.calculatedData = DataModel.CalculatedTeamData(**d.calculatedData)
+	if 'calculatedData' in d.keys():
+		team.calculatedData = DataModel.CalculatedTeamData(**d['calculatedData'])
+		d = DataModel.Team(**d)
+		d.calculatedData = DataModel.CalculatedTeamData(**d.calculatedData)
 	# print("tn: " + str(team.number) + str(d['number']))
 	return team
 

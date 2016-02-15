@@ -24,10 +24,20 @@ FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 
 calculator = Math.Calculator(comp)
 
+secsBetweenCalc = 10
+shouldCacheSecsCounter = 0
+print(1/2)
+numHoursBetweenCaches = 1.0/360.0
+
 while(1):
+	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
+		shouldCacheSecsCounter = 0
+	if(shouldCacheSecsCounter == 0):
+		FBC.cacheFirebase()
+	shouldCacheSecsCounter += secsBetweenCalc
 	dv.validateFirebase()
 	calculator.doCalculations(FBC)
-	time.sleep(10)
+	time.sleep(secsBetweenCalc)
 	print("Calcs...")
 
 ''' # DEBUG

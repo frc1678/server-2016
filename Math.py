@@ -47,11 +47,12 @@ class Calculator(object):
 	def getPlayedTIMDsForTeam(self, team):
 		timds = []
 		#print("t: " + str(team.number))
-		for timd in team.teamInMatchDatas:
-				#print "LOWSHOTSAUTO" + str(timd.numLowShotsMadeAuto)
-			if timd.numLowShotsMadeAuto > -1:
-				timds.append(timd)
-		# print("timds: " + str(timds))
+		if team.teamInMatchDatas != None:
+			for timd in team.teamInMatchDatas:
+					#print "LOWSHOTSAUTO" + str(timd.numLowShotsMadeAuto)
+				if timd.numLowShotsMadeAuto > -1:
+					timds.append(timd)
+			# print("timds: " + str(timds))
 		#print str(len(timds)) + "TEST" 
 		return timds
 
@@ -333,7 +334,7 @@ class Calculator(object):
 		#print "TESTING" + str(team.calculatedData)
 		# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData)
 		return 5 * (team.calculatedData.avgHighShotsTele) + 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.avgLowShotsTele
-	
+
 	def totalSDShotPointsForTeam(self, team):
 		return 5 * team.calculatedData.sdHighShotsTele + 10 * team.calculatedData.sdHighShotsAuto + 5 * team.calculatedData.sdLowShotsAuto + 2 * team.calculatedData.sdLowShotsTele
 
@@ -402,23 +403,25 @@ class Calculator(object):
 		outputDict = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
 		for match in self.comp.matches:
 			for d in outputDict:
-				if d in match.blueDefensePositions:
-					outputDict[d] += 3
-				if d in match.redDefensePositions:
-					outputDict[d] += 3
+				if match.blueDefensePositions != None:
+					if d in match.blueDefensePositions:
+						outputDict[d] += 3
+					if d in match.redDefensePositions:
+						outputDict[d] += 3
 		return outputDict
 
 	def timesDefensesFacedInAllMatchesForTeam(self, team):
 		outputDict = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
 		for match in self.comp.matches:
-			if team.number in match.redAllianceTeamNumbers:
-				for d in outputDict:
-					if d in match.blueDefensePositions:
-						outputDict[d] += 1
-			elif team.number in match.blueAllianceTeamNumbers:
-				for d in outputDict:
-					if d in match.redDefensePositions:
-						outputDict[d] += 1
+			if match.redDefensePositions != None:
+				if team.number in match.redAllianceTeamNumbers:
+					for d in outputDict:
+						if d in match.blueDefensePositions:
+							outputDict[d] += 1
+				elif team.number in match.blueAllianceTeamNumbers:
+					for d in outputDict:
+						if d in match.redDefensePositions:
+							outputDict[d] += 1
 		return outputDict
 
 	def predictedCrosses(self, team, defense):
@@ -662,13 +665,15 @@ class Calculator(object):
 		for teamNumber in match.blueAllianceTeamNumbers:
 			team = self.getTeamForNumber(teamNumber)
 			blueTeams.append(team)
-			predictedScoreForMatch['blue']['score'] += self.totalAvgNumShotPointsForTeam(team)
+			if team.calculatedData.avgHighShotsTele != None:
+				predictedScoreForMatch['blue']['score'] += self.totalAvgNumShotPointsForTeam(team)
 
 		redTeams = []
 		for teamNumber in match.redAllianceTeamNumbers:
 			redTeams.append(self.getTeamForNumber(teamNumber))
 		# predictedScoreForMatch['blue']['score'] -=  5 * (self.blockedShotPointsForAlliance(blueTeams, redTeams)) - ((self.blockedShotPointsForAlliance(blueTeams, redTeams) + self.blockedShotPointsForAlliance(redTeams, blueTeams)) / 2)
-		predictedScoreForMatch['blue']['score'] += self.reachPointsForAlliance(blueTeams)
+		if blueTeams[0].calculatedData.avgHighShotsTele != None:
+			predictedScoreForMatch['blue']['score'] += self.reachPointsForAlliance(blueTeams)
 		
 		for defCategory in blueTeams[0].calculatedData.avgSuccessfulTimesCrossedDefensesTele.values():
 			crossesForCategory = 0.0
