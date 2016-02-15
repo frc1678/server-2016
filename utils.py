@@ -68,37 +68,42 @@ def makeMatchesFromDicts(dicts):
 		matches.append(makeMatchFromDict(match))
 	return matches
 
-
+'''
 def makeDictFromTeamOld(t):
 	d = t.__dict__
 	if not isinstance(t.calculatedData, dict):
 		d["calculatedData"] = t.calculatedData.__dict__
 	return d
-
+'''
 def makeDictFromObject(o):
+	if isinstance(o, dict): 
+		for k, v in o.iteritems():
+			if v.__class__ in [DataModel.CalculatedTeamData, DataModel.CalculatedMatchData, DataModel.CalculatedTeamInMatchData]:
+				o[k] = v.__dict__
+		return o
 	return dict((key, value) for key, value in o.__dict__.iteritems() if not callable(value) and not key.startswith('__'))
 
 def makeDictFromTeam(t):
 	d = makeDictFromObject(t)
 	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
 	return d
-
+'''
 def makeDictFromMatchOld(t):
  	d = t.__dict__
  	if not isinstance(t.calculatedData, dict):
  		d["calculatedData"] = t.calculatedData.__dict__
  	return d
- 
+ '''
 def makeDictFromMatch(t):
 	d = makeDictFromObject(t)
 	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
 	return d
 
 def makeDictFromTIMD(timd):
-	d = timd.__dict__
-	if not isinstance(timd.calculatedData, dict):
-		d["calculatedData"] = timd.calculatedData.__dict__
+	d = makeDictFromObject(timd)
+	d["calculatedData"] = makeDictFromObject(d['calculatedData'])
 	return d
+
 
 def makeDictFromCalculatedTeamData(calculatedData):
 	return calculatedData.__dict__
