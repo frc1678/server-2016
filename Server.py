@@ -26,7 +26,7 @@ calculator = Math.Calculator(comp)
 
 secsBetweenCalc = 10
 shouldCacheSecsCounter = 0
-print(1/2)
+
 numHoursBetweenCaches = 1.0/360.0
 
 while(1):
@@ -35,8 +35,8 @@ while(1):
 	if(shouldCacheSecsCounter == 0):
 		FBC.cacheFirebase()
 	shouldCacheSecsCounter += secsBetweenCalc
-	dv.validateFirebase()
-	calculator.doCalculations(FBC)
+	#dv.validateFirebase()
+	#calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
 	print("Calcs...")
 
