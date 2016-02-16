@@ -5,16 +5,16 @@ from firebase import firebase as fb
 import unicodedata
 import random
 
-#superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc" #dev
+superSecret = "j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc" #dev
 #superSecret = "hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u" #dev2
-superSecret = "AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq" #dev3
+#superSecret = "AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq" #dev3
 #superSecret = "qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee" #scouting
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
 
-#firebase = fb.FirebaseApplication('https://1678-dev-2016.firebaseio.com/', auth)
+firebase = fb.FirebaseApplication('https://1678-dev-2016.firebaseio.com/', auth)
 #firebase = fb.FirebaseApplication('https://1678-dev2-2016.firebaseio.com/', auth)
-firebase = fb.FirebaseApplication('https://1678-dev3-2016.firebaseio.com/', auth)
+#firebase = fb.FirebaseApplication('https://1678-dev3-2016.firebaseio.com/', auth)
 #firebase = fb.FirebaseApplication('https://1678-scouting-2016.firebaseio.com/', auth)
 
 
@@ -71,8 +71,10 @@ class FirebaseCommunicator(object):
 			#if team["team_number"] == 254: #DEBUG
 			#	break
 			t = DataModel.Team()
+	
 			t.number = team["team_number"]
 			t.name = team["nickname"]
+			t.teamInMatchDatas = []
 			self.updateFirebaseWithTeam(t)
 		
 	def addMatchesToFirebase(self):
@@ -90,6 +92,7 @@ class FirebaseCommunicator(object):
 			m.redScore = alliancesDict["red"]["score"]
 			m.blueAllianceTeamNumbers = alliancesDict["blue"]["teams"]
 			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
+			m.TIMDs = []
 			self.updateFirebaseWithMatch(m)
 
 	def addScorelessMatchesToFirebase(self):
@@ -103,10 +106,11 @@ class FirebaseCommunicator(object):
 			alliancesDict = match["alliances"]
 			m.number = match["match_number"]
 			print str(m.number) + ",",
-			m.blueScore = -1
-			m.redScore = -1
+			m.blueScore = None
+			m.redScore = None
 			m.blueAllianceTeamNumbers = alliancesDict["blue"]["teams"]
 			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
+			m.TIMDs = []
 			self.updateFirebaseWithMatch(m)
 
 	def addTIMDsToFirebase(self, matches):

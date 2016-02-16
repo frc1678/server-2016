@@ -34,10 +34,11 @@ class DataValidator(object):
 						problems.append(ctdProblems)
 				
 				if key == "teamInMatchDatas":
-					for TIMD in value:
-					 	timdProblems = self.validateTeamInMatchData(utils.makeDictFromTIMD(TIMD))
-					 	if timdProblems != []:
-					 		problems.append(timdProblems)
+					if value != None:
+						for TIMD in value:
+						 	timdProblems = self.validateTeamInMatchData(utils.makeDictFromTIMD(TIMD))
+						 	if timdProblems != []:
+						 		problems.append(timdProblems)
 
 				if (value in self.valueNotUploaded) and ("pit" not in key) and key != "name" and key != "number" and key != "teamInMatchDatas" and key != "calculatedData" and key != 'matches':
 					thereHasBeenANegative1 = True

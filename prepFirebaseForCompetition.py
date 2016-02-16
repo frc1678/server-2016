@@ -7,7 +7,7 @@ import utils
 basicURL = "http://www.thebluealliance.com/api/v2/"
 headerKey = "X-TBA-App-Id"
 headerValue = "blm:serverProof1678:004" # set to "<your initials>:TBA_communicator:0"
-eventCode = 'casj'
+eventCode = 'new'
 year = 2015
 
 competition = DataModel.Competition()
@@ -27,7 +27,7 @@ def getEventTeamsRequestKey(competition, year):
 def makeEventTeamsRequest(competition, year):
 	return makeRequest(makeYearEventKeyRequestURL(year, competition, 'teams'))
 
-def makeFakeDatabase(eventCode='casj', year=2015):
+def makeFakeDatabase(eventCode='new', year=2015):
 	FBC = firebaseCommunicator.FirebaseCommunicator(competition)
 	FBC.JSONteams = utils.readJSONFromString(makeEventTeamsRequest(eventCode, year))
 	FBC.JSONmatches = utils.readJSONFromString(makeRequest(makeYearEventKeyRequestURL(year, eventCode, 'matches')))
