@@ -19,19 +19,15 @@ class Calculator(object):
 		self.categories = ['a', 'b', 'c', 'd', 'e']
 		self.ourTeamNum = 1678
 
-	def IForB(self, boolean):
+	def booleanToIntegerValue(self, boolean):
 		if boolean: return 1
 		return 0
 
 	def getTeamForNumber(self, num):
 		num = int(num)
-		# for t in self.comp.teams: print t.number
 		for team in self.comp.teams:
 			if team.number == num:
-				# if isinstance(team.calculatedData, {}.__class__): team.calculatedData = DataModel.CalculatedTeamData(**team.calculatedData) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-				# print("TCD: " + str(team.calculatedData))
 				return team
-		print "NO TEAM FOR NUMBER: " + str(num)
 
 	def getMatchForNumber(self, num):
 		for match in self.comp.matches:
@@ -39,22 +35,18 @@ class Calculator(object):
 				return match
 
 	def getTIMDsForTeamNumber(self, num):
+		return [timd for timd in self.comp.]
 		timds = []
 		for timd in self.comp.TIMDs:
-			# print str(timd.teamNumber) + " is the same as " + str(team.number) 
 			if timd.teamNumber == num:
 				timds.append(timd)
-		return timds
+		return timds		
+
+	def timdIsPlayed(self, timd):
+		return timd.numLowShotsMadeAuto != None and timd.rankTorque != None
 
 	def getPlayedTIMDsForTeam(self, team):
-		timds = []
-		for timd in self.getTIMDsForTeamNumber(team.number):
-			if timd.numLowShotsMadeAuto != None:
-				timds.append(timd)
-		# print("timds: " + str(timds))
-
-		#print str(len(timds)) + "TEST" 
-		return timds
+		return [timd for timd in self.getTIMDsForTeamNumber(team.number) if timdIsPlayed(timd)]
 
 	def getTIMDForTeamNumberAndMatchNumber(self, teamNumber, matchNumber): # Match number is an int
 		for timd in self.getTIMDsForTeamNumber(teamNumber):
@@ -246,7 +238,7 @@ class Calculator(object):
 
 	def siegeAbility(self, team): return (15 * team.calculatedData.scalePercentage + 5 * team.calculatedData.challengePercentage)
 
-	def singleSiegeAbility(self, timd): return (15 * self.IForB(timd.didScaleTele) + 5 * self.IForB(timd.didChallengeTele))
+	def singleSiegeAbility(self, timd): return (15 * self.booleanToIntegerValue(timd.didScaleTele) + 5 * self.booleanToIntegerValue(timd.didChallengeTele))
 
 	def siegeConsistency(self, team): 
 		if team.calculatedData.reachPercentage != None: return (team.calculatedData.scalePercentage + team.calculatedData.challengePercentage)
