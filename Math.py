@@ -52,6 +52,7 @@ class Calculator(object):
 			if timd.numLowShotsMadeAuto != None:
 				timds.append(timd)
 		# print("timds: " + str(timds))
+
 		#print str(len(timds)) + "TEST" 
 		return timds
 
