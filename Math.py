@@ -73,28 +73,21 @@ class Calculator(object):
 
 	# Calculated Team Data
 	def averageTIMDObjectOverMatches(self, team, key, coefficient = 1):
-		return np.mean([utils.makeDictFromTIMD(timd)[key] for timd in self.getPlayedTIMDsForTeam(team) if timd.rankTorque != None])
+		return np.mean([utils.makeDictFromTIMD(timd)[key] for timd in self.getCompletedTIMDsForTeam(team) if timd.rankTorque != None])
 
 	def standardDeviationObjectOverAllMatches(self, team, key, coefficient = 1):
-		return np.mean([utils.makeDictFromTIMD(timd)[key] for timd in self.getPlayedTIMDsForTeam(team) if timd.rankTorque != None])
-
+		return np.mean([utils.makeDictFromTIMD(timd)[key] for timd in self.getCompletedTIMDsForTeam(team) if timd.rankTorque != None])
 
 	def percentagesOverAllTIMDs(self, team, key, coefficient = 1):
-		 percentage = [timd for timd in self.getPlayedTIMDsForTeam(team) if utils.makeDictFromTIMD(timd)[key] == True]
-		 return len(percentage) / len(self.getPlayedTIMDsForTeam(team))
+		 percentage = [timd for timd in self.getCompletedTIMDsForTeam(team) if utils.makeDictFromTIMD(timd)[key] == True]
+		 return len(percentage) / len(self.getCompletedTIMDsForTeam(team))
 
 	def disfunctionalPercentage(self, team):
-		timds = self.getPlayedTIMDsForTeam(team)
-		if len(timds) == 0:
-			return None
-		wasOutOfPlayCounter = 0
-		for timd in timds:
-			if timd.didGetDisabled or timd.didGetIncapacitated:
-				wasOutOfPlayCounter += 1
-		return wasOutOfPlayCounter/len(timds)
+		percentage = [timd for timd in self.getCompletedTIMDsForTeam(team) if timd.didGetDisabled == True or didGetIncapacitated == True]
+		return len(percentage) / len(self.getCompletedTIMDsForTeam(team))
 
 	def shotAccuracy(self, team, auto, high):
-		timds = self.getPlayedTIMDsForTeam(team)
+		timds = self.getCompletedTIMDsForTeam(team)
 		if len(timds) == 0:
 			return None
 		totalShotAccuracy = 0
@@ -112,7 +105,7 @@ class Calculator(object):
 		return areInSameMatch
 
 	def teamsWithMatchesPlayed(self):
-		return [team for team in self.comp.teams if len(self.getPlayedTIMDsForTeam(team)) > 0]
+		return [team for team in self.comp.teams if len(self.getCompletedTIMDsForTeam(team)) > 0]
 
 	def getAllTIMDsForMatch(self, match):
 		return [timd for timd in self.comp.TIMDs if timd.matchNumber == match.number]
@@ -150,7 +143,7 @@ class Calculator(object):
 
 
 	def avgBallsIntaked(self, team, key):
-		timds = self.getPlayedTIMDsForTeam(team)
+		timds = self.getCompletedTIMDsForTeam(team)
 		avgBallsIntaked = 0.0
 		for timd in timds:
 			if timd.ballsIntakedAuto != None:
@@ -166,7 +159,7 @@ class Calculator(object):
 
 
 	def makeArrayOfDictionaries(self, team, key): 
- 		timds = self.getPlayedTIMDsForTeam(team)
+ 		timds = self.getCompletedTIMDsForTeam(team)
  		arrayOfDictionaries = [] 
  		for timd in timds:
  			dictionary = utils.makeDictFromTIMD(timd)[key]
@@ -178,7 +171,7 @@ class Calculator(object):
 
   	def averageDefenseCrossesTele(self, team):
   		avgDefenseCrosses = 0
-  		timds = getPlayedTIMDsForTeam(team)
+  		timds = getCompletedTIMDsForTeam(team)
   		for timd in timds:
   			defenses = self.flattenDictionary(timd.timesSuccessfulCrossedDefensesTele)
   			avgDefenseCrosses += sum(defenses.values())
@@ -186,7 +179,7 @@ class Calculator(object):
 
   	def averageDefenseCrossesAuto(self, team):
   		avgDefenseCrosses = 0
-  		timds = getPlayedTIMDsForTeam(team)
+  		timds = getCompletedTIMDsForTeam(team)
   		for timd in timds:
   			defenses = self.flattenDictionary(timd.timesSuccessfulCrossedDefensesAuto)
   			avgDefenseCrosses += sum(defenses.values())
@@ -223,7 +216,7 @@ class Calculator(object):
  		return outputDict
 
  	def twoBallAutoAccuracy(self, team):
- 		timds = self.getPlayedTIMDsForTeam(team)
+ 		timds = self.getCompletedTIMDsForTeam(team)
  		twoBallAutoCompleted = 0
  		for timd in timds:
  			totalNumShots = timd.numHighShotsMadeAuto + timd.numLowShotsMadeAuto + timd.numHighShotsMissedAuto + timd.numLowShotsMissedAuto
@@ -280,7 +273,7 @@ class Calculator(object):
 
 	def numRPsForTeam(self, team):
 		totalRPsForTeam = 0
-		for m in self.getPlayedMatchesForTeam(team):
+		for m in self.getCompletedMatchesForTeam(team):
 			RPs = self.RPsGainedFromMatch(m)
 			if team.number in m.blueAllianceTeamNumbers:
 				totalRPsForTeam += RPs['blue']
@@ -337,7 +330,7 @@ class Calculator(object):
 		varianceValues = []			#add variance for each data point to array
 		stanDevSum = 0
 		for team in alliance:
-			timds = self.getPlayedTIMDsForTeam(team)
+			timds = self.getCompletedTIMDsForTeam(team)
 			if len(timds) == 0:
 				return None
 			else:
@@ -377,7 +370,7 @@ class Calculator(object):
 				varianceValues.append(difOfAvgSquaresTele)
 				varianceValues.append(difOfAvgSquaresAuto)
 			else:
-				timds = self.getPlayedTIMDsForTeam(team)
+				timds = self.getCompletedTIMDsForTeam(team)
 				if len(timds) == 0:
 					return None
 				else:
@@ -403,7 +396,7 @@ class Calculator(object):
 			return math.sqrt(stanDevSum)
 
 	def numScaleAndChallengePointsForTeam(self, team): 
-		return 5 * team.calculatedData.challengePercentage * len(self.getPlayedTIMDsForTeam(team)) + 15 * team.calculatedData.scalePercentage * len(self.getPlayedTIMDsForTeam(team))
+		return 5 * team.calculatedData.challengePercentage * len(self.getCompletedTIMDsForTeam(team)) + 15 * team.calculatedData.scalePercentage * len(self.getCompletedTIMDsForTeam(team))
 
 	def totalAvgNumShotPointsForTeam(self, team):
 		#print "TESTING" + str(team.calculatedData)
@@ -464,10 +457,10 @@ class Calculator(object):
 
 	def sumOfStandardDeviationsOfShotsForAlliance(self, alliance):
 		for team in alliance:
-			sumOfStanDev += sp.stats.tvar([timd.numHighShotsMadeAuto for timd in self.getPlayedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
-			sumOfStanDev += sp.stats.tvar([timd.numHighShotsMadeTele for timd in self.getPlayedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
-			sumOfStanDev += sp.stats.tvar([timd.numLowShotsMadeAuto for timd in self.getPlayedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
-			sumOfStanDev += sp.stats.tvar([timd.numLowShotsMadeTele for timd in self.getPlayedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
+			sumOfStanDev += sp.stats.tvar([timd.numHighShotsMadeAuto for timd in self.getCompletedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
+			sumOfStanDev += sp.stats.tvar([timd.numHighShotsMadeTele for timd in self.getCompletedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
+			sumOfStanDev += sp.stats.tvar([timd.numLowShotsMadeAuto for timd in self.getCompletedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
+			sumOfStanDev += sp.stats.tvar([timd.numLowShotsMadeTele for timd in self.getCompletedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
 		return math.sqrt(sumOfStanDev / (len(alliance) * 4))
 
 	def sumOfStandardDeviationsOfShotsForAllianceWithExclusion(self, alliance, teamWithMatchesToExclude, sTIMD):
@@ -479,7 +472,7 @@ class Calculator(object):
 			tHS = np.array([])
 			aLS = np.array([])
 			tLS = np.array([])
-			timds = self.getPlayedTIMDsForTeam(team)
+			timds = self.getCompletedTIMDsForTeam(team)
 			if len(timds) == 0:
 				return None
 			else:
@@ -536,7 +529,7 @@ class Calculator(object):
 		Xa = 0
 		Xobs = self.timesDefensesFacedInAllMatches()[defense]
 		Fobs = self.timesDefensesFacedInAllMatchesForTeam(team)[defense]
-		timdsForTeam = self.getPlayedTIMDsForTeam(team)
+		timdsForTeam = self.getCompletedTIMDsForTeam(team)
 		for team1 in self.comp.teams:
 			for dC, d in team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto.items():
 				if d == defense:
@@ -733,7 +726,7 @@ class Calculator(object):
 		ATeam = self.getTeamForNumber(timd.teamNumber)
 		teamsWithMatchesPlayed = []
 		for team in self.comp.teams:
-			if len(self.getPlayedTIMDsForTeam(team)) > 0:
+			if len(self.getCompletedTIMDsForTeam(team)) > 0:
 				teamsWithMatchesPlayed.append(team)
 		matrixOfMatches = np.zeros((len(teamsWithMatchesPlayed), len(teamsWithMatchesPlayed)))
 		for team1 in teamsWithMatchesPlayed:	#Create an array where the values correspond to how many matches two teams played together in the same alliance
@@ -783,7 +776,7 @@ class Calculator(object):
 
 	def secondPickAbility(self, team):
 		gamma = 0.5
-		teamsArray = [loopTeam for loopTeam in self.comp.teams if self.getPlayedTIMDsForTeam(loopTeam) > 0] 
+		teamsArray = [loopTeam for loopTeam in self.comp.teams if self.getCompletedTIMDsForTeam(loopTeam) > 0] 
 		secondPickAbility = {}
 		ourTeam = self.getTeamForNumber(self.ourTeamNum)
 		citrusDPRMatrix = self.citrusDPR(team)
@@ -802,7 +795,7 @@ class Calculator(object):
 		gamma = 0.5
 		teamsArray = []
 		for team1 in self.comp.teams:
-			if len(self.getPlayedTIMDsForTeam(team)) > 0:
+			if len(self.getCompletedTIMDsForTeam(team)) > 0:
 				teamsArray.append(team1)
 		secondPickAbility = {}
 		ourTeam = self.getTeamForNumber(self.ourTeamNum)
@@ -1060,16 +1053,8 @@ class Calculator(object):
 
 	#Competition wide Metrics
 	def avgCompScore(self):
-		totalScore = 0
-		totalNumScores = 0
-		for match in self.comp.matches:
-			if match.blueScore > None:
-				totalScore += match.blueScore
-				totalNumScores += 1
-			if match.redScore > None:
-				totalScore += match.redScore
-				totalNumScores += 1
-		return totalScore / totalNumScores
+		a = [(match.redScore + match.blueScore) for match in self.comp.matches if (match.blueScore != None and match.redScore != None)]
+		return sum(a) / len(self.comp.matches)
 
 	def numPlayedMatchesInCompetition(self):
 		numPlayedMatches = 0
@@ -1092,16 +1077,13 @@ class Calculator(object):
 		#if self.numPlayedMatchesInCompetition() > 0:
 		self.comp.sdRScores = self.sdOfRValuesAcrossCompetition()
 		for team in self.comp.teams:
-			timds = self.getPlayedTIMDsForTeam(team)
+			timds = self.getCompletedTIMDsForTeam(team)
 			t = team.calculatedData
 			if len(timds) <= 0:
 				print "No Complete TIMDs for team " + str(team.number) + ", " + team.name
 			else:
-				print("Beginning calculations for team: " + str(team.number) + ", " + team.name)
+				print("Beginning calculations for team: " + str(team.number) + "..." + team.name)
 				#Super Scout Averages
-				
-				# if isinstance(t, {}.__class__): t = DataModel.CalculatedTeamData(**t) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-
 				t.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque')
 				t.avgSpeed = self.averageTIMDObjectOverMatches(team, 'rankSpeed')
 				t.avgEvasion = self.averageTIMDObjectOverMatches(team, 'rankEvasion')
@@ -1115,7 +1097,7 @@ class Calculator(object):
 				t.disabledPercentage = self.percentagesOverAllTIMDs(team, 'didGetDisabled')
 				t.incapacitatedPercentage = self.percentagesOverAllTIMDs(team, 'didGetIncapacitated')
 				t.disfunctionalPercentage = self.disfunctionalPercentage(team)
-				print "Doing something"
+
 				#Auto
 				t.avgHighShotsAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeAuto')
 				t.avgLowShotsAuto = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeAuto')
@@ -1129,12 +1111,7 @@ class Calculator(object):
 				# t.sdMidlineBallsIntakedAuto = self.standardDeviationObjectOverAllMatches(team, 'ballsIntakedAuto')
 				t.sdBallsKnockedOffMidlineAuto = self.standardDeviationObjectOverAllMatches(team, 'numBallsKnockedOffMidlineAuto')
 				t.avgSuccessfulTimesCrossedDefensesAuto = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesSuccessfulCrossedDefensesAuto'))
-				print "Still doing something"
-				
-
-				# if isinstance(t, {}.__class__): t = DataModel.CalculatedTeamData(**t) #We shouldnt have to do this here, it should already be done. Don't have time to figure out why right now.
-
-
+			
 				#Tele
 				t.challengePercentage = self.percentagesOverAllTIMDs(team, 'didChallengeTele')
 				t.scalePercentage = self.percentagesOverAllTIMDs(team, 'didScaleTele')
