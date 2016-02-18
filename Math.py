@@ -51,6 +51,9 @@ class Calculator(object):
 	def getCompletedTIMDsForTeamNumber(self, teamNumber):
 		return filter(self.timdIsCompleted, self.getTIMDsForTeamNumber(teamNumber))
 
+	def getCompletedTIMDsForTeam(self, team):
+		return getCompletedTIMDsForTeamNumber(team.number)
+
 	def getPlayedTIMDsForTeamNumber(self, teamNumber):
 		return filter(self.timdIsPlayed, self.getTIMDsForTeamNumber(teamNumber))
 
@@ -271,7 +274,7 @@ class Calculator(object):
 
 	def numAutoPointsForTeam(self, team):
 		totalAutoPoints = 0
-		for timd in self.getPlayedTIMDsForTeam(team):
+		for timd in self.getCompletedTIMDsForTeamNumber(team.number):
 			totalAutoPoints += self.numAutoPointsForTIMD(timd)
 		return totalAutoPoints
 
