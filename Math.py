@@ -52,7 +52,7 @@ class Calculator(object):
 		return filter(self.timdIsCompleted, self.getTIMDsForTeamNumber(teamNumber))
 
 	def getCompletedTIMDsForTeam(self, team):
-		return getCompletedTIMDsForTeamNumber(team.number)
+		return self.getCompletedTIMDsForTeamNumber(team.number)
 
 	def getPlayedTIMDsForTeamNumber(self, teamNumber):
 		return filter(self.timdIsPlayed, self.getTIMDsForTeamNumber(teamNumber))
@@ -423,14 +423,16 @@ class Calculator(object):
 	def highShotAccuracyForAlliance(self, alliance):
 		overallHighShotAccuracy = 0
 		for team in alliance:
-			overallHighShotAccuracy += team.calculatedData.highShotAccuracyAuto
-			overallHighShotAccuracy += team.calculatedData.highShotAccuracyTele
+			if team.calculatedData.highShotAccuracyAuto != None:
+				overallHighShotAccuracy += team.calculatedData.highShotAccuracyAuto
+				overallHighShotAccuracy += team.calculatedData.highShotAccuracyTele
 		return overallHighShotAccuracy / len(alliance)
 
 	def blockedShotPointsForAlliance(self, alliance, opposingAlliance):
 		blockedShotPoints = 0
 		for team in opposingAlliance:
-			blockedShotPoints += (self.highShotAccuracyForAlliance(alliance) * team.calculatedData.avgShotsBlocked)
+			if team.calculatedData.avgShotsBlocked != None:
+				blockedShotPoints += (self.highShotAccuracyForAlliance(alliance) * team.calculatedData.avgShotsBlocked)
 		return blockedShotPoints
 
 	def blockedShotPointsForAllianceSD(self, alliance, opposingAlliance):
@@ -447,12 +449,10 @@ class Calculator(object):
 			return reachPoints
 
 	def probabilityDensity(self, x, u, o):
-		if o == str(self.ourTeamNum) + " has insufficient data" or o == 0.0:
-			return None
-		else:	
-			return stats.norm.cdf(x,u,o)
+		if x != None and u != None and o != None: return stats.norm.cdf(x, u, o) 
 
 	def sumOfStandardDeviationsOfShotsForAlliance(self, alliance):
+		sumOfStanDev = 0.0
 		for team in alliance:
 			sumOfStanDev += sp.stats.tvar([timd.numHighShotsMadeAuto for timd in self.getCompletedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
 			sumOfStanDev += sp.stats.tvar([timd.numHighShotsMadeTele for timd in self.getCompletedTIMDsForTeam(team) if timd.numHighShotsMadeAuto != None])
@@ -888,8 +888,8 @@ class Calculator(object):
 
 		for category in range(1, len(standardDevCategories) + 1):	#Sort and calculate breach chance using max 4 categories
 			category = self.categories[category - 1]
-			breachRPs *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(blueTeams, category), self.stanDevSumForDefenseCategory(blueTeams, category))
-
+			if self.totalAvgDefenseCategoryCrossingsForAlliance(blueTeams, category) != None and self.stanDevSumForDefenseCategory(blueTeams, category) != None:
+				breachRPs *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(blueTeams, category), self.stanDevSumForDefenseCategory(blueTeams, category))
 		if not math.isnan(breachRPs):
 			predictedScoreForMatch['blue']['RP'] += breachRPs			
 
@@ -936,7 +936,8 @@ class Calculator(object):
 
 		for category in range(1, len(standardDevCategories) + 1):	#Sort and calculate breach chance using max 4 categories
 			category = self.categories[category - 1]
-			breachRPs *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
+			if self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category) != None and self.stanDevSumForDefenseCategory(redTeams, category) != None:
+				breachRPs *= self.probabilityDensity(2.0, self.totalAvgDefenseCategoryCrossingsForAlliance(redTeams, category), self.stanDevSumForDefenseCategory(redTeams, category))
 
 		if not math.isnan(breachRPs):
 			predictedScoreForMatch['red']['RP'] += breachRPs	
@@ -1054,11 +1055,7 @@ class Calculator(object):
 		return sum(a) / len(self.comp.matches)
 
 	def numPlayedMatchesInCompetition(self):
-		numPlayedMatches = 0
-		for match in self.comp.matches:
-			if match.redScore > -0.5 and match.blueScore > -0.5:
-				numPlayedMatches += 1
-		return numPlayedMatches
+		return len([match for match in self.comp.matches if self.matchIsPlayed(match)])
 
 	def actualSeeding(self):
 		return sorted(self.comp.teams, key=attrgetter('calculatedData.numRPs', 'calculatedData.numAutoPoints', 'calculatedData.numScaleAndChallengePoints'), reverse=True)
@@ -1163,7 +1160,7 @@ class Calculator(object):
 		#Match Metrics
 		for match in self.comp.matches:
 			# if match.blueScore > None and match.redScore > None:
-			if match.blueScore != None and match.redScore != None:
+			if self.matchIsPlayed:
 				print "Beginning calculations for match " + str(match.number) + "..."
 				match.calculatedData.predictedBlueScore = self.predictedScoreForMatch(match)['blue']['score']
 				match.calculatedData.predictedRedScore = self.predictedScoreForMatch(match)['red']['score']
