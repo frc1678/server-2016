@@ -83,6 +83,9 @@ def makeDictFromObject(o):
 		return o
 	return dict((key, value) for key, value in o.__dict__.iteritems() if not callable(value) and not key.startswith('__'))
 
+def readValueFromObjectDict(objectDict, key):
+	return objectDict[key]
+
 def makeDictFromTeam(t):
 	d = makeDictFromObject(t)
 	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
