@@ -88,8 +88,7 @@ class Calculator(object):
 
 	def shotAccuracy(self, team, auto, high):
 		timds = self.getCompletedTIMDsForTeam(team)
-		if len(timds) == 0:
-			return None
+		if len(timds) == 0: return None				
 		totalShotAccuracy = 0
 		for timd in timds:
 			a = self.singleMatchShotAccuracy(timd, auto, high)
@@ -119,8 +118,6 @@ class Calculator(object):
 	def getTIMDForTeamNumberAndMatchNumber(self, teamNumber, matchNumber):
 		return [timd for timd in self.getTIMDsForTeamNumber(teamNumber) if timd.matchNumber == matchNumber][0]
 
-
-		
 	def singleMatchShotAccuracy(self, timd, auto, high):
 		if high:
 			if auto:
