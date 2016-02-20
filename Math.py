@@ -1,11 +1,11 @@
 
 # Math.py
 import utils
-import random
 import firebaseCommunicator
 import math
 import numpy as np
 import DataModel
+import dmutils
 import scipy as sp
 import scipy.stats as stats
 import sys, traceback
@@ -61,6 +61,11 @@ class Calculator(object):
 	def matchIsCompleted(self, match):
 		return len(self.getCompletedTIMDsForMatchNumber(match.number)) == 6
 
+	def matchTIMDsForTeamAlliance(self, team, match):
+		if team.number in match.blueAllianceTeamNumbers:
+			return [self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number) for teamNum in match.blueAllianceTeamNumbers]
+		if team.number in match.blueAllianceTeamNumbers:
+			return map(self.getTIMDForTeamNumberAndMatchNumber(teamNum, match.number), match.blueAllianceTeamNumbers)
 
 	# TIMD utility functions
 	def getTIMDsForTeamNumber(self, teamNumber):
@@ -92,6 +97,7 @@ class Calculator(object):
 		return isPlayed
 
 	exceptedKeys = ['calculatedData', 'ballsIntakedAuto', 'superNotes']
+	
 	def timdIsCompleted(self, timd):
 		isCompleted = True 
 		for key, value in utils.makeDictFromTIMD(timd).items():
@@ -104,7 +110,7 @@ class Calculator(object):
 		return np.mean([utils.makeDictFromTIMD(timd)[key] for timd in self.getCompletedTIMDsForTeam(team)])
 
 	def standardDeviationObjectOverAllMatches(self, team, dataFunction, coefficient = 1):
-		return np.std(dataFunction(timd) for timd in self.getCompletedTIMDsForTeam(team)])
+		return np.std([dataFunction(timd) for timd in self.getCompletedTIMDsForTeam(team)])
 
 	def getTIMDHighShotAccuracyTele(self, timd):
 		return timd.numHighShotsMadeTele / (timd.numHighShotsMadeTele + timd.numHighShotsMissedTele)
@@ -230,15 +236,10 @@ class Calculator(object):
 			return 5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked
 
 	def autoAbility(self, team): 
-		avgHighShotsMissedAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMissedAuto')
-		avgLowShotsMissedAuto = self.averageTIMDObjectOverMatches(team, 'numLowShotsMissedAuto')
-
-		if (team.calculatedData.avgHighShotsAuto != 0 or team.calculatedData.avgLowShotsAuto != 0) and (avgHighShotsMissedAuto != 0 or avgLowShotsMissedAuto != 0):
-			if team.calculatedData.avgHighShotsAuto != None:
-				return 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.reachPercentage + 10 
-		else:
-			if team.calculatedData.avgHighShotsAuto != None:
-				return 10 * team.calculatedData.avgHighShotsAuto + 5 * team.calculatedData.avgLowShotsAuto + 2 * team.calculatedData.reachPercentage
+		t = team.calculatedData
+		if sum(self.flattenDictionary(t.avgSuccessfulTimesCrossedDefensesAuto)) >= 1:
+			return 10 + (10 * t.avgHighShotsAuto) + (5 * t.avgLowShotsAuto) + (2 * t.reachPercentage)
+		return (10 * t.avgHighShotsAuto) + (5 * t.avgLowShotsAuto) + (2 * t.reachPercentage)
 
 	def teleopShotAbility(self, team): return (5 * team.calculatedData.avgHighShotsTele + 2 * team.calculatedData.avgLowShotsTele)
 
@@ -382,6 +383,12 @@ class Calculator(object):
 
 	def numScaleAndChallengePointsForTeam(self, team): 
 		return team.siegeAbility * len(self.getCompletedTIMDsForTeam(team))
+
+	def numSiegePointsForTIMD(self, timd):
+		total = 0
+		if timd.didChallengeTele: total += 5
+		if timd.didScaleTele: total += 15
+		return total
 
 	def totalAvgNumShotPointsForTeam(self, team):
 		#print "TESTING" + str(team.calculatedData)
@@ -597,9 +604,23 @@ class Calculator(object):
 		timd = self.getTIMDForTeamNumberAndMatchNumber(team, match)
 		return (1 * timd.rankTorque) + (1 * timd.rankBallControl) + (1 * timd.rankEvasion) + (1 * timd.rankDefense) + (1 * timd.rankSpeed)
 
+<<<<<<< HEAD
 	def predictedScoreForAlliance(self, alliance):
 		allianceAutoPoints = sum(map(self.totalAvgNumShotPointsForTeam, alliance)) # TODO: What do we do if there is a team on the alliance that is None?
 
+=======
+	def numRankingAutoPoints(self, team):
+		a = []
+		for match in self.getCompletedMatchesForTeam(team):
+			a.extend(map(numAutoPointsForTIMD(timd), self.matchTIMDsForTeamAlliance(team, match)))
+		return sum(a)
+		
+	def numRankingSiegePoints(self, team):
+		a = []
+		for match in self.getCompletedMatchesForTeam(team):
+			a.extend(map(numSiegePointsForTIMD(timd), self.matchTIMDsForTeamAlliance(team, match)))
+		return sum(a)
+>>>>>>> 7388063a54bf0e7fc845a265af0cb8a8c44ffd46
 
 	def predictedScoreCustomAlliance(self, alliance):
 		predictedScoreCustomAlliance = 0		
@@ -1052,7 +1073,7 @@ class Calculator(object):
 		return len([match for match in self.comp.matches if self.matchIsPlayed(match)])
 
 	def actualSeeding(self):
-		return sorted(self.comp.teams, key=attrgetter('calculatedData.numRPs', 'calculatedData.numAutoPoints', 'calculatedData.numScaleAndChallengePoints'), reverse=True)
+		return sorted(self.comp.teams, key=attrgetter('calculatedData.numRPs', 'calculatedData.rankingAutoPoints', 'calculatedData.rankingSiegePoints'), reverse=True)
 
 	def getRankingForTeam(self, team):
 		return self.actualSeeding().index(team)
@@ -1065,28 +1086,28 @@ class Calculator(object):
 		for team in self.comp.teams:
 			timds = self.getCompletedTIMDsForTeam(team)
 
-			print("Calculating TIMDs for team " + str(team.number))
-			for timd in timds:
-				c = timd.calculatedData # Think about this later. What if the calculated data is None?
-				c.highShotAccuracyTele = self.getTIMDHighShotAccuracyTele(timd) # Checked
-				c.highShotAccuracyAuto = self.getTIMDHighShotAccuracyAuto(timd) # Checked
-				c.lowShotAccuracyTele = self.getTIMDLowShotAccuracyTele(timd) # Checked
-				c.lowShotAccuracyAuto = self.getTIMDLowShotAccuracyAuto(timd) # Checked
-				c.siegeAbility = self.singleSiegeAbility(timd)
-				c.numRPs = self.RPsGainedFromMatch(self.getMatchForNumber(timd.matchNumber))
-				c.numAutoPoints = self.numAutoPointsForTIMD(timd)
-				c.numScaleAndChallengePoints = c.siegeAbility #they are the same
-				c.scoreContribution = self.scoreContribution(timd)
-				c.RScoreSpeed = self.singleMatchRScore(timd, 'rankSpeed')
-				c.RScoreEvasion = self.singleMatchRScore(timd, 'rankEvasion')
-				c.RScoreDefense = self.singleMatchRScore(timd, 'rankDefense')
-				c.RScoreTorque = self.singleMatchRScore(timd, 'rankTorque')
-				c.RScoreBallControl = self.singleMatchRScore(timd, 'rankBallControl')
-				c.RScoreDrivingAbility = 1 * c.RScoreSpeed + 1 * c.RScoreEvasion + 1 * c.RScoreDefense + 1 * c.RScoreTorque + 1 * c.RScoreBallControl
-				c.firstPickAbility = self.teamInMatchFirstPickAbility(team, self.getMatchForNumber(timd.matchNumber))
-				c.secondPickAbility = self.secondPickAbilityWithExclusion(team, timd)
-				c.overallSecondPickAbility = self.overallSecondPickAbilityWithExclusion(team, timd)
-				c.numBallsIntakedOffMidlineAuto = len(utils.makeDictFromTIMD(timd)['ballsIntakedAuto'])
+			# print("Calculating TIMDs for team " + str(team.number))
+			# for timd in timds:
+			# 	c = timd.calculatedData # Think about this later. What if the calculated data is None?
+			# 	c.highShotAccuracyTele = self.getTIMDHighShotAccuracyTele(timd) # Checked
+			# 	c.highShotAccuracyAuto = self.getTIMDHighShotAccuracyAuto(timd) # Checked
+			# 	c.lowShotAccuracyTele = self.getTIMDLowShotAccuracyTele(timd) # Checked
+			# 	c.lowShotAccuracyAuto = self.getTIMDLowShotAccuracyAuto(timd) # Checked
+			# 	c.siegeAbility = self.singleSiegeAbility(timd)
+			# 	c.numRPs = self.RPsGainedFromMatch(self.getMatchForNumber(timd.matchNumber))
+			# 	c.numAutoPoints = self.numAutoPointsForTIMD(timd)
+			# 	c.numScaleAndChallengePoints = c.siegeAbility #they are the same
+			# 	c.scoreContribution = self.scoreContribution(timd)
+			# 	c.RScoreSpeed = self.singleMatchRScore(timd, 'rankSpeed')
+			# 	c.RScoreEvasion = self.singleMatchRScore(timd, 'rankEvasion')
+			# 	c.RScoreDefense = self.singleMatchRScore(timd, 'rankDefense')
+			# 	c.RScoreTorque = self.singleMatchRScore(timd, 'rankTorque')
+			# 	c.RScoreBallControl = self.singleMatchRScore(timd, 'rankBallControl')
+			# 	c.RScoreDrivingAbility = 1 * c.RScoreSpeed + 1 * c.RScoreEvasion + 1 * c.RScoreDefense + 1 * c.RScoreTorque + 1 * c.RScoreBallControl
+			# 	c.firstPickAbility = self.teamInMatchFirstPickAbility(team, self.getMatchForNumber(timd.matchNumber))
+			# 	c.secondPickAbility = self.secondPickAbilityWithExclusion(team, timd)
+			# 	c.overallSecondPickAbility = self.overallSecondPickAbilityWithExclusion(team, timd)
+			# 	c.numBallsIntakedOffMidlineAuto = len(utils.makeDictFromTIMD(timd)['ballsIntakedAuto'])
 
 
 			t = team.calculatedData
@@ -1095,11 +1116,11 @@ class Calculator(object):
 			else:
 				print("Beginning calculations for team: " + str(team.number) + "..." + team.name)
 				#Super Scout Averages
-				t.avgTorque = self.averageTIMDObjectOverMatches(team, 'rankTorque') # Checked
-				t.avgSpeed = self.averageTIMDObjectOverMatches(team, 'rankSpeed') # Checked
-				t.avgEvasion = self.averageTIMDObjectOverMatches(team, 'rankEvasion') # Checked
-				t.avgDefense = self.averageTIMDObjectOverMatches(team, 'rankDefense') # Checked
-				t.avgBallControl = self.averageTIMDObjectOverMatches(team, 'rankBallControl') # Checked
+				t.avgTorque = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankTorque) # Checked
+				t.avgSpeed = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankSpeed)  # Checked
+				t.avgEvasion = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankEvasion)  # Checked
+				t.avgDefense = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankDefense)  # Checked
+				t.avgBallControl = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankBallControl)  # Checked
 				t.RScoreTorque = self.RScore(team, 'rankTorque') # Checked
 				t.RScoreSpeed = self.RScore(team, 'rankSpeed') # Checked
 				t.RScoreEvasion = self.RScore(team, 'rankEvasion') # Checked
@@ -1110,8 +1131,8 @@ class Calculator(object):
 				t.disfunctionalPercentage = t.disabledPercentage + t.incapacitatedPercentage # Checked
 
 				#Auto
-				t.avgHighShotsAuto = self.averageTIMDObjectOverMatches(team, 'numHighShotsMadeAuto') # Checked
-				t.avgLowShotsAuto = self.averageTIMDObjectOverMatches(team, 'numLowShotsMadeAuto') # Checked
+				t.avgHighShotsAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.didReachAuto) #Checked
+				t.avgLowShotsAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.didReachAuto) #Checked	
 				t.reachPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.didReachAuto) # Checked
 				t.highShotAccuracyAuto = self.getAverageForDataFunctionForTeam(team, self.getTIMDHighShotAccuracyAuto) # Checked
 				t.lowShotAccuracyAuto = self.getAverageForDataFunctionForTeam(team, self.getTIMDLowShotAccuracyAuto) # Checked
@@ -1148,6 +1169,8 @@ class Calculator(object):
 				t.secondPickAbility = self.secondPickAbility(team)
 				t.overallSecondPickAbility = self.overallSecondPickAbility(team)
 				t.predictedSeed = self.getRankingForTeam(team)
+				t.rankingAutoPoints = self.numRankingAutoPoints(team)
+				t.rankingSiegePoints = self.numRankingSiegePoints(team)
 			
 				FBC.addCalculatedTeamDataToFirebase(team.number, t)
 				print("Putting calculations for team " + str(team.number) + " to Firebase.")
