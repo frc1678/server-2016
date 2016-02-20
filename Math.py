@@ -18,7 +18,13 @@ class Calculator(object):
 		self.comp = competition
 		self.categories = ['a', 'b', 'c', 'd', 'e']
 		self.ourTeamNum = 1678
-
+		self.defenseKeys = ['pc', 'cdf', 'mt', 'rt', 'rw', 'lb', 'rp', 'sp', 'db']
+		self.defenseDictionary = {'a' : ['pc', 'cdf'],
+			'b' : ['mt', 'rp'],
+			'c' : ['sp', 'db'],
+			'd' : ['rw', 'rt'],
+			'e' : ['lb']
+		}
 	# Team utility functions
 	def getTeamForNumber(self, teamNumber):
 		return [team for team in self.comp.teams if team.number == teamNumber][0]
@@ -492,64 +498,39 @@ class Calculator(object):
 		return defenseKey.upper() in defensePositions
 
 	def numTimesTeamFacedDefense(self, team, defenseKey):
-		return len(filter(lambda timd: self.defenseFacedForTIMD(timd, defenseKey)(self.defenseFacedForTIMD, self.getCompletedTIMDsForTeam(team)))
+		return len(filter(lambda timd: self.defenseFacedForTIMD(timd, defenseKey)(self.defenseFacedForTIMD, self.getCompletedTIMDsForTeam(team))))
 
 	def numTimesCompetitionFacedDefense(self, defenseKey):
 		return sum(map(self.numTimesTeamFacedDefense, self.teamsWithCompletedMatches))
 
-	def competitionProportionForDefense(self):
+	def competitionProportionForDefense(self, defenseKey):
 		competitionDefenseSightings = self.numTimesCompetitionFacedDefense()
 		competitionTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsInCompetition())
 		return competitionDefenseSightings / competitionTotalNumberOfDefenseSightings
 
-	def alphaForDefense(self, team, defenseCategory, defenseKey):
+	def teamProportionForDefense(self, team, defenseKey):
+		teamDefenseSightings = self.numTimesTeamFacedDefense(team, defenseKey)
+		teamTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsForTeam(team))
+		return teamDefenseSightings / teamTotalNumberOfDefenseSightings
 
+	def alphaForTeamForDefense(self, team, defenseKey):
+		return self.competitionProportionForDefense(defenseKey) + self.teamProportionForDefense(defenseKey)
+
+	def betaForTeamForDefense(self, team, defenseKey):
+		sumDefenseAlphas = map(lambda dKey: self.alphaForDefense(team, dKey), self.defenseKeys)
 
 	def predictedCrosses(self, team, defenseCategory, defenseKey):
 		dataRetrievalFunction = lambda t1: t1.calculatedData.avgSuccessfulTimesCrossedDefensesTele[defenseCategory][defenseKey]
 		averageOfDefenseCrossingsAcrossCompetition = np.mean([self.getAverageForDataFunctionForTeam(t, defenseRetrievalFunction) for t in self.teamsWithCompletedMatches()])
 		teamAverageDefenseCrossings = self.getAverageForDataFunctionForTeam(team, defenseRetrievalFunction)
-		competitionDefenseSightings = self.numTimesCompetitionFacedDefense()
+		competitionDefenseSightings = self.numTimesCompetitionFacedDefense(defenseKey)
 		teamDefenseSightings = self.numTimesTeamFacedDefense(team)
 		competitionTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsInCompetition())
 		teamTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsForTeam(team))
 		proportionOfCompetitionDefenseSightings = competitionDefenseSightings / competitionTotalNumberOfDefenseSightings
 		proportionOfTeamDefenseSightings = teamDefenseSightings / teamTotalNumberOfDefenseSightings
-		alphaForDefense = lambda d: 
-
-
-		predictedCrossesForDefense = 0.0
-		timesDefenseFacedAllBots = 0
-		timesDefenseFacedOneBot = 0
-		avgCrossesDefenseAcrossComp = 0.0
-		Xa = 0
-		Xobs = self.timesDefensesFacedInAllMatches()[defense]
-		Fobs = self.timesDefensesFacedInAllMatchesForTeam(team)[defense]
-		timdsForTeam = self.getCompletedTIMDsForTeam(team)
-		for team1 in self.comp.teams:
-			for dC, d in team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto.items():
-				if d == defense:
-					avgCrossesDefenseAcrossComp += team.calculatedData.avgSuccessfulTimesCrossedDefensesTele[dC][d]
-		avgCrossesDefenseAcrossComp /= (len(self.comp.teams) * 2)
-		if sum(self.timesDefensesFacedInAllMatches().values()) > 0:
-			Xprop = Xobs / sum(self.timesDefensesFacedInAllMatches().values())
-		if sum(self.timesDefensesFacedInAllMatches().values()) > 0:
-			Fprop = Fobs / sum(self.timesDefensesFacedInAllMatchesForTeam(team).values())
-		for dC, d in team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto.items():
-			if d == defense:
-				Xa += team.calculatedData.avgSuccessfulTimesCrossedDefensesTele[dC][d] 
-		alphaForDefense = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
-		for d in alphaForDefense:
-			if sum(self.timesDefensesFacedInAllMatches().values()) + sum(self.timesDefensesFacedInAllMatchesForTeam(team).values()) > 0:
-				alphaForDefense[d] = (self.timesDefensesFacedInAllMatches()[d]/sum(self.timesDefensesFacedInAllMatches().values())) + (self.timesDefensesFacedInAllMatchesForTeam(team)[d]/sum(self.timesDefensesFacedInAllMatchesForTeam(team).values()))
-		betaForDefense = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
-		for d in betaForDefense:
-			if sum(alphaForDefense.values()) > 0:
-				betaForDefense[d] = alphaForDefense[d] / sum(alphaForDefense.values())
-		thetaForDefense = sum(betaForDefense.values())
-		if Xobs > 0:
-			predictedCrossesForDefense += ((avgCrossesDefenseAcrossComp * thetaForDefense) + (Xa * Xobs)) / (Xobs + 1)
-		return predictedCrossesForDefense
+		theta = sum(map(lambda dKey: self.betaForTeamForDefense(team, dKey), self.defenseKeys)) # TODO: Rename theta something better
+		return (averageOfDefenseCrossingsAcrossCompetition * theta + teamAverageDefenseCrossings * teamDefenseSightings) / (teamAverageDefenseCrossings + 1)
 	
 	def listOfSuperDataPointsForTIMD(self, timd):
 		return [timd.rankTorque, timd.rankSpeed, timd.rankEvasion, timd.rankDefense, timd.rankBallControl]
@@ -604,11 +585,33 @@ class Calculator(object):
 		timd = self.getTIMDForTeamNumberAndMatchNumber(team, match)
 		return (1 * timd.rankTorque) + (1 * timd.rankBallControl) + (1 * timd.rankEvasion) + (1 * timd.rankDefense) + (1 * timd.rankSpeed)
 
-<<<<<<< HEAD
-	def predictedScoreForAlliance(self, alliance):
-		allianceAutoPoints = sum(map(self.totalAvgNumShotPointsForTeam, alliance)) # TODO: What do we do if there is a team on the alliance that is None?
+	def getDefensePairingsForCategory(self, category):
+		return [(category, defenseKey) for defenseKey in defenseDictionary[category]]
 
-=======
+	def getDefensePairings(self):
+		defensePairings = []
+		map(defensePairings.extend, map(self.getDefensePairingsForCategory, self.categories))
+		return defensePairings
+
+	def predictedCrossingsForDefenseCategory(self, team, category):
+		return np.mean(map(lambda dKey: predictedCrosses(team, category, dKey), self.defenseDictionary[category]))
+
+	def predictedTeleDefenseCrossingsForTeam(self, team):
+		return sum(map(lambda category: self.pointsForDefenseCategory(team, category), self.categories))
+
+	def predictedTeleDefensePointsForAllianceForCategory(self, alliance, category):
+		predictedCrossingsRetrievalFunction = lambda t: self.predictedCrossingsForDefenseCategory(t, category)
+		unlimitedCrossingsForAllianceForCategory = sum(map(predictedCrossingsRetrievalFunction, alliance))
+		return min(unlimitedCrossingsForAllianceForCategory, 2)
+
+	def predictedScoreForAlliance(self, alliance):
+		allianceTeleopShotPoints = sum(map(lambda t: t.teleopShotAbility, alliance)) # TODO: What do we do if there is a team on the alliance that is None?
+		allianceSiegePoints = sum(map(lambda t: t.siegeAbility, alliance))
+		allianceAutoPoints = sum(map(lambda t: t.autoAbility, alliance))
+		alliancePredictedCrossingsRetrievalFunction = lambda c: self.predictedTeleDefensePointsForAllianceForCategory(alliance, c)
+		allianceDefensePointsTele = sum(map(alliancePredictedCrossingsRetrievalFunction, self.categories))
+
+
 	def numRankingAutoPoints(self, team):
 		a = []
 		for match in self.getCompletedMatchesForTeam(team):
@@ -620,7 +623,6 @@ class Calculator(object):
 		for match in self.getCompletedMatchesForTeam(team):
 			a.extend(map(numSiegePointsForTIMD(timd), self.matchTIMDsForTeamAlliance(team, match)))
 		return sum(a)
->>>>>>> 7388063a54bf0e7fc845a265af0cb8a8c44ffd46
 
 	def predictedScoreCustomAlliance(self, alliance):
 		predictedScoreCustomAlliance = 0		
@@ -1073,7 +1075,7 @@ class Calculator(object):
 		return len([match for match in self.comp.matches if self.matchIsPlayed(match)])
 
 	def actualSeeding(self):
-		return sorted(self.comp.teams, key=attrgetter('calculatedData.numRPs', 'calculatedData.rankingAutoPoints', 'calculatedData.rankingSiegePoints'), reverse=True)
+		return sorted(self.comp.teams, key=lambda team: (self.numRPsForTeam(team), self.numRankingAutoPoints(team), self.numRankingSiegePoints(team)), reverse=True)
 
 	def getRankingForTeam(self, team):
 		return self.actualSeeding().index(team)
@@ -1083,6 +1085,7 @@ class Calculator(object):
 
 	def doCalculations(self, FBC):
 		# self.comp.sdRScores = self.sdOfRValuesAcrossCompetition()
+		# self.comp.actualSeeding = self.actualSeeding()
 		for team in self.comp.teams:
 			timds = self.getCompletedTIMDsForTeam(team)
 
@@ -1169,8 +1172,7 @@ class Calculator(object):
 				t.secondPickAbility = self.secondPickAbility(team)
 				t.overallSecondPickAbility = self.overallSecondPickAbility(team)
 				t.predictedSeed = self.getRankingForTeam(team)
-				t.rankingAutoPoints = self.numRankingAutoPoints(team)
-				t.rankingSiegePoints = self.numRankingSiegePoints(team)
+				
 			
 				FBC.addCalculatedTeamDataToFirebase(team.number, t)
 				print("Putting calculations for team " + str(team.number) + " to Firebase.")

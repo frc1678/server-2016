@@ -99,8 +99,6 @@ class CalculatedTeamData(object):
 		self.numRPs = None
 		self.numAutoPoints = None
 		self.numScaleAndChallengePoints = None
-		self.rankingAutoPoints = None
-		self.rankingSiegePoints = None
 		self.sdHighShotsAuto = None
 		self.sdHighShotsTele = None
 		self.sdLowShotsAuto = None
