@@ -23,6 +23,11 @@ class Calculator(object):
 	def getTeamForNumber(self, teamNumber):
 		return [team for team in self.comp.teams if team.number == teamNumber][0]
 
+	def teamHasCompletedMatches(self, team): return len(self.getCompletedTIMDsForTeam(team)) > 0
+
+	def teamsWithCompletedMatches(self):
+		return filter(self.teamHasCompletedMatches, self.comp.teams)
+
 	def getMatchesForTeam(self, team):
 		return [match for match in self.comp.matches if self.teamInMatch(team, match)]
 
@@ -47,6 +52,9 @@ class Calculator(object):
 	def teamInMatch(self, team, match):
 		return team in self.teamsInMatch(match)
 
+	def teamIsOnRedAllianceInMatch(self, team, match):
+		return team.number in match.redAllianceTeamNumbers
+
 	def matchIsPlayed(self, match):
 		return match.redScore != None or match.blueScore != None
 
@@ -60,6 +68,9 @@ class Calculator(object):
 
 	def getCompletedTIMDsForTeamNumber(self, teamNumber):
 		return filter(self.timdIsCompleted, self.getTIMDsForTeamNumber(teamNumber))
+
+	def getCompletedTIMDsInCompetition(self):
+		return filter(self.timdIsCompleted, self.comp.TIMDs)
 
 	def getCompletedTIMDsForTeam(self, team):
 		return self.getCompletedTIMDsForTeamNumber(team.number)
@@ -467,34 +478,39 @@ class Calculator(object):
 
 		return math.sqrt(sumVar)
 
+	def defenseFacedForTIMD(self, timd, defenseKey):
+		match = self.getMatchForNumber(timd.matchNumber)
+		team = self.getTeamForNumber(timd.teamNumber)
+		defensePositions = timd.redDefensePositions if self.teamIsOnRedAllianceInMatch(team, match) else timd.blueDefensePositions
+		return defenseKey.upper() in defensePositions
 
-	def timesDefensesFacedInAllMatches(self):
-		outputDict = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
-		for match in self.comp.matches:
-			for d in outputDict:
-				if match.blueDefensePositions != None:
-					if d in match.blueDefensePositions:
-						outputDict[d] += 3
-					if d in match.redDefensePositions:
-						outputDict[d] += 3
-		return outputDict
+	def numTimesTeamFacedDefense(self, team, defenseKey):
+		return len(filter(lambda timd: self.defenseFacedForTIMD(timd, defenseKey)(self.defenseFacedForTIMD, self.getCompletedTIMDsForTeam(team)))
 
-	def timesDefensesFacedInAllMatchesForTeam(self, team):
-		outputDict = {'pc' : 0, 'cdf' : 0, 'mt' : 0, 'rp' : 0, 'sp' : 0, 'db' : 0, 'rt' : 0, 'rw' : 0, 'lb' : 0}
-		for match in self.comp.matches:
-			if team.number in match.redAllianceTeamNumbers:
-				for d in outputDict:
-					if match.blueDefensePositions != None:
-						if d in match.blueDefensePositions:
-							outputDict[d] += 1
-			elif team.number in match.blueAllianceTeamNumbers:
-				for d in outputDict:
-					if match.blueDefensePositions != None:
-						if d in match.redDefensePositions:
-							outputDict[d] += 1
-		return outputDict
+	def numTimesCompetitionFacedDefense(self, defenseKey):
+		return sum(map(self.numTimesTeamFacedDefense, self.teamsWithCompletedMatches))
 
-	def predictedCrosses(self, team, defense):
+	def competitionProportionForDefense(self):
+		competitionDefenseSightings = self.numTimesCompetitionFacedDefense()
+		competitionTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsInCompetition())
+		return competitionDefenseSightings / competitionTotalNumberOfDefenseSightings
+
+	def alphaForDefense(self, team, defenseCategory, defenseKey):
+
+
+	def predictedCrosses(self, team, defenseCategory, defenseKey):
+		dataRetrievalFunction = lambda t1: t1.calculatedData.avgSuccessfulTimesCrossedDefensesTele[defenseCategory][defenseKey]
+		averageOfDefenseCrossingsAcrossCompetition = np.mean([self.getAverageForDataFunctionForTeam(t, defenseRetrievalFunction) for t in self.teamsWithCompletedMatches()])
+		teamAverageDefenseCrossings = self.getAverageForDataFunctionForTeam(team, defenseRetrievalFunction)
+		competitionDefenseSightings = self.numTimesCompetitionFacedDefense()
+		teamDefenseSightings = self.numTimesTeamFacedDefense(team)
+		competitionTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsInCompetition())
+		teamTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsForTeam(team))
+		proportionOfCompetitionDefenseSightings = competitionDefenseSightings / competitionTotalNumberOfDefenseSightings
+		proportionOfTeamDefenseSightings = teamDefenseSightings / teamTotalNumberOfDefenseSightings
+		alphaForDefense = lambda d: 
+
+
 		predictedCrossesForDefense = 0.0
 		timesDefenseFacedAllBots = 0
 		timesDefenseFacedOneBot = 0
@@ -580,6 +596,10 @@ class Calculator(object):
 	def drivingAbility(self, team, match):
 		timd = self.getTIMDForTeamNumberAndMatchNumber(team, match)
 		return (1 * timd.rankTorque) + (1 * timd.rankBallControl) + (1 * timd.rankEvasion) + (1 * timd.rankDefense) + (1 * timd.rankSpeed)
+
+	def predictedScoreForAlliance(self, alliance):
+		allianceAutoPoints = sum(map(self.totalAvgNumShotPointsForTeam, alliance)) # TODO: What do we do if there is a team on the alliance that is None?
+
 
 	def predictedScoreCustomAlliance(self, alliance):
 		predictedScoreCustomAlliance = 0		
