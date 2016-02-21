@@ -1,6 +1,7 @@
 import DataModel
 import json
 from StringIO import StringIO
+import time
 
 ########## Defining Util/Convenience Functions ############
 ''' If there were too many more of these, or if this 
@@ -148,6 +149,10 @@ def makeArrayOfTeamNumAndMatchNum(teamNum):
 	for timd in self.comp.TIMDs:
 		if timd.teamNumber == teamNum:
 			teamNumAndMatchNum = teamNum + "Q" + str(timd.matchNumber)			
+
+def printWarningForSeconds(numSeconds):
+		print str(numSeconds) + ' SECONDS UNTIL FIREBASE WIPES'
+		time.sleep(1)
 
 
 

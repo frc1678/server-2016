@@ -3,11 +3,10 @@ import utils
 import json
 from firebase import firebase as fb
 import unicodedata
-import random
 from os import listdir
 
-(superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
-# (superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
+#(superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
+(superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
 # (superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
 #(superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
 
@@ -51,7 +50,6 @@ class FirebaseCommunicator(object):
 	def addCalculatedTeamDataToFirebase(self, teamNumber, calculatedTeamData):
 		calculatedTeamDataDict = utils.makeDictFromCalculatedTeamData(calculatedTeamData)
 		FBLocation = "/Teams/" + str(teamNumber) 
-		#print calculatedTeamDataDict
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
 
 	def addCalculatedMatchDataToFirebase(self, matchNumber, calculatedMatchData):
@@ -92,7 +90,7 @@ class FirebaseCommunicator(object):
 			self.updateFirebaseWithMatch(m)
 
 	def addScorelessMatchesToFirebase(self):
-		print "\nSetting Match Scores to -1..."
+		print "\nDoing Matches..."
 		for match in self.JSONmatches:
 			#if match["match_number"] == 14: #DEBUG
 			#	break
@@ -129,7 +127,8 @@ class FirebaseCommunicator(object):
 		self.competition.averageScore = -1
 
 	def wipeDatabase(self):
-		print "Wiping Firebase..."
+		map(utils.printWarningForSeconds, range(10, 0, -1))
+		print "\nWARNING: Wiping Firebase..."
 		FBLocation = "/"
 		firebase.put(FBLocation, 'Teams', [])
 		firebase.put(FBLocation, 'Matches', [])

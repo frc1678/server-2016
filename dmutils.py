@@ -44,6 +44,22 @@ def getCompletedTIMDsForTeam(team):
 def teamsWithMatchesCompleted():
 	return [team for team in comp.teams if len(getCompletedTIMDsForTeam(team)) > 0]
 
+def getColorFromTeamAndMatch(team, match):
+	blue = map(getTeamForNumber, match.blueAllianceTeamNumbers)
+	red = map(getTeamForNumber, match.redAllianceTeamNumbers)
+	return blue if team in blue else red
+
+def getOppColorFromTeamAndMatch(team, match):
+	blue = map(getTeamForNumber, match.blueAllianceTeamNumbers)
+	red = map(getTeamForNumber, match.redAllianceTeamNumbers)
+	return blue if team in red else red
+
+def getAllTeamMatchAlliances(team):
+	return [getColorFromTeamAndMatch(team, match) for match in getCompletedMatchesForTeam(team)]
+
+def getAllTeamOppositionAlliances(team):
+	return [getOppColorFromTeamAndMatch(team, match) for match in getCompletedMatchesForTeam(team)]
+
 # Match utility functions
 def getMatchForNumber(matchNumber):
 	return [match for match in comp.matches if match.number == matchNumber][0]
@@ -77,6 +93,9 @@ def matchHasAllTeams(match):
 def matchesThatHaveBeenPlayed():
 	return [match for match in comp.matches if matchHasAllTeams(match)]
 
+def matchesThatHaveBeenCompleted():
+	return [match for match in comp.matches if matchIsCompleted(match)]
+
 # TIMD utility functions
 def getTIMDsForTeamNumber( teamNumber):
 	return [timd for timd in comp.TIMDs if timd.teamNumber == teamNumber]
@@ -99,6 +118,9 @@ def getCompletedTIMDsForMatchNumber( matchNumber):
 def getTIMDForTeamNumberAndMatchNumber(teamNumber, matchNumber):
 	return [timd for timd in getTIMDsForTeamNumber(teamNumber) if timd.matchNumber == matchNumber][0]	
 
+def getCompletedTIMDsInCompetition():
+	return [timd for timd in comp.TIMDs if timdIsCompleted(timd)]
+
 def timdIsPlayed( timd):
 	isPlayed = False 
 	for key, value in utils.makeDictFromTIMD(timd).items():
@@ -116,7 +138,7 @@ def teamsAreOnSameAllianceInMatch(team1, team2, match):
 
 exceptedKeys = ['calculatedData', 'ballsIntakedAuto', 'superNotes']
 
-def timdIsCompleted( timd):
+def timdIsCompleted(timd):
 	isCompleted = True 
 	for key, value in utils.makeDictFromTIMD(timd).items():
 		if key not in exceptedKeys and value == None:

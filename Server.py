@@ -11,7 +11,6 @@ import unicodedata
 import time
 import DataValidator
 import CSVExporter
-import dmutils
 
 comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
@@ -26,6 +25,7 @@ calculator = Math.Calculator(comp)
 
 secsBetweenCalc = 10
 shouldCacheSecsCounter = 0
+cycle = 1
 
 numHoursBetweenCaches = 1.0 #1.0/360.0
 
@@ -38,7 +38,8 @@ while(1):
 	dv.validateFirebase()
 	calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
-	print("Calcs...")
+	cycle += 1
+	print("\nCalcs Cycle " + str(cycle) + "...")
 
 ''' # DEBUG
 teams = []

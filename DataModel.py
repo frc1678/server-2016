@@ -28,11 +28,15 @@ class CalculatedTeamData(object):
 			None : None
 		}
 		self.avgSuccessfulTimesCrossedDefenses = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.firstPickAbility = None
 		self.overallSecondPickAbility = None
@@ -62,33 +66,50 @@ class CalculatedTeamData(object):
 		self.scalePercentage = None
 		self.challengePercentage = None
 		self.breachPercentage = None
+		self.teleopShotAbility = None
 		self.avgSuccessfulTimesCrossedDefensesAuto = { #Works
-		  	'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+		  	'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.avgSuccessfulTimesCrossedDefensesTele = { #Works
-		  	'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+		  	'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.avgFailedTimesCrossedDefensesAuto = {
-		 	'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+		 	'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.avgFailedTimesCrossedDefensesTele = {
-		 	'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+		 	'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.siegePower = None
 		self.siegeConsistency = None
@@ -107,32 +128,47 @@ class CalculatedTeamData(object):
 		self.sdMidlineBallsIntakedAuto = None
 		self.sdBallsKnockedOffMidlineAuto = None
 		self.sdSuccessfulDefenseCrossesAuto = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
-		}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None		}
 		self.sdSuccessfulDefenseCrossesTele = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.sdFailedDefenseCrossesAuto = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.sdFailedDefenseCrossesTele = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.RScoreTorque = None
 		self.RScoreSpeed = None
@@ -259,19 +295,27 @@ class TeamInMatchData(object):
 		# }
 
 		self.timesSuccessfulCrossedDefensesAuto = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 
 		self.timesFailedCrossedDefensesAuto = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 
 		self.numHighShotsMadeAuto = None
@@ -298,19 +342,27 @@ class TeamInMatchData(object):
 		#  }
 
 		self.timesSuccessfulCrossedDefensesTele = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 
 		self.timesFailedCrossedDefensesTele = {
-			'a' : {'pc' : None, 'cdf' : None},
-			'b' : {'mt' : None, 'rp' : None},
-			'c' : {'db' : None, 'sp' : None},
-			'd' : {'rw' : None, 'rt' : None},
-			'e' : {'lb' : None}
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
 		}
 		self.superNotes = None
 
