@@ -7,8 +7,8 @@ from StringIO import StringIO
 were actual server code, I would make a module, but 
 for fake database creation purposes it is not worth it'''
 
-def assign(object, retrievalFunction, value):
-	retrievalFunction(object) = value
+# def assign(object, retrievalFunction, value):
+# 	retrievalFunction(object) = value
 
 def setDictionaryValue(dict, key, value):
 	dict[key] = value
