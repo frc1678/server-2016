@@ -474,7 +474,7 @@ class Calculator(object):
 		return min(unlimitedCrossingsForAllianceForCategory, 2)
 
 	def predictedScoreForAllianceWithNumbers(self, allianceNumbers):
-		return self.predictedScoreForAlliance(map(getTeamForNumber, allianceNumbers))
+		return self.predictedScoreForAlliance(map(dmutils.getTeamForNumber, allianceNumbers))
 
 	def predictedScoreForAlliance(self, alliance):
 		allianceTeleopShotPoints = sum(map(lambda t: t.teleopShotAbility, alliance)) # TODO: What do we do if there is a team on the alliance that is None?
@@ -839,11 +839,25 @@ class Calculator(object):
 		return np.mean(map(retrievalFunction, dmutils.getMatchesForTeam(team)))
 
 	def getAvgOfDefensesForRetrievalFunctionForTeam(self, team, teamRetrievalFunction):
-		defenseRetrievalFunctions = dmutils.getDefenseRetrievalFunctionsForRetrievalFunction(teamRetrievalFunction)
+		defenseRetrievalFunctions = dmutils.getDefenseRetrievalFunctions(teamRetrievalFunction)
 		return np.mean(map(lambda retrievalFunction: retrievalFunction(team), defenseRetrievalFunctions))
 
-	def setDefenseValuesForTeam(self, team, keyRetrievalFunction, valueRetrevalFunction, dataPointModificationFunction):
-		second
+	def setDefenseValuesForTeam(self, team, keyRetrievalFunction, valueRetrievalFunction, dataPointModificationFunction):
+		dict = keyRetrievalFunction(team)
+		defenseRetrievalFunctions = map(lambda dKey: dmutils.getDefenseRetrievalFunctionForDefense(retrievalFunctions, dKey), dmutils.defensesList)
+		defenseModifiedFunctions = map(dataPointModificationFunction, defenseRetrievalFunctions)
+		
+		for d in dmutils.defensesList:
+			defenseRetrievalFunction = dmutils.getDefenseRetrievalFunctionForDefense(retrievalFunctions, d)
+			defenseLengthFunction = lambda t: len(defenseRetrievalFunction(t))
+			self.getAverageForDataFunctionForTeam(team, defenseLengthFunction)
+
+
+		defenseRetrievalFunctions = dmutils.getDefenseRetrievalFunctions(keyRetrievalFunction)
+		defenseValueFunctions = map(len, dmutils.getDefenseRetrievalFunctions(valueRetrievalFunction))
+		defenseModifiedFunctions = map(dataPointModificationFunction, defenseValueFunctions)
+		setFunction = lambda dKey: utils.setDictionaryValue(dict, dKey, defenseModifiedFunctions)
+		map(, dmutils.defenseList)
 		defenseSetFunction = lambda dp: utils.setDictionaryKey(keyRetrievalFunction(team), dataPointModificationFunction(dmutils.getDefenseRetrievalFunctionForDefensePairing(valueRetrievalFunction, dp)))
 		# defenseRetrievalFunctions = map(dmutils.getDefenseRetrievalFunctionForDefensePairing, self.getDefensePairings())
 		map(defenseSetFunction, self.getDefensePairings())

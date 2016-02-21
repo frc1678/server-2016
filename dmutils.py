@@ -13,21 +13,17 @@ defenseDictionary = {'a' : ['pc', 'cdf'],
 			'e' : ['lb']
 		}
 
-def getDefenseRetrievalFunctionForDefensePairing(retrievalFunction, modificationFunction, defensePairing):
-	return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, modificationFunction, defensePairing[0], defensePairing[1])
+defensesList = ['pc', 'cdf', 'mt', 'rp', 'sp', 'db', 'rw', 'rt', 'lb']
 
-def getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, modificationFunction, category, defenseKey):
-	return lambda t: modificationFunction(retrievalFunction(t)[category][defenseKey])
+def getDefenseRetrievalFunctionForDefense(retrievalFunction, defenseKey):
+	return lambda t: retrievalFunction(t)[defenseKey]
+	return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, defenseKey)
 
-def getDefenseRetrievalFunctionsForCategory(retrievalFunction, modificationFunction, category):
-	defenseRetrievalFunction = lambda dKey: getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, modificationFunction, category, dKey)
-	return map(defenseRetrievalFunction, defenseDictionary[category])
+def getDefenseRetrievalFunctions(retrievalFunction, modificationFunction, defenseKey):
+	return map(lambda dKey: getDefenseRetrievalFunctionsForDefense(retrievalFunction, dKey), defensesList)
 
-def getDefenseRetrievalFunctionsForRetrievalFunction(retrievalFunction, modificationFunction):
-	defenseRetrievalFunctions = []
-	defenseCategoryRetrievalFunction = lambda c: defenseRetrievalFunctions.extend(getDefenseRetrievalFunctionsForCategory(retrievalFunction, modificationFunction, c))
-	map(defenseCategoryRetrievalFunction, defenseDictionary)
-	return defenseRetrievalFunctions
+def getValuedDefenseRetrievalFunctionsForTeam(team, retrievalFunction):
+	return filter(lambda f: f(team) != None, getDefenseRetrievalFunctions(retrievalFunction))
 
 # Team utility functions
 def getTeamForNumber(teamNumber):
