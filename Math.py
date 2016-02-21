@@ -123,11 +123,8 @@ class Calculator(object):
 			return 5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked
 
 	def autoAbility(self, team): 
-		t = team.calculatedData
-		defenseRetrievalFunctions = dmutils.getDefenseRetrievalFunctionsForRetrievalFunction(lambda t: t.avgSuccessfulTimesCrossedDefensesAuto)
-		if sum(map(lambda f: f(team), defenseRetrievalFunctions)) >= 1:
-			return 10 + (10 * t.avgHighShotsAuto) + (5 * t.avgLowShotsAuto) + (2 * t.reachPercentage)
-		return (10 * t.avgHighShotsAuto) + (5 * t.avgLowShotsAuto) + (2 * t.reachPercentage)
+		defenseRetrievalFunctions = dmutils.getDefenseRetrievalFunctionsForRetrievalFunction(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesAuto)
+		return (10 * t.avgHighShotsAuto) + (5 * t.avgLowShotsAuto) + (2 * t.reachPercentage) + 10 if sum(map(lambda f: f(team), defenseRetrievalFunctions)) >= 1 else 0
 
 	def teleopShotAbility(self, team): return (5 * team.calculatedData.avgHighShotsTele + 2 * team.calculatedData.avgLowShotsTele)
 
@@ -980,6 +977,13 @@ class Calculator(object):
 		defenseRetrievalFunctions = dmutils.getDefenseRetrievalFunctionsForRetrievalFunction(teamRetrievalFunction)
 		return np.mean(map(lambda retrievalFunction: retrievalFunction(team), defenseRetrievalFunctions))
 
+	def setDefenseValuesForTeam(team, keyRetrievalFunction, defenseRetrievalFunction):
+		keyRetrievalFunctions = dmutils.getDefenseRetrievalFunctionsForRetrievalFunction(keyRetrievalFunction)
+		defenseRetrievalFunctions = dmutils.getDefenseRetrievalFunctionsForRetrievalFunction(defenseRetrievalFunction)
+		averageBuilderFunction = lambda x: self.getAverageForDataFunctionForTeam(team, defenseRetrievalFunctions[x])
+		defenseAssignmentFunctionCreatorFunction = lambda i: utils.assign(team.calculatedData, keyRetrievalFunctions[i], averageBuilderFunction)
+		map(defenseAssignmentFunctionCreatorFunction, range(len(defenseRetrievalFunctions)))
+
 	def doCalculations(self, FBC):
 		# self.comp.sdRScores = self.sdOfRValuesAcrossCompetition()
 		for team in self.comp.teams:
@@ -1030,7 +1034,7 @@ class Calculator(object):
 				# t.disfunctionalPercentage = t.disabledPercentage + t.incapacitatedPercentage 
 
 				#Auto
-				t.autoAbility = self.autoAbility(team)
+				t.autoAbility = self.autoAbility()
 				t.avgHighShotsAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.numHighShotsMadeAuto) #Checked
 				t.avgLowShotsAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.numLowShotsMadeAuto) #Checked	
 				# t.reachPercentage = self.getPercentageForDataPointForTeam(team, 'timd.didReachAuto')
@@ -1042,7 +1046,12 @@ class Calculator(object):
 				t.sdLowShotsAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numLowShotsMadeAuto) # Checked
 				# t.sdMidlineBallsIntakedAuto = self.getStandardDeviationForDataFunctionForTeam(team, 'ballsIntakedAuto')
 				t.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numBallsKnockedOffMidlineAuto) # Checked
-				t.avgSuccessfulTimesCrossedDefensesAuto = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesSuccessfulCrossedDefensesAuto'))
+
+				valueKeyFunction = lambda team1: team1.calculatedData.avgSuccessfulTimesCrossedDefensesAuto # Checked
+				defenseRetrievalFunction = lambda timd: timd.timesSuccessfulCrossedDefensesAuto # Checked
+				setDefenseValuesForTeam(team, valueKeyFunction, defenseRetrievalFunction) # Checked
+				
+
 			
 				# #Tele
 				# t.challengePercentage = self.getPercentageForDataPointForTeam(team, 'timd.didChallengeTele')
@@ -1058,7 +1067,6 @@ class Calculator(object):
 				t.teleopShotAbility = self.teleopShotAbility(team) # Checked
 				t.siegeConsistency = t.challengePercentage + t.scalePercentage # Checked
 				t.siegeAbility = self.siegeAbility(team) # Checked
-				t.avgSuccessfulTimesCrossedDefensesTele = self.averageDictionaries(self.makeArrayOfDictionaries(team, 'timesSuccessfulCrossedDefensesTele'))
 				t.sdHighShotsTele = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numHighShotsMadeTele) # Checked
 				t.sdLowShotsTele = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numLowShotsMadeTele) # Checked
 				t.sdGroundIntakes = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numGroundIntakesTele) # Checked
@@ -1070,7 +1078,11 @@ class Calculator(object):
 				t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
 				t.actualSeeding = self.getRankingForTeamByRetrievalFunctions(self.getSeedingFunctions()) # Checked
 				t.predictedSeeding = self.getRankingForTeamByRetrievalFunctions(self.getPredictedSeedingFunctions()) # Checked
-				
+
+				valueKeyFunction = lambda team1: team1.calculatedData.avgSuccessfulTimesCrossedDefensesTele # Checked
+				defenseRetrievalFunction = lambda timd: timd.timesSuccessfulCrossedDefensesTele # Checked
+				setDefenseValuesForTeam(team, valueKeyFunction, defenseRetrievalFunction) # Checked
+
 			
 				FBC.addCalculatedTeamDataToFirebase(team.number, t)
 				print("Putting calculations for team " + str(team.number) + " to Firebase.")

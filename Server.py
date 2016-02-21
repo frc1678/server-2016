@@ -22,6 +22,7 @@ dv = DataValidator.DataValidator(comp)
 
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 
+import pdb; pdb.set_trace()  # breakpoint 718877bb //
 calculator = Math.Calculator(comp)
 
 secsBetweenCalc = 10
