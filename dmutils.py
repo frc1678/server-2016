@@ -13,19 +13,19 @@ defenseDictionary = {'a' : ['pc', 'cdf'],
 			'e' : ['lb']
 		}
 
-def getDefenseRetrievalFunctionForDefensePairing(retrievalFunction, defensePairing):
-	return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, defensePairing[0], defensePairing[1])
+def getDefenseRetrievalFunctionForDefensePairing(retrievalFunction, modificationFunction, defensePairing):
+	return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, modificationFunction, defensePairing[0], defensePairing[1])
 
-def getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, category, defenseKey):
-	return lambda t: retrievalFunction(t)[category][defenseKey]
+def getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, modificationFunction, category, defenseKey):
+	return lambda t: modificationFunction(retrievalFunction(t)[category][defenseKey])
 
-def getDefenseRetrievalFunctionsForCategory(retrievalFunction, category):
-	defenseRetrievalFunction = lambda dKey: getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, category, dKey)
+def getDefenseRetrievalFunctionsForCategory(retrievalFunction, modificationFunction, category):
+	defenseRetrievalFunction = lambda dKey: getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, modificationFunction, category, dKey)
 	return map(defenseRetrievalFunction, defenseDictionary[category])
 
-def getDefenseRetrievalFunctionsForRetrievalFunction(retrievalFunction):
+def getDefenseRetrievalFunctionsForRetrievalFunction(retrievalFunction, modificationFunction):
 	defenseRetrievalFunctions = []
-	defenseCategoryRetrievalFunction = lambda c: defenseRetrievalFunctions.extend(getDefenseRetrievalFunctionsForCategory(retrievalFunction, c))
+	defenseCategoryRetrievalFunction = lambda c: defenseRetrievalFunctions.extend(getDefenseRetrievalFunctionsForCategory(retrievalFunction, modificationFunction, c))
 	map(defenseCategoryRetrievalFunction, defenseDictionary)
 	return defenseRetrievalFunctions
 
