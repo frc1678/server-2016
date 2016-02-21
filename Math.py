@@ -29,6 +29,9 @@ class Calculator(object):
 	def getTeamForNumber(self, teamNumber):
 		return [team for team in self.comp.teams if team.number == teamNumber][0]
 
+	def getOurTeam():
+		return getTeamForNumber(self.ourTeamNum)
+
 	def teamHasCompletedMatches(self, team): return len(self.getCompletedTIMDsForTeam(team)) > 0
 
 	def teamsWithCompletedMatches(self):
@@ -610,7 +613,7 @@ class Calculator(object):
 		allianceAutoPoints = sum(map(lambda t: t.autoAbility, alliance))
 		alliancePredictedCrossingsRetrievalFunction = lambda c: self.predictedTeleDefensePointsForAllianceForCategory(alliance, c)
 		allianceDefensePointsTele = sum(map(alliancePredictedCrossingsRetrievalFunction, self.categories))
-
+		return allianceTeleopShotPoints + allianceSiegePoints + allianceAutoPoints + allianceDefensePointsTele
 
 	def numRankingAutoPoints(self, team):
 		a = []
@@ -774,11 +777,7 @@ class Calculator(object):
 
 	def firstPickAbility(self, team):
 		ourTeam = self.getTeamForNumber(self.ourTeamNum)
-		alliance = [ourTeam, team]
-		predictedScoreCustomAlliance = self.predictedScoreCustomAlliance(alliance) 
-		if math.isnan(predictedScoreCustomAlliance):
-			return None
-		return self.predictedScoreCustomAlliance(alliance) 
+		return self.predictedScoreForAlliance([ourTeam, team])
 
 	def teamInMatchFirstPickAbility(self, team, match):
 		ourTeam = self.getTeamForNumber(self.ourTeamNum)
@@ -788,22 +787,25 @@ class Calculator(object):
 			return None
 		return self.predictedScoreCustomAlliance(alliance) 
 
-	def secondPickAbility(self, team):
+	def allianceWithTeamRemoved(self, team, alliance):
+		return filter(lambda t: t.number != team.number)
+
+	def scoreContributionToTeamOnAlliance(self, team, alliance):
+		return predictedScoreForAlliance(alliance) - self.predictedScoreForAlliance(self.allianceWithTeamRemoved(team, alliance))
+
+	def secondPickAbilityForTeamWithTeam(team1, team2):
 		gamma = 0.5
-		teamsArray = [loopTeam for loopTeam in self.comp.teams if self.getCompletedTIMDsForTeam(loopTeam) > 0] 
-		secondPickAbility = {}
-		ourTeam = self.getTeamForNumber(self.ourTeamNum)
-		citrusDPRMatrix = self.citrusDPR(team)
-		for team1 in teamsArray:
-			if team1.number != self.ourTeamNum and team1.number != team.number:	#Loop through all of the teams and find the score contribution of the team whose
-				citrusDPR = citrusDPRMatrix[teamsArray.index(team1) - 1]
-				alliance3Robots = [ourTeam, team, team1]				
-				alliance2Robots = [ourTeam, team1]
-				scoreContribution = self.predictedScoreCustomAlliance(alliance3Robots) - self.predictedScoreCustomAlliance(alliance2Robots)
-				secondPickAbility[team1.number] = gamma * scoreContribution * (1 - gamma) * int(citrusDPR)		#gamma is a constant
-		for key, spa in secondPickAbility.items():
-			if math.isnan(spa): secondPickAbility[key] = None
-		return secondPickAbility
+		return gamma * team1.calculatedData.citrusDPR + (1 - gamma) * self.predictedScoreForAlliance([self.getOurTeam(), team2, team1])
+
+	def secondPickAbility(self, team):
+		secondPickAbilityDict = {}
+		secondPickAbilityFunction = lambda t: secondPickAbilityDict[t.number] = secondPickAbilityForTeamWithTeam(team, t)
+		map(secondPickAbilityFunction, self.teamsWithCompletedMatches())
+		return secondPickAbilityDict
+
+	def overallSecondPickAbility(self, team):
+		secondPickAbilityFunction = lambda t: team.secondPickAbility[t.number]
+		return np.mean(map(secondPickAbilityFunction, top16Teams)) # Replace top 16 teams with something that finds the rank.
 
 	def secondPickAbilityWithExclusion(self, team, timd):
 		gamma = 0.5
