@@ -1,7 +1,5 @@
 import firebaseCommunicator
 import utils
-import random
-import Math
 # Classes That Reflect Firebase Data Structure
 
 class Competition(object):
@@ -95,6 +93,7 @@ class CalculatedTeamData(object):
 		self.siegePower = None
 		self.siegeConsistency = None
 		self.siegeAbility = None
+		self.autoAbility = None
 		self.predictedNumRPs = None
 		self.numRPs = None
 		self.numAutoPoints = None

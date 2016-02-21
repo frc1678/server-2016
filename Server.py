@@ -5,7 +5,6 @@ import sys
 
 #Our Modules
 import DataModel
-import utils
 import firebaseCommunicator
 import Math
 import unicodedata

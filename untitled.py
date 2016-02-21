@@ -7,18 +7,20 @@ class A(object):
 
 class B(object):
 	"""docstring for B"""
-	def __init__(self, a):
+	def __init__(self):
 		super(B, self).__init__()
-		self.a = a
+	def rank(self, os):
+		return sorted(os, key=lambda x: (self.getA(x), self.getB(x)), reverse=True)
 	def getA(self, o):
 		return o.a
 	def getB(self, o):
 		return o.b
-	def rank(self, os):
-		return sorted(os, key=lambda x: (self.getA(x), getB(x)))
-a = [A(1, 2), A(1, 3)]
-b = B(10)
-c = B.rank(a)
-for d in c:
-	print c.a, c.b
 
+c = [A(12, 10), A(12, 20)]
+for d in c:
+	print d.a, d.b
+
+b = B()
+e = b.rank(c)	
+for f in e:
+	print f.a, f.b
