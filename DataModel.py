@@ -158,19 +158,19 @@ class Team(object):
 		self.otherImageUrls = {
 			 'not0' : '-1'
 		}
-		self.pitHeightOfBallLeavingShooter = -1.0
-		self.pitLowBarCapability = -1
-		self.pitPotentialLowBarCapability = -1
+		self.pitHeightOfBallLeavingShooter = None
+		self.pitLowBarCapability = None
+		self.pitPotentialLowBarCapability = None
 		#self.pitPotentialCDFAndPCCapability = None
-		self.pitPotentialMidlineBallCapability = -1
+		self.pitPotentialMidlineBallCapability = None
 		#self.pitFrontBumperWidth = None
-		self.pitDriveBaseWidth = -1.0
-		self.pitDriveBaseLength = -1.0
-		self.pitBumperHeight = -1.0
-		self.pitPotentialShotBlockerCapability = -1
-		self.pitNotes = '-1'
-		self.pitOrganization = -1
-		self.pitNumberOfWheels = -1
+		self.pitDriveBaseWidth = None
+		self.pitDriveBaseLength = None
+		self.pitBumperHeight = None
+		self.pitPotentialShotBlockerCapability = None
+		self.pitNotes = None
+		self.pitOrganization = None
+		self.pitNumberOfWheels = None
 		#self.pitHeightOfRobot = None
 		self.__dict__.update(args)
 
