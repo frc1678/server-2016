@@ -5,13 +5,13 @@ import sys
 
 #Our Modules
 import DataModel
-import utils
 import firebaseCommunicator
-import Math
+# import Math
 import unicodedata
 import time
 import DataValidator
 import CSVExporter
+import dmutils
 
 comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
