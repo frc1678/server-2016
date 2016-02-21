@@ -13,6 +13,9 @@ defenseDictionary = {'a' : ['pc', 'cdf'],
 			'e' : ['lb']
 		}
 
+def getDefenseRetrievalFunctionForDefensePairing(retrievalFunction, defensePairing):
+	return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, defensePairing[0], defensePairing[1])
+
 def getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, category, defenseKey):
 	return lambda t: retrievalFunction(t)[category][defenseKey]
 
