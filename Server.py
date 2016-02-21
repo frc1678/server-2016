@@ -6,7 +6,7 @@ import sys
 #Our Modules
 import DataModel
 import firebaseCommunicator
-# import Math
+import Math
 import unicodedata
 import time
 import DataValidator

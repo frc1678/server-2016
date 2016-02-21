@@ -6,6 +6,25 @@ comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()
 
+defenseDictionary = {'a' : ['pc', 'cdf'],
+			'b' : ['mt', 'rp'],
+			'c' : ['sp', 'db'],
+			'd' : ['rw', 'rt'],
+			'e' : ['lb']
+		}
+
+def getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, category, defenseKey):
+	return lambda t: retrievalFunction(t)[category][defenseKey]
+
+def getDefenseRetrievalFunctionsForCategory(retrievalFunction, category):
+	defenseRetrievalFunction = lambda dKey: getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, category, dKey)
+	return map(defenseRetrievalFunction, defenseDictionary[category])
+
+def getDefenseRetrievalFunctionsForRetrievalFunction(retrievalFunction):
+	defenseRetrievalFunctions = []
+	defenseCategoryRetrievalFunction = lambda c: defenseRetrievalFunctions.extend(getDefenseRetrievalFunctionsForCategory(retrievalFunction, c))
+	map(defenseCategoryRetrievalFunction, defenseDictionary)
+	return defenseRetrievalFunctions
 
 # Team utility functions
 def getTeamForNumber(teamNumber):

@@ -7,6 +7,9 @@ from StringIO import StringIO
 were actual server code, I would make a module, but 
 for fake database creation purposes it is not worth it'''
 
+def setDictionaryValue(dict, key, value):
+	dict[key] = value
+
 def jprint(JSON):
 	print(json.dumps(JSON, sort_keys=True, indent=4))
 
