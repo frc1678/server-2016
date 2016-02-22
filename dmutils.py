@@ -1,10 +1,6 @@
 import DataModel
 import utils
-
-comp = DataModel.Competition()
-
-comp.updateTeamsAndMatchesFromFirebase()
-comp.updateTIMDsFromFirebase()
+import pdb
 
 defenseDictionary = {'a' : ['pc', 'cdf'],
 			'b' : ['mt', 'rp'],
@@ -15,12 +11,15 @@ defenseDictionary = {'a' : ['pc', 'cdf'],
 
 defensesList = ['pc', 'cdf', 'mt', 'rp', 'sp', 'db', 'rw', 'rt', 'lb']
 
+def setCompetition(competition):
+	comp = competition
+
 def getDefenseRetrievalFunctionForDefense(retrievalFunction, defenseKey):
 	return lambda t: retrievalFunction(t)[defenseKey]
 	return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, defenseKey)
 
-def getDefenseRetrievalFunctions(retrievalFunction, modificationFunction, defenseKey):
-	return map(lambda dKey: getDefenseRetrievalFunctionsForDefense(retrievalFunction, dKey), defensesList)
+def getDefenseRetrievalFunctions(retrievalFunction):
+	return map(lambda dKey: getDefenseRetrievalFunctionForDefense(retrievalFunction, dKey), defensesList)
 
 def getValuedDefenseRetrievalFunctionsForTeam(team, retrievalFunction):
 	return filter(lambda f: f(team) != None, getDefenseRetrievalFunctions(retrievalFunction))
@@ -28,6 +27,9 @@ def getValuedDefenseRetrievalFunctionsForTeam(team, retrievalFunction):
 # Team utility functions
 def getTeamForNumber(teamNumber):
 	return [team for team in comp.teams if team.number == teamNumber][0]
+
+def teamsWithCalculatedData():
+	return filter(lambda t: calculatedDataHasValues(t.calculatedData), comp.teams)
 
 def getMatchesForTeam(team):
 	return [match for match in comp.matches if teamInMatch(team, match)]
@@ -112,7 +114,7 @@ def getPlayedTIMDsForTeamNumber( teamNumber):
 def getTIMDsForMatchNumber( matchNumber):
 	return [timd for timd in comp.TIMDs if timd.matchNumber == matchNumber]
 
-def getCompletedTIMDsForMatchNumber( matchNumber):
+def getCompletedTIMDsForMatchNumber(matchNumber):
 	return filter(timdIsCompleted, getTIMDsForMatchNumber(matchNumber))
 
 def getTIMDForTeamNumberAndMatchNumber(teamNumber, matchNumber):
@@ -120,6 +122,13 @@ def getTIMDForTeamNumberAndMatchNumber(teamNumber, matchNumber):
 
 def getCompletedTIMDsInCompetition():
 	return [timd for timd in comp.TIMDs if timdIsCompleted(timd)]
+
+def calculatedDataHasValues(calculatedData):
+	hasValues = False 
+	for key, value in utils.makeDictFromObject(calculatedData).items():
+		if value != None and not 'Defense' in key and not 'defense' in key and not 'second' in key:
+			hasValues = True
+	return hasValues
 
 def timdIsPlayed( timd):
 	isPlayed = False 

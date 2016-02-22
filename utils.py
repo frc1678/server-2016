@@ -11,6 +11,9 @@ for fake database creation purposes it is not worth it'''
 # def assign(object, retrievalFunction, value):
 # 	retrievalFunction(object) = value
 
+def convertFirebaseBoolean(fbBool):
+	return True if fbBool == 'true' else False
+
 def setDictionaryValue(dict, key, value):
 	dict[key] = value
 

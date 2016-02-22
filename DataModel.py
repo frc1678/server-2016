@@ -111,7 +111,6 @@ class CalculatedTeamData(object):
 			'rw' : None,
 			'lb' : None
 		}
-		self.siegePower = None
 		self.siegeConsistency = None
 		self.siegeAbility = None
 		self.autoAbility = None

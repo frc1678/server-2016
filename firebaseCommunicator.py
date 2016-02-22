@@ -4,9 +4,10 @@ import json
 from firebase import firebase as fb
 import unicodedata
 from os import listdir
+import pdb
 
-#(superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
-(superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
+(superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
+# (superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
 # (superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
 #(superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
 
@@ -48,6 +49,7 @@ class FirebaseCommunicator(object):
 		result = firebase.put(FBLocation, str(timd.teamNumber) + "Q" + str(timd.matchNumber), timdDict)
 
 	def addCalculatedTeamDataToFirebase(self, teamNumber, calculatedTeamData):
+		pdb.set_trace()
 		calculatedTeamDataDict = utils.makeDictFromCalculatedTeamData(calculatedTeamData)
 		FBLocation = "/Teams/" + str(teamNumber) 
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
