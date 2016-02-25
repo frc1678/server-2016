@@ -5,7 +5,6 @@ import DataModel
 import firebaseCommunicator
 import math
 import numpy as np
-import dmutils
 import scipy as sp
 from operator import attrgetter
 import scipy.stats as stats
@@ -1254,17 +1253,6 @@ class Calculator(object):
 #
 			# print("Calculating TIMDs for team " + str(team.number)) + "... "
 			# for timd in timds:
-				# 
-			# self.TIMDs = self.comp.TIMDs
-			# self.doCalculationsForTeam(team)
-				
-		#Match Metrics
-		# for match in self.matches:
-			
-
-		# for team in self.teamsWithCalculatedData():
-			
-			# FBC.addCalculatedTeamDataToFirebase(team.number, team.calculatedData)
 
 		#Competition metrics
 		if self.numPlayedMatchesInCompetition() > 0:

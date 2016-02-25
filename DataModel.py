@@ -14,11 +14,18 @@ class Competition(object):
 		self.predictedSeeding = []
 		self.actualSeeding = []
 		self.sdRScores = []
-	def updateTeamsAndMatchesFromFirebase(self):
+	
+	def updateTeamsAndMatchesFromFirebase(self, doneCallback):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
-	def updateTIMDsFromFirebase(self):
+		while 1: 
+			if len(self.teams) > 0 and len(self.matches) > 0: doneCallback()
+
+	def updateTIMDsFromFirebase(self, doneCallback):
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
+		while 1: 
+			if len(self.TIMDs) > 0:
+				doneCallback(self)
 
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
