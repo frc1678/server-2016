@@ -11,12 +11,15 @@ defenseDictionary = {'a' : ['pc', 'cdf'],
 
 defensesList = ['pc', 'cdf', 'mt', 'rp', 'sp', 'db', 'rw', 'rt', 'lb']
 
+comp = None
+
 def setCompetition(competition):
+	global comp
 	comp = competition
 
 def getDefenseRetrievalFunctionForDefense(retrievalFunction, defenseKey):
-	return lambda t: retrievalFunction(t)[defenseKey]
-	return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, defenseKey)
+	return lambda t: (retrievalFunction(t)[defenseKey] if len(filter(lambda key: key == defenseKey, retrievalFunction(t).keys())) > 0 else 0)
+	#return getDefenseRetrievalFunctionForCategoryAndDefenseForRetrievalFunction(retrievalFunction, defenseKey)
 
 def getDefenseRetrievalFunctions(retrievalFunction):
 	return map(lambda dKey: getDefenseRetrievalFunctionForDefense(retrievalFunction, dKey), defensesList)
