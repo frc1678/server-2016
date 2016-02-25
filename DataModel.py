@@ -25,7 +25,6 @@ class CalculatedTeamData(object):
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.secondPickAbility = {
-			None : None
 		}
 		self.avgSuccessfulTimesCrossedDefenses = {
 			'pc' : None,
@@ -283,7 +282,7 @@ class TeamInMatchData(object):
 		self.rankBallControl = None
 
 		#Auto
-		self.ballsIntakedAuto = None
+		self.ballsIntakedAuto = []
 		self.numBallsKnockedOffMidlineAuto = None
 		# self.timesCrossedDefensesAuto = {
 		# 	'a' : {'pc' : {'successes' : None, 'fails' : None}, 'cdf' : {'successes' : None, 'fails' : None}},
@@ -390,7 +389,6 @@ class CalculatedTeamInMatchData(object):
 		self.citrusDPR = None 
 		self.firstPickAbility = None
 		self.secondPickAbility = {
-			None: None
 		}
 		self.overallSecondPickAbility = None
 		self.scoreContribution = None #
