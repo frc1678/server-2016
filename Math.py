@@ -90,7 +90,9 @@ class Calculator(object):
 		return [match for match in self.matches if match.number == matchNumber][0]
 
 	def teamsInMatch(self, match):
-		teamNumbersInMatch = match.redAllianceTeamNumbers
+		pdb.set_trace()
+		teamNumbersInMatch = []
+		teamNumbersInMatch.extend(match.redAllianceTeamNumbers)
 		teamNumbersInMatch.extend(match.blueAllianceTeamNumbers)
 		return [self.getTeamForNumber(teamNumber) for teamNumber in teamNumbersInMatch]
 
@@ -572,6 +574,7 @@ class Calculator(object):
 		return team if self.calculatedDataHasValues(team.calculatedData) else self.averageTeam
 
 	def predictedScoreForAlliance(self, alliance):
+		pdb.set_trace()
 		alliance = map(self.replaceWithAverageIfNecessary, alliance)
 		allianceTeleopShotPoints = sum([t.calculatedData.teleopShotAbility for t in alliance if t.calculatedData.teleopShotAbility != None]) # TODO: What do we do if there is a team on the alliance that is None?
 		allianceSiegePoints = sum([t.calculatedData.siegeAbility for t in alliance if t.calculatedData.siegeAbility != None])
@@ -1095,7 +1098,7 @@ class Calculator(object):
 		else:
 			print "Beginning first calculations for team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber)
 			team = self.getTeamForNumber(timd.teamNumber)
-			match = self.getMatchForNumber(timd.matchNumber)
+			pdb.set_trace()
 
 			self.TIMDs = filter(lambda t: (t.teamNumber != timd.teamNumber) == (t.matchNumber != timd.matchNumber), self.comp.TIMDs)
 			self.matches = filter(lambda m: (not self.teamInMatch(team, m)) == (timd.matchNumber != m.number), self.comp.matches)
@@ -1125,7 +1128,6 @@ class Calculator(object):
 			print "Beginning first calculations for team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber)
 			c = timd.calculatedData
 			team = self.getTeamForNumber(timd.teamNumber)
-			match = self.getMatchForNumber(timd.matchNumber)
 
 			self.TIMDs = filter(lambda t: (t.teamNumber != timd.teamNumber) == (t.matchNumber != timd.matchNumber), self.comp.TIMDs)
 			self.matches = filter(lambda m: (not self.teamInMatch(team, m)) == (timd.matchNumber != m.number), self.comp.matches)
@@ -1149,6 +1151,7 @@ class Calculator(object):
 		if not self.matchIsCompleted(match):
 			print "Match " + str(match.number) + " has not been played yet."
 		else:
+			pdb.set_trace()
 			print "Beginning calculations for match " + str(match.number) + "..."
 			match.calculatedData.predictedBlueScore = self.predictedScoreForAllianceWithNumbers(match.blueAllianceTeamNumbers)
 			print "still going..."
@@ -1191,7 +1194,9 @@ class Calculator(object):
 		for team in self.comp.teams:
 			self.doFirstCalculationsForTeam(team)
 		self.getAverageTeam()
+		self.restoreComp()
 		for match in self.comp.matches:
+			pdb.set_trace()
 			self.doFirstCalculationsForMatch(match)
 		for team in self.comp.teams:
 			self.restoreComp()
