@@ -117,6 +117,28 @@ class CalculatedTeamData(object):
 			'rw' : None,
 			'lb' : None
 		}
+		self.avgTimeForDefenseCrossAuto = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.avgTimeForDefenseCrossTele = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
 		self.siegeConsistency = None
 		self.siegeAbility = None
 		self.autoAbility = None
