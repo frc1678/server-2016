@@ -211,8 +211,8 @@ class Calculator(object):
  		return twoBallAutoCompleted / len(timds)
 
 	def blockingAbility(self, team):
-		avgHighShotAccuracy = sum(map(lambda t: t.calculatedData.highShotAccuracyTele, self.teamsWithMatchesCompleted())) / len(self.teamsWithMatchesCompleted())
-		return 5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked if len(self.getCompletedMatchesForTeam(team)) > 0 else None
+		avgHighShotAccuracy = sum(map(lambda t: t.calculatedData.highShotAccuracyTele, self.teamsWithMatchesCompleted())) 
+		return (5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked) / len(self.teamsWithMatchesCompleted()) if len(self.getCompletedMatchesForTeam(team)) > 0 else None
 
 	def autoAbility(self, team):
 		t = team.calculatedData
@@ -1271,14 +1271,17 @@ class Calculator(object):
 		for team in self.comp.teams:
 			self.doSecondCalculationsForTeam(team)
 		for team in self.comp.teams:
-			print "Writing team " + str(team.number) + " to Firebase..."
-			FBC.addCalculatedTeamDataToFirebase(team)
+			if team in self.teamsWithMatchesCompleted():
+				print "Writing team " + str(team.number) + " to Firebase..."
+				FBC.addCalculatedTeamDataToFirebase(team)
 		for timd in self.comp.TIMDs:
-			print "Writing team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber) + " to Firebase..."
-			FBC.addCalculatedTIMDataToFirebase(timd)
+			if self.timdIsCompleted(timd):
+				print "Writing team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber) + " to Firebase..."
+				FBC.addCalculatedTIMDataToFirebase(timd)
 		for match in self.comp.matches:
-			print "Writing match " + str(match.number) + " to Firebase..."
-			FBC.addCalculatedMatchDataToFirebase(match)
+			if self.matchIsCompleted(match):
+				print "Writing match " + str(match.number) + " to Firebase..."
+				FBC.addCalculatedMatchDataToFirebase(match)
 
 		# for team in self.comp.teams:
 			# timds = self.getCompletedTIMDsForTeam(team)

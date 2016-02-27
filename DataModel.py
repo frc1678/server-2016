@@ -15,9 +15,10 @@ class Competition(object):
 		self.actualSeeding = []
 		self.sdRScores = []
 	
-	def updateTeamsAndMatchesFromFirebase(self, doneCallback):
+	def updateTeamsAndMatchesFromFirebase(self, doneCallback = None):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
+		if doneCallback == None: return 
 		while 1: 
 			if len(self.teams) > 0 and len(self.matches) > 0: doneCallback()
 
