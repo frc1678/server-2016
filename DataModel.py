@@ -139,6 +139,17 @@ class CalculatedTeamData(object):
 			'rw' : None,
 			'lb' : None
 		}
+		predictedSuccessfulCrossingsForDefenseTele = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
 		self.siegeConsistency = None
 		self.siegeAbility = None
 		self.autoAbility = None

@@ -2,6 +2,9 @@ import DataModel
 import json
 from StringIO import StringIO
 import time
+import math
+import numpy as np
+import pdb
 
 ########## Defining Util/Convenience Functions ############
 ''' If there were too many more of these, or if this 
@@ -13,6 +16,29 @@ for fake database creation purposes it is not worth it'''
 
 def convertFirebaseBoolean(fbBool):
 	return True if fbBool == 'true' else False
+
+def rms(values):
+	return math.sqrt(np.mean(map(lambda x: x**2, values)))
+
+def convertNoneToIdentity(x, identity):
+	return identity if x == None else x
+
+def dictOperation(dict1, dict2, dictOp, identity):
+	newDict = {}
+	map(lambda k: setDictionaryValue(newDict, k, dictOp(convertNoneToIdentity(dict1[k], identity), convertNoneToIdentity(dict2[k], identity))), dict1)
+	return newDict
+
+def dictSum(dict1, dict2):
+	return dictOperation(dict1, dict2, lambda x, y: x + y, 0)
+
+def dictDifference(dict1, dict2):
+	return dictOperation(dict1, dict2, lambda x, y: x - y, 0)
+
+def dictProduct(dict1, dict2):
+	return dictOperation(dict1, dict2, lambda x, y: x * y, 1)
+
+def dictQuotient(dict1, dict2):
+	return dictOperation(dict1, dict2, lambda x, y: x / y, 1)
 
 def setDictionaryValue(dict, key, value):
 	dict[key] = value
