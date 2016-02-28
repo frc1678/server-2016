@@ -87,7 +87,7 @@ class Calculator(object):
 
 	# Match utility functions
 	def getMatchForNumber(self, matchNumber):
-		return [match for match in self.matches if match.number == matchNumber][0]
+		return [match for match in self.comp.matches if match.number == matchNumber][0] 
 
 	def teamsInMatch(self, match):
 		teamNumbersInMatch = []
@@ -211,7 +211,7 @@ class Calculator(object):
  		return twoBallAutoCompleted / len(timds)
 
 	def blockingAbility(self, team):
-		avgHighShotAccuracy = sum(map(lambda t: t.calculatedData.highShotAccuracyTele, self.teamsWithMatchesCompleted())) 
+		avgHighShotAccuracy = 0 #sum(map(lambda t: t.calculatedData.highShotAccuracyTele, self.teamsWithMatchesCompleted())) 
 		return (5 * avgHighShotAccuracy * team.calculatedData.avgShotsBlocked) / len(self.teamsWithMatchesCompleted()) if len(self.getCompletedMatchesForTeam(team)) > 0 else None
 
 	def autoAbility(self, team):
@@ -457,7 +457,9 @@ class Calculator(object):
 		return math.sqrt(sumVar)
 
 	def defenseFacedForTIMD(self, timd, defenseKey):
+		# if timd.matchNumber == 18 and timd.teamNumber == 4243: pdb.set_trace()
 		match = self.getMatchForNumber(timd.matchNumber)
+		if type(match) == str: print match
 		team = self.getTeamForNumber(timd.teamNumber)
 		defensePositions = match.redDefensePositions if self.getTeamAllianceIsRedInMatch(team, match) else match.blueDefensePositions
 		return defenseKey in defensePositions
@@ -709,7 +711,8 @@ class Calculator(object):
 		return citrusDPRMatrix
 
 	def firstPickAbility(self, team):
-		ourTeam = self.getTeamForNumber(self.ourTeamNum)
+		pdb.set_trace()
+		ourTeam = self.getTeamForNumber(self.ourTeamNum) if self.ourTeamNum in self.comp.teams else self.getTeamForNumber(343)
 		return self.predictedScoreForAlliance([ourTeam, team])
 
 	def teamInMatchFirstPickAbility(self, team, match):
@@ -739,7 +742,7 @@ class Calculator(object):
 
 	def overallSecondPickAbility(self, team):
 		top16 = sorted(self.teamsWithMatchesCompleted(), key=attrgetter("calculatedData.firstPickAbility"))[:16]
-		return np.mean([team.calculatedData.secondPickAbility[t.number] for t in top16 if team.calculatedData.secondPickAbility[t.number] != None])	
+		return np.mean([team.calculatedData.secondPickAbility[t.number] for t in top16 if t.number in team.calculatedData.secondPickAbility.keys()])	
 
 
 	def teamsSortedByRetrievalFunctions(self, retrievalFunctions, teamsRetrievalFunction=teamsWithMatchesCompleted):
@@ -1159,14 +1162,14 @@ class Calculator(object):
 			[utils.setDictionaryValue(t.secondPickAbility, team.number, 15.0) for team in self.comp.teams]
 			t.overallSecondPickAbility = 15.0
 			t.citrusDPR = 12.0
-			# t.firstPickAbility = self.firstPickAbility(team) # Checked	
-			# t.secondPickAbility = self.secondPickAbility(team) # Checked
-			# t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
-			# t.citrusDPR = self.citrusDPR(team)
+			t.firstPickAbility = self.firstPickAbility(team) # Checked	
+			t.secondPickAbility = self.secondPickAbility(team) # Checked
+			t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
+			t.citrusDPR = self.citrusDPR(team)
 			t.actualSeed = 5
 			t.predictedSeed = 7
-			# t.actualSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getSeedingFunctions()) # Checked
-			# t.predictedSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getPredictedSeedingFunctions()) # Checked
+			t.actualSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getSeedingFunctions()) # Checked
+			t.predictedSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getPredictedSeedingFunctions()) # Checked
 
 	def doFirstCalculationsForTIMD(self, timd):
 		if (not self.timdIsCompleted(timd)):
@@ -1282,12 +1285,6 @@ class Calculator(object):
 			if self.matchIsCompleted(match):
 				print "Writing match " + str(match.number) + " to Firebase..."
 				FBC.addCalculatedMatchDataToFirebase(match)
-
-		# for team in self.comp.teams:
-			# timds = self.getCompletedTIMDsForTeam(team)
-#
-			# print("Calculating TIMDs for team " + str(team.number)) + "... "
-			# for timd in timds:
 
 		#Competition metrics
 		if self.numPlayedMatchesInCompetition() > 0:
