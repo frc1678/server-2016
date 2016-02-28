@@ -497,6 +497,8 @@ class Calculator(object):
 		return defenseAlpha / sumDefenseAlphas if sumDefenseAlphas > 0 else None
 
 	def predictedCrosses(self, team, defenseKey):
+		if team.number == -1:
+			pdb.set_trace()
 		defenseRetrievalFunction = self.getDefenseRetrievalFunctionForDefense(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele, defenseKey)
 		averageOfDefenseCrossingsAcrossCompetition = np.mean([defenseRetrievalFunction(t) for t in self.teamsWithMatchesCompleted() if defenseRetrievalFunction(t) != None])
 		teamAverageDefenseCrossings = defenseRetrievalFunction(team) if defenseRetrievalFunction(team) != None else 0
@@ -583,12 +585,10 @@ class Calculator(object):
 		return team if self.calculatedDataHasValues(team.calculatedData) else self.averageTeam
 
 	def predictedScoreForAlliance(self, alliance):
-		# pdb.set_trace()
 		alliance = map(self.replaceWithAverageIfNecessary, alliance)
 		allianceTeleopShotPoints = sum([t.calculatedData.teleopShotAbility for t in alliance if t.calculatedData.teleopShotAbility != None])
 		allianceSiegePoints = sum([t.calculatedData.siegeAbility for t in alliance if t.calculatedData.siegeAbility != None])
 		allianceAutoPoints = sum([t.calculatedData.autoAbility for t in alliance if t.calculatedData.autoAbility != None])
-		self.predictedTeleDefensePointsForAllianceForCategory(alliance, 'a')
 		alliancePredictedCrossingsRetrievalFunction = lambda c: self.predictedTeleDefensePointsForAllianceForCategory(alliance, c)
 		allianceDefensePointsTele = sum(map(alliancePredictedCrossingsRetrievalFunction, self.categories))
 		return allianceTeleopShotPoints + allianceSiegePoints + allianceAutoPoints + allianceDefensePointsTele
@@ -964,6 +964,28 @@ class Calculator(object):
 		map(dictionarySetFunction, self.defenseList)
 
 
+	def setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(self, team, keyRetrievalFunction, valueRetrievalFunction, dataPointModificationFunction):
+		keyDict = keyRetrievalFunction(team)
+		protectedModifiedDataPointFunction = lambda x: dataPointModificationFunction(x)
+		getModifiedDataPointFunction = lambda dKey, timd: protectedModifiedDataPointFunction(valueRetrievalFunction(timd)[dKey] if dKey in valueRetrievalFunction(timd) else None)
+		getAverageFunction = lambda dKey: self.getAverageAcrossCompetitionTeamSawDefense(team, dKey, lambda timd: getModifiedDataPointFunction(dKey, timd))
+		protectedGetAverageFunction = lambda dKey: getAverageFunction(dKey) if not math.isnan(getAverageFunction(dKey)) else None
+		dictionarySetFunction = lambda dKey: utils.setDictionaryValue(keyDict, dKey, protectedGetAverageFunction(dKey))
+		map(dictionarySetFunction, self.defenseList)
+
+	def timdsWithDefense(self, defenseKey):
+		return filter(lambda t: self.defenseFacedForTIMD(t, defenseKey), self.getCompletedTIMDsInCompetition())
+
+	def getAverageAcrossCompetitionTeamSawDefense(self, team, defenseKey, retrievalFunction):
+		return np.mean(map(retrievalFunction, self.timdsWithDefense(defenseKey)))
+
+	def setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForCompetition(self, team, keyRetrievalFunction, valuesRetrievalFunction):
+		dict = keyRetrievalFunction(team)
+		someFunction = lambda dKey, timd: self.getDefenseLength(valuesRetrievalFunction(timd), dKey)
+		getAverageFunction = lambda dKey: self.getAverageForDefenseDataFunctionForTeam(team, lambda timd: valuesRetrievalFunction(timd), dKey, lambda timd: someFunction(dKey, timd))
+		protectedGetAverageFunction = lambda dKey: getAverageFunction(dKey) if not math.isnan(getAverageFunction(dKey)) else None
+		dictionarySetFunction = lambda dKey: utils.setDictionaryValue(dict, dKey, protectedGetAverageFunction(dKey))
+		map(dictionarySetFunction, self.defenseList)
 
 
 
@@ -1043,7 +1065,13 @@ class Calculator(object):
 		# t.sdMidlineBallsIntakedAuto = self.getStandardDeviationForDataFunctionForTeam(team, 'ballsIntakedAuto')
 		t.sdMidlineBallsIntakedAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: len(timd.ballsIntakedAuto))
 		t.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda timd: timd.numBallsKnockedOffMidlineAuto) # Checked\
-		self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForTeam(team, lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
+		self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(team, lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, lambda timd: timd.timesSuccessfulCrossedDefensesAuto, lambda x: len(x) if x != None else 0)
+		self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(team, lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesTele, lambda timd: timd.timesSuccessfulCrossedDefensesTele, lambda x: len(x) if x != None else 0)
+		self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(team, lambda tm: tm.calculatedData.avgFailedTimesCrossedDefensesAuto, lambda timd: timd.timesFailedCrossedDefensesAuto, lambda x: len(x) if x != None else 0)
+		self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(team, lambda tm: tm.calculatedData.avgFailedTimesCrossedDefensesTele, lambda timd: timd.timesFailedCrossedDefensesTele, lambda x: len(x) if x != None else 0)
+		self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(team, lambda tm: tm.calculatedData.avgTimeForDefenseCrossAuto, lambda timd: timd.timesSuccessfulCrossedDefensesAuto, lambda x: np.mean(x) if x != None and x != [] else 0)
+		self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(team, lambda tm: tm.calculatedData.avgTimeForDefenseCrossTele, lambda timd: timd.timesSuccessfulCrossedDefensesTele, lambda x: np.mean(x) if x != None and x != [] else 0)
+		# self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForTeam(team, lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
 		# self.setDefenseValuesForTeam(team, lambda t1: t1.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, lambda timd: timd.timesSuccessfulCrossedDefensesAuto, lambda rF: self.getAverageForDataFunctionForTeam(team, lambda timd: len(rF(timd))))				
 	
 		# #Tele
@@ -1154,7 +1182,7 @@ class Calculator(object):
 			t.RScoreDrivingAbility = self.RScoreForTeamForRetrievalFunction(team, self.drivingAbilityForTIMD)
 			t.avgSuccessfulTimesCrossedDefenses = utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto, t.avgSuccessfulTimesCrossedDefensesTele)
 
-			t.firstPickAbility = 6.0
+			t.firstPickAbility = self.firstPickAbility(team)
 			t.secondPickAbility = {}
 			[utils.setDictionaryValue(t.secondPickAbility, team.number, 15.0) for team in self.comp.teams]
 			t.overallSecondPickAbility = 15.0
@@ -1257,10 +1285,10 @@ class Calculator(object):
 
 	def doCalculations(self, FBC):
 		self.comp.sdRScores = self.sdOfRValuesAcrossCompetition()
-		for timd in self.comp.TIMDs:
-			self.doFirstCalculationsForTIMD(timd)
-		for timd in self.comp.TIMDs:
-			self.doSecondCalculationsForTIMD(timd)
+		# for timd in self.comp.TIMDs:
+		# 	self.doFirstCalculationsForTIMD(timd)
+		# for timd in self.comp.TIMDs:
+		# 	self.doSecondCalculationsForTIMD(timd)
 		self.restoreComp()
 		for team in self.comp.teams:
 			self.doFirstCalculationsForTeam(team)
