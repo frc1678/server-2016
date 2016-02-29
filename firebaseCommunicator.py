@@ -50,6 +50,7 @@ class FirebaseCommunicator(object):
 
 	def addCalculatedTeamDataToFirebase(self, team):
 		calculatedTeamDataDict = utils.makeDictFromCalculatedTeamData(team.calculatedData)
+		#pdb.set_trace()
 		FBLocation = "/Teams/" + str(team.number) 
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
 

@@ -229,9 +229,9 @@ class Team(object):
 		self.number = None
 		self.teamInMatchDatas = None
 		self.calculatedData = CalculatedTeamData()
-		self.selectedImageUrl = '-1'
+		self.selectedImageUrl = None
 		self.otherImageUrls = {
-			 'not0' : '-1'
+			 'not0' : None
 		}
 		self.pitHeightOfBallLeavingShooter = None
 		self.pitLowBarCapability = None
