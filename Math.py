@@ -1334,6 +1334,7 @@ class Calculator(object):
             print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
         else:
             print("Beginning second calculations for team: " + str(team.number) + ", " + str(team.name))
+            #print("#")
             t = team.calculatedData
             t.RScoreTorque = self.RScoreForTeamForRetrievalFunction(team, lambda timd: timd.rankTorque)
             t.RScoreSpeed = self.RScoreForTeamForRetrievalFunction(team, lambda timd: timd.rankSpeed)
@@ -1343,17 +1344,23 @@ class Calculator(object):
             t.RScoreDrivingAbility = self.RScoreForTeamForRetrievalFunction(team, self.drivingAbilityForTIMD)
             t.avgSuccessfulTimesCrossedDefenses = utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto,
                                                                 t.avgSuccessfulTimesCrossedDefensesTele)
+            #print("#")
 
             t.firstPickAbility = self.firstPickAbility(team)
+            #print("#")
             t.secondPickAbility = {}
             [utils.setDictionaryValue(t.secondPickAbility, team.number, 15.0) for team in self.comp.teams]
+            #print("#")
             t.overallSecondPickAbility = 15.0
             t.citrusDPR = 12.0
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
             t.firstPickAbility = self.firstPickAbility(team) # Checked	
+            #print("#")
             t.secondPickAbility = self.secondPickAbility(team) # Checked
+            #print("#")
             t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
             t.citrusDPR = self.citrusDPR(team)
+            #print("#")
             t.actualSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getSeedingFunctions()) # Checked
             t.predictedSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getPredictedSeedingFunctions()) # Checked
 
@@ -1428,6 +1435,7 @@ class Calculator(object):
                 match.blueAllianceTeamNumbers)
             match.calculatedData.predictedRedScore = self.predictedScoreForAllianceWithNumbers(
                 match.redAllianceTeamNumbers)
+            print("Predicted Scores Done")
             match.calculatedData.predictedBlueRPs = self.predictedRPsForAllianceForMatch(False, match)
             match.calculatedData.predictedRedRPs = self.predictedRPsForAllianceForMatch(True, match)
             match.calculatedData.numDefensesCrossedByBlue = self.numDefensesCrossedInMatch(False, match)

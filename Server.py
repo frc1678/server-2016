@@ -13,7 +13,7 @@ import DataValidator
 import CSVExporter
 import dmutils
 
-
+shouldCacheJSONCopies = True
 
 def donePulling(comp):	
 	dmutils.setCompetition(comp)
@@ -32,11 +32,13 @@ def donePulling(comp):
 	numHoursBetweenCaches = 1.0 #1.0/360.0
 
 	while(1):
-		# if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
-		# 	shouldCacheSecsCounter = 0
-		# if(shouldCacheSecsCounter == 0):
-		# 	FBC.cacheFirebase()
-		# shouldCacheSecsCounter += secsBetweenCalc
+		if shouldCacheJSONCopies:
+			if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
+			 	shouldCacheSecsCounter = 0
+			if(shouldCacheSecsCounter == 0):
+			 	FBC.cacheFirebase()
+			shouldCacheSecsCounter += secsBetweenCalc
+
 		dv.validateFirebase()
 		calculator.doCalculations(FBC)
 		time.sleep(secsBetweenCalc)
