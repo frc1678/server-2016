@@ -14,6 +14,9 @@ for fake database creation purposes it is not worth it'''
 # def assign(object, retrievalFunction, value):
 # 	retrievalFunction(object) = value
 
+def sumStdDevs(stdDevs):
+	return sum(map(lambda x: x ** 2, stdDevs)) ** 0.5
+
 def convertFirebaseBoolean(fbBool):
 	return True if fbBool == 'true' else False
 
@@ -39,6 +42,9 @@ def dictProduct(dict1, dict2):
 
 def dictQuotient(dict1, dict2):
 	return dictOperation(dict1, dict2, lambda x, y: x / y, 1)
+
+def stdDictSum(dict1, dict2):
+	return dictOperation(dict1, dict2, lambda x, y: sumStdDevs([x, y]))
 
 def setDictionaryValue(dict, key, value):
 	dict[key] = value

@@ -161,8 +161,11 @@ class CalculatedTeamData(object):
 		self.sdHighShotsAuto = None
 		self.sdHighShotsTele = None
 		self.sdLowShotsAuto = None
+		self.sdSiegeAbility = None
 		self.sdLowShotsTele = None
 		self.sdGroundIntakes = None
+		self.sdTeleopShotAbility = None
+		self.sdAutoAbility = None
 		self.sdShotsBlocked = None
 		self.sdMidlineBallsIntakedAuto = None
 		self.sdBallsKnockedOffMidlineAuto = None
@@ -255,7 +258,9 @@ class CalculatedMatchData(object):
 	def __init__(self, **args):
 		super(CalculatedMatchData, self).__init__()
 		self.predictedRedScore = None
-		self.predictedBlueScore = None	
+		self.predictedBlueScore = None
+		self.sdPredictedRedScore = None
+		self.sdPredictedBlueScore = None
 
 		self.numDefensesCrossedByBlue = None
 		self.numDefensesCrossedByRed = None 
@@ -372,13 +377,6 @@ class TeamInMatchData(object):
 		self.numShotsBlockedTele = None
 		self.didScaleTele = None
 		self.didChallengeTele = None
-		# self.timesCrossedDefensesTele = {
-	 # 		'a' : {'pc' : {'successes' : None, 'fails' : None}, 'cdf' : {'successes' : None, 'fails' : None}},
-	 # 		'b' : {'mt' : {'successes' : None, 'fails' : None}, 'rp' : {'successes' : None, 'fails' : None}},
-	 # 		'c' : {'db' : {'successes' : None, 'fails' : None}, 'sp' : {'successes' : None, 'fails' : None}},
-	 # 		'd' : {'rw' : {'successes' : None, 'fails' : None}, 'rt' : {'successes' : None, 'fails' : None}},
-		# 	'e' : {'lb' : {'successes' : None, 'fails' : None}}
-		#  }
 
 		self.timesSuccessfulCrossedDefensesTele = {
 			'pc' : None,
@@ -415,7 +413,9 @@ class CalculatedTeamInMatchData(object):
 		self.lowShotAccuracyAuto = None #
 		self.highShotAccuracyTele = None #
 		self.lowShotAccuracyTele = None #
+		self.teleopShotAbility = None
 		self.siegeAbility = None#
+		self.autoAbility = None
 		self.siegeConsistency = None#
 		self.numRPs = None#
 		self.numAutoPoints = None#
