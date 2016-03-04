@@ -142,7 +142,7 @@ class FirebaseCommunicator(object):
 		firebase.put(FBLocation, 'TeamInMatchDatas', [])
 
 	def cacheFirebase(self):
-		numFiles = len(listdir("./CachedFirebases"))
+		numFiles = len(listdir("CachedFirebases"))
 		data = json.dumps(firebase.get("/", None))
 		with open("./CachedFirebases/" + str(numFiles) + '.json', 'w') as f:
 			f.write(data)

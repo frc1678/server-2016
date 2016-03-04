@@ -13,7 +13,7 @@ import DataValidator
 import CSVExporter
 import dmutils
 
-shouldCacheJSONCopies = True
+shouldCacheJSONCopies = False
 
 def donePulling(comp):	
 	dmutils.setCompetition(comp)
