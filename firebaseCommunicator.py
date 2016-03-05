@@ -50,17 +50,19 @@ class FirebaseCommunicator(object):
 
 	def addCalculatedTeamDataToFirebase(self, team):
 		calculatedTeamDataDict = utils.makeDictFromCalculatedTeamData(team.calculatedData)
-		#pdb.set_trace()
+		pdb.set_trace()
 		FBLocation = "/Teams/" + str(team.number) 
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
 
 	def addCalculatedTIMDataToFirebase(self, timd):
 		calculatedTIMDataDict = utils.makeDictFromCalculatedTIMData(timd.calculatedData)
+		pdb.set_trace()
 		FBLocation = "/TeamInMatchDatas/" + str(timd.teamNumber) + "Q" + str(timd.matchNumber)
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTIMDataDict)
 
 	def addCalculatedMatchDataToFirebase(self, match):
 		calculatedMatchDataDict = utils.makeDictFromCalculatedMatchData(match.calculatedData)
+		pdb.set_trace()
 		FBLocation = "/Matches/" + str(match.number)
 		result = firebase.put(FBLocation, 'calculatedData', calculatedMatchDataDict)
 

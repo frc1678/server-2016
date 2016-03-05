@@ -137,7 +137,7 @@ class CalculatedTeamData(object):
 			'rw' : None,
 			'lb' : None
 		}
-		predictedSuccessfulCrossingsForDefenseTele = {
+		self.predictedSuccessfulCrossingsForDefenseTele = {
 			'pc' : None,
 			'cdf' : None,
 			'mt' : None,
