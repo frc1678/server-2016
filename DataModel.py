@@ -15,18 +15,15 @@ class Competition(object):
 		self.actualSeeding = []
 		self.sdRScores = []
 	
-	def updateTeamsAndMatchesFromFirebase(self, doneCallback = None):
+	def updateTeamsAndMatchesFromFirebase(self):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
-		if doneCallback == None: return 
-		while 1: 
-			if len(self.teams) > 0 and len(self.matches) > 0: doneCallback()
+		# if doneCallback == None: return 
+		# while 1: 
+		# 	if len(self.teams) > 0 and len(self.matches) > 0: doneCallback()
 
-	def updateTIMDsFromFirebase(self, doneCallback):
+	def updateTIMDsFromFirebase(self):
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
-		while 1: 
-			if len(self.TIMDs) > 0:
-				doneCallback(self)
 
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
@@ -330,13 +327,6 @@ class TeamInMatchData(object):
 		#Auto
 		self.ballsIntakedAuto = []
 		self.numBallsKnockedOffMidlineAuto = None
-		# self.timesCrossedDefensesAuto = {
-		# 	'a' : {'pc' : {'successes' : None, 'fails' : None}, 'cdf' : {'successes' : None, 'fails' : None}},
-		# 	'b' : {'mt' : {'successes' : None, 'fails' : None}, 'rp' : {'successes' : None, 'fails' : None}},
-		# 	'c' : {'db' : {'successes' : None, 'fails' : None}, 'sp' : {'successes' : None, 'fails' : None}},
-		# 	'd' : {'rw' : {'successes' : None, 'fails' : None}, 'rt' : {'successes' : None, 'fails' : None}},
-		# 	'e' : {'lb' : {'successes' : None, 'fails' : None}}
-		# }
 
 		self.timesSuccessfulCrossedDefensesAuto = {
 			'pc' : None,
