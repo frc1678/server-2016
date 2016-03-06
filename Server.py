@@ -25,7 +25,7 @@ FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 
 calculator = Math.Calculator(comp)
 
-secsBetweenCalc = 10
+secsBetweenCalc = 0
 shouldCacheSecsCounter = 0
 cycle = 1
 

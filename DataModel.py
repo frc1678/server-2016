@@ -62,6 +62,7 @@ class CalculatedTeamData(object):
 		self.avgEvasion = None
 		self.avgDefense = None
 		self.avgBallControl = None
+		self.avgDrivingAbility = None
 		self.blockingAbility = None
 		self.disfunctionalPercentage = None
 		self.reachPercentage = None
@@ -408,6 +409,7 @@ class CalculatedTeamInMatchData(object):
 		self.autoAbility = None
 		self.siegeConsistency = None#
 		self.numRPs = None#
+		self.drivingAbility = None#
 		self.numAutoPoints = None#
 		self.numScaleAndChallengePoints = None#
 		self.numBallsIntakedOffMidlineAuto = None
