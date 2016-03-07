@@ -80,19 +80,24 @@ predictedRPsForAllianceForMatch:
 			avgHighShots, LowShots (auto and tele)
 		standardDeviationSumForShotsForAlliance:
 			avgHighShots, LowShots (auto and tele)
+		probabilityDensity
 
 	breachChanceForAllianceForMatch:
+		predictedCrossingsForDefenseCategory
+		standardDeviationForTeamForCategory
+		probabilityDensity
+
 
 	welchsTest:
 		predictedScoreForAlliance
 		sdPredictedScoreForAlliance
 		avgNumCompletedTIMDsForAlliance
-		
+
 scoreContribution:
 	predictedScoreForAlliance
 
 secondPickAbility:
-	predictedScoreForMatch (for opposition for all of a team's completed matches)
+	predictedScoreForAlliance (for opposition for all of a team's completed matches)
 	scoreContribution (for all teams except for 1678 and the team being calculated for)
 
 overallSecondPickAbility:
@@ -105,3 +110,7 @@ predictedSeed:
 	predictedNumRPs
 	autoAbility
 	siegeAbility
+
+
+
+

@@ -512,7 +512,7 @@ class Calculator(object):
 
     def stanDevForDefenseCategoryForKeyRetrievalFunctionForTeam(self, team, keyRetrievalFunction, category):
         values = map(lambda dKey: keyRetrievalFunction(team)[dKey], self.defenseDictionary[category])
-        return math.sqrt(np.mean(map(lambda x: x ** 2, values)))
+        return utils.rms(values)
 
     def stanDevSumForDefenseCategoryForRetrievalFunctionForAlliance(self, alliance, keyRetrievalFunction, category):
         return utils.rms(map(
@@ -854,61 +854,22 @@ class Calculator(object):
         dictionarySetFunction = lambda dKey: utils.setDictionaryValue(keyDict, dKey, protectedGetAverageFunction(dKey))
         map(dictionarySetFunction, self.defenseList)
 
+    def setDefenseValuesForForAverageTeam(self, retrievalFunction, dataModification):
+        keyDict = retrievalFunction(self.averageTeam)
+        getValueFunc = lambda x, dKey: retrievalFunction(x)[dKey] if self.teamFacedDefense(x, dKey) else None
+        avgFunc = lambda dKey: dataModification([getValueFunc(t, dKey) for t in self.teamsWithCalculatedData() if getValueFunc(t, dKey) != None])
+        dictSetFunction = lambda dKey: utils.setDictionaryValue(keyDict, dKey, avgFunc(dKey))
+        map(dictSetFunction, self.defenseList)
+
     def timdsWithDefense(self, defenseKey):
         return filter(lambda t: self.defenseFacedForTIMD(t, defenseKey), self.getCompletedTIMDsInCompetition())
 
     def getAverageAcrossCompetitionTeamSawDefense(self, team, defenseKey, retrievalFunction):
         return np.mean(map(retrievalFunction, self.timdsWithDefense(defenseKey)))
 
-    def setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForCompetition(self, team,
-                                                                                        keyRetrievalFunction,
-                                                                                        valuesRetrievalFunction):
-        dict = keyRetrievalFunction(team)
-        someFunction = lambda dKey, timd: self.getDefenseLength(valuesRetrievalFunction(timd), dKey)
-        getAverageFunction = lambda dKey: self.getAverageForDefenseDataFunctionForTeam(team, lambda
-            timd: valuesRetrievalFunction(timd), dKey, lambda timd: someFunction(dKey, timd))
-        protectedGetAverageFunction = lambda dKey: getAverageFunction(dKey) if not math.isnan(
-            getAverageFunction(dKey)) else None
-        dictionarySetFunction = lambda dKey: utils.setDictionaryValue(dict, dKey, protectedGetAverageFunction(dKey))
-        map(dictionarySetFunction, self.defenseList)
-
-    def setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForTeam(self, team, keyRetrievalFunction,
-                                                                                 valuesRetrievalFunction):
-        dict = keyRetrievalFunction(team)
-        someFunction = lambda dKey, timd: self.getDefenseLength(valuesRetrievalFunction(timd), dKey)
-        getAverageFunction = lambda dKey: self.getAverageForDefenseDataFunctionForTeam(team, lambda
-            timd: valuesRetrievalFunction(timd), dKey, lambda timd: someFunction(dKey, timd))
-        protectedGetAverageFunction = lambda dKey: getAverageFunction(dKey) if not math.isnan(
-            getAverageFunction(dKey)) else None
-        dictionarySetFunction = lambda dKey: utils.setDictionaryValue(dict, dKey, protectedGetAverageFunction(dKey))
-        map(dictionarySetFunction, self.defenseList)
-
     def getAvgOfDefensesForRetrievalFunctionForTeam(self, team, teamRetrievalFunction):
         defenseRetrievalFunctions = self.getDefenseRetrievalFunctions(teamRetrievalFunction)
         return np.mean(map(lambda retrievalFunction: retrievalFunction(team), defenseRetrievalFunctions))
-
-    def setDefenseValuesForTeam(self, team, keyRetrievalFunction, valueRetrievalFunction,
-                                dataPointModificationFunction):
-        dict = keyRetrievalFunction(team)
-        defenseRetrievalFunctions = map(
-            lambda dKey: self.getDefenseRetrievalFunctionForDefense(valueRetrievalFunction, dKey), self.defenseList)
-        defenseModifiedFunctions = map(dataPointModificationFunction, defenseRetrievalFunctions)
-
-        for d in self.defenseList:
-            defenseRetrievalFunction = self.getDefenseRetrievalFunctionForDefense(valueRetrievalFunction, d)
-            defenseLengthFunction = lambda t: len(defenseRetrievalFunction(t))
-            self.getAverageForDataFunctionForTeam(team, defenseLengthFunction)
-
-        defenseValueFunctions = map(len, self.getDefenseRetrievalFunctions(valueRetrievalFunction))
-        defenseModifiedFunctions = map(dataPointModificationFunction, defenseValueFunctions)
-        setFunction = lambda dKey: utils.setDictionaryValue(dict, dKey, defenseModifiedFunctions)
-        map(setFunction, self.defenseList)
-        defenseSetFunction = lambda dp: utils.setDictionaryKey(keyRetrievalFunction(team),
-                                                               dataPointModificationFunction(
-                                                                   self.getDefenseRetrievalFunctionForDefensePairing(
-                                                                       valueRetrievalFunction, dp)))
-        defenseRetrievalFunctions = map(self.getDefenseRetrievalFunctionForDefensePairing, self.getDefensePairings())
-        map(defenseSetFunction, self.getDefensePairings())
 
     def totalAvgDefenseCrosses(self, team):
         t = team.calculatedData
@@ -921,7 +882,6 @@ class Calculator(object):
 
     def getTIMDTeleopShotAbility(self, timd):
         return 5 * timd.numHighShotsMadeTele + 2 * timd.numLowShotsMadeTele
-
 
     def getAverageOfDataFunctionAcrossCompetition(self, dataFunction):
         return np.mean(map(dataFunction, self.teamsWithCalculatedData()))
@@ -967,7 +927,7 @@ class Calculator(object):
         map(lambda dKey: utils.setDictionaryValue(cachedData.alphas, dKey, self.alphaForTeamForDefense(team, dKey)), self.defenseList)
 
     def getFirstCalculationsForAverageTeam(self): 
-        print "Beginning first calculations for team: " + self.averageTeam.number + ", " + str(self.averageTeam.name)
+        print "Beginning first calculations for team: " + str(self.averageTeam.number) + ", " + self.averageTeam.name
         a = self.averageTeam.calculatedData
 
         #Super Averages
@@ -976,13 +936,13 @@ class Calculator(object):
         a.avgEvasion = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgEvasion)  # Checked
         a.avgDefense = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgDefense)  # Checked
         a.avgBallControl = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgBallControl)  # Checked
-        a.avgDrivingAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.drivingAbility)
+        a.avgDrivingAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgDrivingAbility)
 
         a.disabledPercentage = self.getAverageOfDataFunctionAcrossCompetition( 
             lambda t: t.calculatedData.disabledPercentage)
         a.incapacitatedPercentage = self.getAverageOfDataFunctionAcrossCompetition( 
             lambda t: t.calculatedData.incapacitatedPercentage)
-        a.disfunctionalPercentage = t.disabledPercentage + t.incapacitatedPercentage
+        a.disfunctionalPercentage = a.disabledPercentage + a.incapacitatedPercentage
 
         #Auto
         a.autoAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.autoAbility)
@@ -997,7 +957,11 @@ class Calculator(object):
         a.sdHighShotsAuto = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdHighShotsAuto)  # Checked
         a.sdLowShotsAuto = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdLowShotsAuto)  # Checked
         a.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdBallsKnockedOffMidlineAuto)  # Checked
-
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, lambda x: np.mean(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesAuto, lambda x: np.mean(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgTimeForDefenseCrossAuto, lambda x: np.mean(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesAuto, lambda x: utils.rms(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x))
 
         #Tele
         a.scalePercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.scalePercentage)
@@ -1012,41 +976,41 @@ class Calculator(object):
         a.teleopShotAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.teleopShotAbility)  # Checked
         a.siegeConsistency = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.challengePercentage + t.calculatedData.scalePercentage)  # Checked
         a.siegeAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeAbility)  # Checked
-        t.sdHighShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda
+        a.sdHighShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda
             t: t.calculatedData.sdHighShotsTele)  # Checked
-        t.sdLowShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda
+        a.sdLowShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda
             t: t.calculatedData.sdLowShotsTele)  # Checked
-        t.sdGroundIntakes = self.getAverageOfDataFunctionAcrossCompetition(lambda
+        a.sdGroundIntakes = self.getAverageOfDataFunctionAcrossCompetition(lambda
             t: t.calculatedData.sdGroundIntakes)  # Checked
-        t.sdShotsBlocked = self.getAverageOfDataFunctionAcrossCompetition(lambda
+        a.sdShotsBlocked = self.getAverageOfDataFunctionAcrossCompetition(lambda
             t: t.calculatedData.sdShotsBlocked)  # Checked
-        t.sdTeleopShotAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.teleopShotAbility)
-        t.sdSiegeAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeAbility)
-        t.sdAutoAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.autoAbility)
+        a.sdTeleopShotAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.teleopShotAbility)
+        a.sdSiegeAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeAbility)
+        a.sdAutoAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.autoAbility)
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele, lambda x: np.mean(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesTele, lambda x: np.mean(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgTimeForDefenseCrossTele, lambda x: np.mean(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, lambda x: utils.rms(x))
+        self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x))
 
-        t.numScaleAndChallengePoints = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
-        t.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
+        a.numScaleAndChallengePoints = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
+        a.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
 
     def getSecondCalculationsForAverageTeam(self):
         a = self.averageTeam.calculatedData
 
-        a.RScoreTorque = self.getAvereOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreTorque)
+        a.RScoreTorque = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreTorque)
         a.RScoreSpeed = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreSpeed)
         a.RScoreEvasion = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreEvasion)
         a.RScoreDefense = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreDefense)
         a.RScoreBallControl = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreBallControl)
         a.RScoreDrivingAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreDrivingAbility)
-        a.avgSuccessfulTimesCrossedDefenses = utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto,
-                                                            t.avgSuccessfulTimesCrossedDefensesTele)
+        a.avgSuccessfulTimesCrossedDefenses = utils.dictSum(a.avgSuccessfulTimesCrossedDefensesAuto,
+                                                            a.avgSuccessfulTimesCrossedDefensesTele)
         a.firstPickAbility = self.firstPickAbility(self.averageTeam)
-        # a.citrusDPR = 12.0
-        a.firstPickAbility = self.firstPickAbility(team) # Checked  
-        a.secondPickAbility = self.secondPickAbility(team) # Checked
-        a.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
-        # if team.number in self.cachedComp.citrusDPRs: t.citrusDPR = self.cachedComp.citrusDPRs[team.number]
-        a.numRPs = self.getSumForDataFunctionForTeam(team, lambda timd: timd.calculatedData.numRPs)
-        # a.actualSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getSeedingFunctions()) # Checked
-        # a.predictedSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getPredictedSeedingFunctions())
+        a.numRPs = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numRPs)
+        a.predictedNumRPs = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.predictedNumRPs)
+
 
 
 
@@ -1354,19 +1318,16 @@ class Calculator(object):
         self.matches = self.comp.matches
 
     def doFirstTeamCalculations(self):
-        for team in self.comp.teams:
-            self.doFirstCalculationsForTeam(team)
-        self.doFirstCalculationsForTeam(self.averageTeam)
+        map(self.doFirstCalculationsForTeam, self.comp.teams)
+        self.getFirstCalculationsForAverageTeam()
 
     def doSecondTeamCalculations(self):
-        for team in self.comp.teams:
-            self.doSecondCalculationsForTeam(team)
-        self.doSecondCalculationsForTeam(self.averageTeam)
+        map(self.doSecondCalculationsForTeam, self.comp.teams)
+        self.getSecondCalculationsForAverageTeam()
 
     def doMatchesCalculations(self):
-        for match in self.matches:
+        for match in self.comp.matches:
             self.doFirstCalculationsForMatch(match)
-
     def writeCalculationDiagnostic(self, time):
         with open('./diagnostics.txt', 'a') as file:
             file.write('Time: ' + str(time) + '    TIMDs: ' + str(len(self.getCompletedTIMDsInCompetition())) + '\n')
