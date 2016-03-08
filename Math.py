@@ -48,6 +48,24 @@ class FirstTIMDThread(multiprocessing.Process):
             c.numScaleAndChallengePoints = c.siegeAbility  # they are the same
             c.numBallsIntakedOffMidlineAuto = 0.0
 
+
+            # c.numBallsIntakedOffMidlineAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: len(timd.ballsIntakedAuto if timd.ballsIntakedAuto != None else []))
+
+class SecondTIMDThread(multiprocessing.Process):
+    def __init__(self, timd, calculator):
+        super(SecondTIMDThread, self).__init__()
+        self.timd = timd
+        self.calculator = calculator
+    def run(self):
+        if (not self.calculator.timdIsCompleted(self.timd)):
+            print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
+        else:
+            print "Beginning second calculations for team " + str(self.timd.teamNumber) + " in match " + str(
+                self.timd.matchNumber)
+            c = self.timd.calculatedData
+            team = self.calculator.getTeamForNumber(self.timd.teamNumber)
+            match = self.calculator.getMatchForNumber(self.timd.matchNumber)
+
             self.calculator.cacheFirstTeamData()
             self.calculator.doFirstTeamCalculations()
             self.calculator.cacheSecondTeamData()
@@ -64,21 +82,6 @@ class FirstTIMDThread(multiprocessing.Process):
             c.RScoreDrivingAbility = team.calculatedData.RScoreDrivingAbility
             c.firstPickAbility = team.calculatedData.firstPickAbility
             c.scoreContribution = self.calculator.scoreContributionForTeamForMatch(team, match)
-
-            # c.numBallsIntakedOffMidlineAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: len(timd.ballsIntakedAuto if timd.ballsIntakedAuto != None else []))
-
-# class SecondTIMDThread(multiprocessing.Process):
-#     def __init__(self, timd, calculator):
-#         super(SecondTIMDThread, self).__init__()
-#         self.timd = timd
-#         self.calculator = calculator
-#     def run(self):
-#         if (not self.calculator.timdIsCompleted(self.timd)):
-#             print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
-#         else:
-#             print "Beginning second calculations for team " + str(self.timd.teamNumber) + " in match " + str(
-#                 self.timd.matchNumber)
-#             c = self.timd.calculatedData
             
 
             
@@ -1375,6 +1378,12 @@ class Calculator(object):
                 threads.append(thread)
                 thread.start()
             map(lambda t: t.join(), threads)
+            threads2 = []
+            for timd in self.comp.TIMDs:
+                thread = SecondTIMDThread(timd, copy.deepcopy(self))
+                threads2.append(thread)
+                thread.start()
+            map(lambda t: t.join(), threads2)
             # while True in map(lambda t: t.isAlive(),)
             # threads2 = []
             # for timd in self.comp.TIMDs:
