@@ -12,6 +12,79 @@ import DataModel
 import utils
 import time
 
+import multiprocessing
+import copy
+
+class FirstTIMDThread(multiprocessing.Process):
+    def __init__(self, timd, calculator):
+        super(FirstTIMDThread, self).__init__()
+        self.timd = timd
+        self.calculator = calculator
+    def run(self):
+        if (not self.calculator.timdIsCompleted(self.timd)):
+            print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
+        else:
+            print "Beginning first calculations for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
+            team = self.calculator.getTeamForNumber(self.timd.teamNumber)
+            match = self.calculator.getMatchForNumber(self.timd.matchNumber)
+
+            self.calculator.matches = filter(lambda m: not self.calculator.teamInMatch(team, m) == (self.timd.matchNumber != m.number), self.calculator.comp.matches)
+            self.calculator.TIMDs = filter(lambda t: t.matchNumber in [m.number for m in self.calculator.matches], self.calculator.comp.TIMDs)
+
+            if not self.calculator.TIMCalculatedDataHasValues(
+                    self.timd.calculatedData): self.timd.calculatedData = DataModel.CalculatedTeamInMatchData()
+            c = self.timd.calculatedData
+            c.teleopShotAbility = self.calculator.getTIMDTeleopShotAbility(self.timd)
+            c.highShotAccuracyTele = self.calculator.getTIMDHighShotAccuracyTele(self.timd)  # Checked
+            c.highShotAccuracyAuto = self.calculator.getTIMDHighShotAccuracyAuto(self.timd)  # Checked
+            c.lowShotAccuracyTele = self.calculator.getTIMDLowShotAccuracyTele(self.timd)  # Checked
+            c.lowShotAccuracyAuto = self.calculator.getTIMDLowShotAccuracyAuto(self.timd)  # Checked
+            c.siegeAbility = self.calculator.singleSiegeAbility(self.timd)
+            c.autoAbility = self.calculator.autoAbility(self.timd)
+            c.drivingAbility = self.calculator.drivingAbilityForTIMD(self.timd)
+            c.siegeConsistency = utils.convertFirebaseBoolean(self.timd.didChallengeTele) + utils.convertFirebaseBoolean(self.timd.didScaleTele)
+            c.numRPs = self.calculator.RPsGainedFromMatchForTeam(match, team)
+            c.numAutoPoints = self.calculator.numAutoPointsForTIMD(self.timd)
+            c.numScaleAndChallengePoints = c.siegeAbility  # they are the same
+            c.numBallsIntakedOffMidlineAuto = 0.0
+
+
+            # c.numBallsIntakedOffMidlineAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: len(timd.ballsIntakedAuto if timd.ballsIntakedAuto != None else []))
+
+class SecondTIMDThread(multiprocessing.Process):
+    def __init__(self, timd, calculator):
+        super(SecondTIMDThread, self).__init__()
+        self.timd = timd
+        self.calculator = calculator
+    def run(self):
+        if (not self.calculator.timdIsCompleted(self.timd)):
+            print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
+        else:
+            print "Beginning second calculations for team " + str(self.timd.teamNumber) + " in match " + str(
+                self.timd.matchNumber)
+            c = self.timd.calculatedData
+            team = self.calculator.getTeamForNumber(self.timd.teamNumber)
+            match = self.calculator.getMatchForNumber(self.timd.matchNumber)
+
+            self.calculator.cacheFirstTeamData()
+            self.calculator.doFirstTeamCalculations()
+            self.calculator.cacheSecondTeamData()
+            self.calculator.doBetweenFirstAndSecondCalculationsForTeams()
+            self.calculator.doMatchesCalculations()
+            self.calculator.calculateCitrusDPRs()
+            self.calculator.doSecondTeamCalculations()
+
+            c.RScoreTorque = team.calculatedData.RScoreTorque
+            c.RScoreSpeed = team.calculatedData.RScoreSpeed
+            c.RScoreEvasion = team.calculatedData.RScoreEvasion
+            c.RScoreDefense = team.calculatedData.RScoreDefense
+            c.RScoreBallControl = team.calculatedData.RScoreBallControl
+            c.RScoreDrivingAbility = team.calculatedData.RScoreDrivingAbility
+            c.firstPickAbility = team.calculatedData.firstPickAbility
+            c.scoreContribution = self.calculator.scoreContributionForTeamForMatch(team, match)
+            
+
+            
 
 class Calculator(object):
     """docstring for Calculator"""
@@ -57,7 +130,7 @@ class Calculator(object):
         return [team for team in self.comp.teams if team.number == teamNumber][0]
 
     def teamsWithCalculatedData(self):
-        return filter(lambda t: self.calculatedDataHasValues(t.calculatedData), self.comp.teams)
+        return filter(lambda t: self.teamCalculatedDataHasValues(t.calculatedData), self.comp.teams)
 
     def getMatchesForTeam(self, team):
         return [match for match in self.matches if self.teamInMatch(team, match)]
@@ -142,19 +215,24 @@ class Calculator(object):
     def getCompletedTIMDsInCompetition(self):
         return [timd for timd in self.TIMDs if self.timdIsCompleted(timd)]
 
-    def calculatedDataHasValues(self, calculatedData):
-        hasValues = False
-        for key, value in utils.makeDictFromObject(calculatedData).items():
-            if value != None and not 'Defense' in key and not 'defense' in key and not 'second' in key and not "ballsIntakedAuto" in key:
-                hasValues = True
-        return hasValues
+    def teamCalculatedDataHasValues(self, calculatedData):
+        return calculatedData.siegeAbility != None
+
+    def TIMCalculatedDataHasValues(self, calculatedData):
+        return calculatedData.drivingAbility != None
+        # hasValues = False
+        # for key, value in utils.makeDictFromObject(calculatedData).items():
+        #     if value != None and not 'Defense' in key and not 'defense' in key and not 'second' in key and not "ballsIntakedAuto" in key:
+        #         hasValues = True
+        # return hasValues
 
     def timdIsPlayed(self, timd):
-        isPlayed = False
-        for key, value in utils.makeDictFromTIMD(timd).items():
-            if value != None:
-                isPlayed = True
-        return isPlayed
+        return timd.rankTorque != None and timd.numHighShotsMadeTele != None
+        # isPlayed = False
+        # for key, value in utils.makeDictFromTIMD(timd).items():
+        #     if value != None:
+        #         isPlayed = True
+        # return isPlayed
 
     def teamsAreOnSameAllianceInMatch(self, team1, team2, match):
         areInSameMatch = False
@@ -167,21 +245,23 @@ class Calculator(object):
     exceptedKeys = ['calculatedData', 'ballsIntakedAuto', 'superNotes']
 
     def timdIsCompleted(self, timd):
-        isCompleted = True
-        m = self.getMatchForNumber(timd.matchNumber)
-        isCompleted = m.redDefensePositions != None and m.blueDefensePositions != None
-        for key, value in utils.makeDictFromTIMD(timd).items():
-            if key not in self.exceptedKeys and value == None:
-                isCompleted = False
-        return isCompleted
+        return timd.rankTorque != None and timd.numHighShotsMadeTele != None
+        # isCompleted = True
+        # m = self.getMatchForNumber(timd.matchNumber)
+        # isCompleted = m.redDefensePositions != None and m.blueDefensePositions != None
+        # for key, value in utils.makeDictFromTIMD(timd).items():
+        #     if key not in self.exceptedKeys and value == None:
+        #         isCompleted = False
+        # return isCompleted
 
     matchExceptedKeys = ['calculatedData']
     def matchHasValuesSet(self, match):
-        isCompleted = True
-        for key, value in utils.makeDictFromMatch(match).items():
-            if key not in self.matchExceptedKeys and value == None:
-                isCompleted = False
-        return isCompleted
+        return match.redScore != None and match.blueScore != None
+        # isCompleted = True
+        # for key, value in utils.makeDictFromMatch(match).items():
+        #     if key not in self.matchExceptedKeys and value == None:
+        #         isCompleted = False
+        # return isCompleted
 
     def retrieveCompletedTIMDsForTeam(self, team):
         return self.getCompletedTIMDsForTeamNumber(team.number)
@@ -326,11 +406,12 @@ class Calculator(object):
         return value
 
     def defenseFacedForTIMD(self, timd, defenseKey):
+        return defenseKey in self.defensesFacedInTIMD(timd)
+
+    def defensesFacedInTIMD(self, timd):
         match = self.getMatchForNumber(timd.matchNumber)
         team = self.getTeamForNumber(timd.teamNumber)
-        defensePositions = match.redDefensePositions if self.getTeamAllianceIsRedInMatch(team,
-                                                                                         match) else match.blueDefensePositions
-        return defenseKey in defensePositions
+        return match.redDefensePositions if self.getTeamAllianceIsRedInMatch(team, match) else match.blueDefensePositions
 
     def timdsWhereTeamFacedDefense(self, team, defenseKey):
         return filter(lambda timd: self.defenseFacedForTIMD(timd, defenseKey), self.getCompletedTIMDsForTeam(team))
@@ -439,7 +520,7 @@ class Calculator(object):
         return self.predictedScoreForAlliance(self.teamsForTeamNumbersOnAlliance(allianceNumbers))
 
     def replaceWithAverageIfNecessary(self, team):
-        return team if self.calculatedDataHasValues(team.calculatedData) else self.averageTeam
+        return team if self.teamCalculatedDataHasValues(team.calculatedData) else self.averageTeam
 
     def stdDevPredictedScoreForAlliance(self, alliance):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
@@ -838,21 +919,17 @@ class Calculator(object):
         dictionarySetFunction = lambda dKey: utils.setDictionaryValue(keyDict, dKey, protectedGetAverageFunction(dKey))
         map(dictionarySetFunction, self.defenseList)
 
-    def setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForCompetition(self,
-                                                                                                               team,
-                                                                                                               keyRetrievalFunction,
-                                                                                                               valueRetrievalFunction,
-                                                                                                               dataPointModificationFunction):
-        keyDict = keyRetrievalFunction(team)
-        protectedModifiedDataPointFunction = lambda x: dataPointModificationFunction(x)
-        getModifiedDataPointFunction = lambda dKey, timd: protectedModifiedDataPointFunction(
-            valueRetrievalFunction(timd)[dKey] if dKey in valueRetrievalFunction(timd) else None)
-        getAverageFunction = lambda dKey: self.getAverageAcrossCompetitionTeamSawDefense(team, dKey, lambda
-            timd: getModifiedDataPointFunction(dKey, timd))
-        protectedGetAverageFunction = lambda dKey: getAverageFunction(dKey) if not math.isnan(
-            getAverageFunction(dKey)) else None
-        dictionarySetFunction = lambda dKey: utils.setDictionaryValue(keyDict, dKey, protectedGetAverageFunction(dKey))
-        map(dictionarySetFunction, self.defenseList)
+    
+
+
+        # keyDict = keyRetrievalFunction(team)
+        # getModifiedDataPointFunction = lambda dKey, timd: dataPointModificationFunction(valueRetrievalFunction(timd)[dKey] if dKey in valueRetrievalFunction(timd) else None)
+        # getAverageFunction = lambda dKey: self.getAverageAcrossCompetitionTeamSawDefense(team, dKey, lambda
+        #     timd: getModifiedDataPointFunction(dKey, timd))
+        # protectedGetAverageFunction = lambda dKey: getAverageFunction(dKey) if not math.isnan(
+        #     getAverageFunction(dKey)) else None
+        # dictionarySetFunction = lambda dKey: utils.setDictionaryValue(keyDict, dKey, protectedGetAverageFunction(dKey))
+        # map(dictionarySetFunction, self.defenseList)
 
     def setDefenseValuesForForAverageTeam(self, retrievalFunction, dataModification):
         keyDict = retrievalFunction(self.averageTeam)
@@ -927,7 +1004,7 @@ class Calculator(object):
         map(lambda dKey: utils.setDictionaryValue(cachedData.alphas, dKey, self.alphaForTeamForDefense(team, dKey)), self.defenseList)
 
     def getFirstCalculationsForAverageTeam(self): 
-        print "Beginning first calculations for team: " + str(self.averageTeam.number) + ", " + self.averageTeam.name
+        # print "Beginning first calculations for team: " + str(self.averageTeam.number) + ", " + self.averageTeam.name
         a = self.averageTeam.calculatedData
 
         #Super Averages
@@ -1015,16 +1092,15 @@ class Calculator(object):
 
 
     def doFirstCalculationsForTeam(self, team):
-        if len(self.getCompletedTIMDsForTeam(team)) <= 0:
-            print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
-        else:
-            print("Beginning first calculations for team: " + str(team.number) + ", " + str(team.name))
+        if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
+            # print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
+        # else:
+            # print("Beginning first calculations for team: " + str(team.number) + ", " + str(team.name))
             # Super Scout Averages
 
-            if not self.calculatedDataHasValues(team.calculatedData):
+            if not self.teamCalculatedDataHasValues(team.calculatedData):
                 team.calculatedData = DataModel.CalculatedTeamData()
             t = team.calculatedData
-
             t.avgTorque = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankTorque)  # Checked
             t.avgSpeed = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankSpeed)
             t.avgEvasion = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankEvasion)  # Checked
@@ -1037,7 +1113,6 @@ class Calculator(object):
             t.incapacitatedPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
                 utils.convertFirebaseBoolean(timd.didGetIncapacitated)))
             t.disfunctionalPercentage = t.disabledPercentage + t.incapacitatedPercentage
-
             # Auto
             t.autoAbility = self.getAverageForDataFunctionForTeam(team,
                 lambda timd: timd.calculatedData.autoAbility)
@@ -1062,28 +1137,12 @@ class Calculator(object):
                 timd: timd.numLowShotsMadeAuto)  # Checked
             t.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda
                 timd: timd.numBallsKnockedOffMidlineAuto)  # Checked\
-
-            self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam( # TODO: Format all of the defenses this way (Abhi)
-                team,
-                lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesAuto,
-                lambda timd: timd.timesSuccessfulCrossedDefensesAuto,
-                lambda x: len(x) if x != None else 0,
-                self.getAverageAcrossMatchesTeamSawDefense)
-            
-            self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
-                team,
-                lambda tm: tm.calculatedData.avgFailedTimesCrossedDefensesAuto, 
-                lambda timd: timd.timesFailedCrossedDefensesAuto,
-                lambda x: len(x) if x != None else 0,
-                self.getAverageAcrossMatchesTeamSawDefense)
-            
-            self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
-                team,
-                lambda tm: tm.calculatedData.avgTimeForDefenseCrossAuto, 
-                lambda timd: timd.timesSuccessfulCrossedDefensesAuto,
-                lambda x: np.mean(x) if x != None and x != [] else 0,
-                self.getAverageAcrossMatchesTeamSawDefense)
-            
+            t.avgSuccessfulTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
+            t.avgSuccessfulTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
+            t.avgFailedTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
+            t.avgFailedTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
+            t.avgTimeForDefenseCrossAuto = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
+            t.avgTimeForDefenseCrossTele = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
 
             # #Tele
             t.scalePercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
@@ -1124,41 +1183,83 @@ class Calculator(object):
             t.breachPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: 
                 utils.convertFirebaseBoolean(self.teamDidBreachInMatch(team, self.getMatchForNumber(timd.matchNumber))))
 
-            self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
-                team,
-                lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesTele,
-                lambda timd: timd.timesSuccessfulCrossedDefensesTele,
-                lambda x: len(x) if x != None else 0,
-                self.getAverageAcrossMatchesTeamSawDefense)
-            self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
-                team,
-                lambda tm: tm.calculatedData.avgFailedTimesCrossedDefensesTele,
-                lambda timd: timd.timesFailedCrossedDefensesTele,
-                lambda x: len(x) if x != None else 0,
-                self.getAverageAcrossMatchesTeamSawDefense)
-            self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
-                team,
-                lambda tm: tm.calculatedData.avgTimeForDefenseCrossTele,
-                lambda timd: timd.timesSuccessfulCrossedDefensesTele,
-                lambda x: np.mean(x) if x != None and x != [] else 0,
-                self.getAverageAcrossMatchesTeamSawDefense)
-            self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
-                team,
-                lambda tm: tm.calculatedData.sdSuccessfulDefenseCrossesTele,
-                lambda timd: timd.timesSuccessfulCrossedDefensesTele,
-                lambda x: len(x) if x != None else 0,
-                self.getStdDevAcrossMatchesTeamSawDefense)            
-           
+            # self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
+            #     team,
+            #     lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesTele,
+            #     lambda timd: timd.timesSuccessfulCrossedDefensesTele,
+            #     lambda x: len(x) if x != None else 0,
+            #     self.getAverageAcrossMatchesTeamSawDefense)
+            # self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
+            #     team,
+            #     lambda tm: tm.calculatedData.avgFailedTimesCrossedDefensesTele,
+            #     lambda timd: timd.timesFailedCrossedDefensesTele,
+            #     lambda x: len(x) if x != None else 0,
+            #     self.getAverageAcrossMatchesTeamSawDefense)
+            # self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
+            #     team,
+            #     lambda tm: tm.calculatedData.avgTimeForDefenseCrossTele,
+            #     lambda timd: timd.timesSuccessfulCrossedDefensesTele,
+            #     lambda x: np.mean(x) if x != None and x != [] else 0,
+            #     self.getAverageAcrossMatchesTeamSawDefense)
+            # self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
+            #     team,
+            #     lambda tm: tm.calculatedData.sdSuccessfulDefenseCrossesTele,
+            #     lambda timd: timd.timesSuccessfulCrossedDefensesTele,
+            #     lambda x: len(x) if x != None else 0,
+            #     self.getStdDevAcrossMatchesTeamSawDefense) 
+                   
+    def getAverageNumberDefenseValues(self, team, valueRetrievalFunction):
+        valuesDict = {}
+        for defense in self.defenseList:
+            values = []
+            for timd in self.timdsWhereTeamFacedDefense(team, defense):
+                valueDict = valueRetrievalFunction(timd)
+                if defense in valueDict:
+                    values.append(len(valueDict[defense] if valueDict[defense] != None else []))
+            valuesDict[defense] = np.mean(values) if len(values) > 0 else None
+        return valuesDict
+
+    def getAverageTimeDefenseValues(self, team, valueRetrievalFunction):
+        valuesDict = {}
+        for defense in self.defenseList:
+            values = []
+            for timd in self.timdsWhereTeamFacedDefense(team, defense):
+                valueDict = valueRetrievalFunction(timd)
+                if defense in valueDict:
+                    values.append(np.mean(valueDict[defense]) if valueDict[defense] != None and valueDict[defense] != [] else 0.0)
+            valuesDict[defense] = np.mean(values) if len(values) > 0 else None
+        return valuesDict
+                
+
+    # def setDefenseValues(self, team,
+    #                     calculatedDataPoints,
+    #                     valueRetrievalFunction,
+    #                     dataPointModificationFunction,
+    #                     secondDataPointModificationFunction):                                                                           
+    #     dataPoints = {}
+    #     for dKey in self.defenseList:
+    #         dataPoints[dKey] = []
+    #     for timd in self.getCompletedTIMDsForTeam(team):
+    #         # print valueRetrievalFunction(timd)
+    #         # print dataPoints
+    #         for defense in self.defensesFacedInTIMD(timd):
+    #             value = valueRetrievalFunction(timd)[defense]
+    #             if 
+    #             dataPoints[defense].append(dataPointModificationFunction(valueRetrievalFunction(timd)[defense]))
+    #     for key in dataPoints:
+    #         print dataPoints
+    #         calculatedDataPoints[key] = secondDataPointModificationFunction(dataPoints[key])
+
     def doBetweenFirstAndSecondCalculationsForTeams(self):
         for team in self.comp.teams:
             self.doBetweenFirstAndSecondCalculationsForTeam(team)
         self.doBetweenFirstAndSecondCalculationsForTeam(self.averageTeam)
 
     def doBetweenFirstAndSecondCalculationsForTeam(self, team):
-        if len(self.getCompletedTIMDsForTeam(team)) <= 0:
-            print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
-        else:
-            print("Beginning second calculations for team: " + str(team.number) + ", " + str(team.name))
+        if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
+            # print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
+        # else:
+            # print("Beginning second calculations for team: " + str(team.number) + ", " + str(team.name))
             #print("#")
             map(lambda dKey: utils.setDictionaryValue(
                 team.calculatedData.predictedSuccessfulCrossingsForDefenseTele, # TODO: Update with the correct key
@@ -1168,10 +1269,10 @@ class Calculator(object):
 
 
     def doSecondCalculationsForTeam(self, team):
-        if len(self.getCompletedTIMDsForTeam(team)) <= 0:
-            print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
-        else:
-            print("Beginning second calculations for team: " + str(team.number) + ", " + str(team.name))
+        if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
+            # print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
+        # else:
+            # print("Beginning second calculations for team: " + str(team.number) + ", " + str(team.name))
             #print("#")
 
             t = team.calculatedData
@@ -1183,8 +1284,13 @@ class Calculator(object):
             t.RScoreDrivingAbility = self.cachedComp.drivingAbilityZScores[team.number]
             t.avgSuccessfulTimesCrossedDefenses = utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto,
                                                                 t.avgSuccessfulTimesCrossedDefensesTele)
+<<<<<<< HEAD
             t.firstPickAbility = self.firstPickAbility(team)
             if team.number in self.cachedComp.citrusDPRs: t.citrusDPR = self.cachedComp.citrusDPRs[team.number]
+=======
+            # t.firstPickAbility = self.firstPickAbility(team)
+            # t.citrusDPR = 12.0
+>>>>>>> 93a6496309748f2f81e92d6629dde818f6d9a1f8
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
             t.actualNumRPs = self.actualNumberOfRPs(team)
             t.firstPickAbility = self.firstPickAbility(team) # Checked	
@@ -1196,79 +1302,13 @@ class Calculator(object):
             t.predictedSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getPredictedSeedingFunctions()) # Checked
 
     def doThirdCalculationsForTeam(self, team):
-        if len(self.getCompletedTIMDsForTeam(team)) <= 0:
-            print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
-        else:
-            print("Beginning third calculations for team: " + str(team.number) + ", " + str(team.name))
+        if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
+            # print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
+        # else:
+            # print("Beginning third calculations for team: " + str(team.number) + ", " + str(team.name))
             t = team.calculatedData
             t.secondPickAbility = self.secondPickAbility(team) # Checked
-            t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
-
-    def doFirstCalculationsForTIMD(self, timd):
-        if (not self.timdIsCompleted(timd)):
-            print "TIMD is not complete for team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber)
-        else:
-            print "Beginning first calculations for team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber)
-            team = self.getTeamForNumber(timd.teamNumber)
-            match = self.getMatchForNumber(timd.matchNumber)
-
-
-            if not self.calculatedDataHasValues(
-                    timd.calculatedData): timd.calculatedData = DataModel.CalculatedTeamInMatchData()
-            c = timd.calculatedData
-            c.teleopShotAbility = self.getTIMDTeleopShotAbility(timd)
-            c.highShotAccuracyTele = self.getTIMDHighShotAccuracyTele(timd)  # Checked
-            c.highShotAccuracyAuto = self.getTIMDHighShotAccuracyAuto(timd)  # Checked
-            c.lowShotAccuracyTele = self.getTIMDLowShotAccuracyTele(timd)  # Checked
-            c.lowShotAccuracyAuto = self.getTIMDLowShotAccuracyAuto(timd)  # Checked
-            c.siegeAbility = self.singleSiegeAbility(timd)
-            c.autoAbility = self.autoAbility(timd)
-            c.drivingAbility = self.drivingAbilityForTIMD(timd)
-            c.siegeConsistency = utils.convertFirebaseBoolean(timd.didChallengeTele) + utils.convertFirebaseBoolean(timd.didScaleTele)
-            c.numRPs = self.RPsGainedFromMatchForTeam(match, team)
-            c.numAutoPoints = self.numAutoPointsForTIMD(timd)
-            c.numScaleAndChallengePoints = c.siegeAbility  # they are the same
-            c.numBallsIntakedOffMidlineAuto = 0.0
-            # c.numBallsIntakedOffMidlineAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: len(timd.ballsIntakedAuto if timd.ballsIntakedAuto != None else []))
-            self.restoreComp()
-
-    def doSecondCalculationsForTIMD(self, timd):
-        if (not self.timdIsCompleted(timd)):
-            print "TIMD is not complete for team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber)
-        else:
-            print "Beginning second calculations for team " + str(timd.teamNumber) + " in match " + str(
-                timd.matchNumber)
-            c = timd.calculatedData
-            team = self.getTeamForNumber(timd.teamNumber)
-            match = self.getMatchForNumber(timd.matchNumber)
-
-
-            self.matches = filter(lambda m: not self.teamInMatch(team, m) == (timd.matchNumber != m.number), self.comp.matches)
-            self.TIMDs = filter(lambda t: t.matchNumber in [m.number for m in self.matches], self.comp.TIMDs)
-
-            self.cacheFirstTeamData()
-            self.doFirstTeamCalculations()
-            self.cacheSecondTeamData()
-            self.doBetweenFirstAndSecondCalculationsForTeams()
-            self.doMatchesCalculations()
-            self.calculateCitrusDPRs()
-            self.doSecondTeamCalculations()
-
-            c.RScoreTorque = team.calculatedData.RScoreTorque
-            c.RScoreSpeed = team.calculatedData.RScoreSpeed
-            c.RScoreEvasion = team.calculatedData.RScoreEvasion
-            c.RScoreDefense = team.calculatedData.RScoreDefense
-            c.RScoreBallControl = team.calculatedData.RScoreBallControl
-            c.RScoreDrivingAbility = team.calculatedData.RScoreDrivingAbility
-            c.firstPickAbility = team.calculatedData.firstPickAbility
-            # c.secondPickAbility = team.calculatedData.secondPickAbility
-            # c.citrusDPR = team.calculatedData.citrusDPR
-            c.scoreContribution = self.scoreContributionForTeamForMatch(team, match)
-
-            # c.secondPickAbility = {}
-            # [utils.setDictionaryValue(c.secondPickAbility, team.number, 15.0) for team in self.comp.teams]
-            # c.overallSecondPickAbility = team.calculatedData.overallSecondPickAbility
-            self.restoreComp()
+            t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked        
 
 
     def getOptimalDefensesForAlliance(self, alliance):
@@ -1286,7 +1326,7 @@ class Calculator(object):
         return self.getOptimalDefensesForAlliance(alliance)
 
     def doFirstCalculationsForMatch(self, match):
-        print "Performing calculations for match Q" + str(match.number)
+        # print "Performing calculations for match Q" + str(match.number)
         if self.matchIsCompleted(match):
             match.calculatedData.actualBlueRPs = self.RPsGainedFromMatchForAlliance(True, match)
             match.calculatedData.actualRedRPs = self.RPsGainedFromMatchForAlliance(False, match)
@@ -1337,10 +1377,25 @@ class Calculator(object):
         isData = len(self.getCompletedTIMDsInCompetition()) > 0
         if isData:
             startTime = time.time()
+            threads = []
             for timd in self.comp.TIMDs:
-            	self.doFirstCalculationsForTIMD(timd)
+            	thread = FirstTIMDThread(timd, copy.deepcopy(self))
+                threads.append(thread)
+                thread.start()
+            map(lambda t: t.join(), threads)
+            threads2 = []
             for timd in self.comp.TIMDs:
-            	self.doSecondCalculationsForTIMD(timd)
+                thread = SecondTIMDThread(timd, copy.deepcopy(self))
+                threads2.append(thread)
+                thread.start()
+            map(lambda t: t.join(), threads2)
+            # while True in map(lambda t: t.isAlive(),)
+            # threads2 = []
+            # for timd in self.comp.TIMDs:
+            # 	thread2 = SecondTIMDThread(timd, copy.deepcopy(self))
+            #     threads2.append(thread2)
+            #     thread2.start()
+            # map(lambda t: t.join(), threads2)
             self.restoreComp()
             self.cacheFirstTeamData()
             self.doFirstTeamCalculations()
