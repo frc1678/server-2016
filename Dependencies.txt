@@ -1,4 +1,4 @@
-All averages: TIMD data from super scout and scout: 
+All averages: averageTIMDObjectOverMatches: 
 	avgSuccessfulTimesCrossedDefensesAuto
 	avgGroundIntakes   
 	avgHighShotsTele    
@@ -50,6 +50,10 @@ Driving Ability:
 	avgEvasion
 	avgDefense
 
+twoBallAutoAccuracy:
+	avgLowShotsAuto (made + missed)
+	avgHighShotsAuto (made + missed)
+
 avgTimesCrossedDefenses:
 	avgSuccessfulTimesCrossedDefensesAuto
 	avgSuccessfulTimesCrossedDefensesTele
@@ -64,15 +68,65 @@ teleopShotAbility:
 	avgLowShotsTele
 	avgHighShotsTele
 
+numAutoPointsForTIMD:
+	timd.lowShots + highShotsAuto
+	timd.timesSuccessfulCrossedDefensesAuto
+	timd.didReach
+
+numScaleAndChallengePointsForTeam
+	siegeAbility
+
+highShotAccuracyForAlliance:
+	calculatedData.highShotAccuracyTele + auto
+
+blockedShotPointsForAlliance:
+	highShotAccuracyForAlliance
+	avgShotsBlocked
+
+predictedCrosses:
+	calcData.avgSuccessfulDefenseCrossesTele
+	timesTeamFacedDefenseAcrossComp
+	averageDefenseCrossingsAcrossCompetition
+	numTimesFacedDefenseAcrossCompetition
+
+stdDevPredictedScoreForAlliance:
+	stdDevTeleopShotAbility
+	stdDevSiegeAbility + autoAbility
+	stdDevForPredictedDefenseScoreForAllianceForCategory
+
+numAutoPointsForTeam:
+	numAutoPointsForTIMD
+
 predictedCrossesForDefenses:
 	predictedCrosses function
 	avgSuccessfulTimesCrossedDefensesTele
 
-firstPickAbility:
+blockingAbility:
+	avgShotsBlocked
+	TIMDHighShotAccuracyTele
+
+predictedScoreForAlliance
 	teleopShotAbility
 	autoAbility
 	siegeAbility
+	blockingAbility
 	predictedCrossesForDefenses (for each category)
+
+predictedScoreWithDefenseCombos:
+	same as above
+	predictedTeleDefensePointsForAllianceForDefense (across defense combo)
+
+defenseCombinations:
+	getDefenseCombinations
+
+calculateCitrusDPRs:
+	teamsInValidMatches
+	predictedScoreForAlliance
+
+
+
+firstPickAbility:
+	predictedScoreForAlliance
 
 predictedRPsForAllianceForMatch:
 	captureChanceForAllianceForMatch:
@@ -93,15 +147,19 @@ predictedRPsForAllianceForMatch:
 		sdPredictedScoreForAlliance
 		avgNumCompletedTIMDsForAlliance
 
-scoreContribution:
+scoreContributionToTeamOnAlliance:
 	predictedScoreForAlliance
 
+
+
 secondPickAbility:
+	citrusDPR
 	predictedScoreForAlliance (for opposition for all of a team's completed matches)
 	scoreContribution (for all teams except for 1678 and the team being calculated for)
 
 overallSecondPickAbility:
 	secondPickAbility
+	firstPickAbility
 
 predictedNumRPs:
 	predictedRPsForAllianceForMatch

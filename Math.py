@@ -1184,7 +1184,7 @@ class Calculator(object):
             t.avgSuccessfulTimesCrossedDefenses = utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto,
                                                                 t.avgSuccessfulTimesCrossedDefensesTele)
             t.firstPickAbility = self.firstPickAbility(team)
-            # t.citrusDPR = 12.0
+            if team.number in self.cachedComp.citrusDPRs: t.citrusDPR = self.cachedComp.citrusDPRs[team.number]
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
             t.actualNumRPs = self.actualNumberOfRPs(team)
             t.firstPickAbility = self.firstPickAbility(team) # Checked	
