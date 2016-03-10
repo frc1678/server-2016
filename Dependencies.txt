@@ -1,4 +1,4 @@
-All averages: averageTIMDObjectOverMatches: 
+averages: averageTIMDObjectOverMatches: 
 	avgSuccessfulTimesCrossedDefensesAuto
 	avgGroundIntakes   
 	avgHighShotsTele    
