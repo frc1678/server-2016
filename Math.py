@@ -48,7 +48,8 @@ class FirstTIMDThread(multiprocessing.Process):
             c.numRPs = self.calculator.RPsGainedFromMatchForTeam(match, team)
             c.numAutoPoints = self.calculator.numAutoPointsForTIMD(self.timd)
             c.numScaleAndChallengePoints = c.siegeAbility  # they are the same
-            c.numBallsIntakedOffMidlineAuto = 0.0
+            c.numBallsIntakedOffMidlineAuto = float(0.0)
+
             self.calculatedTIMDsList.append(self.timd)
             
 
@@ -72,6 +73,7 @@ class SecondTIMDThread(multiprocessing.Process):
             self.calculator.cacheFirstTeamData()
             print  "1"
             self.calculator.doFirstTeamCalculations()
+            # print [t.calculatedData.avgSuccessfulTimesCrossedDefensesTele for t in self.calculator.comp.teams]
             print  "2"
             self.calculator.cacheSecondTeamData()
             print  "3"
@@ -79,6 +81,7 @@ class SecondTIMDThread(multiprocessing.Process):
             self.calculator.doBetweenFirstAndSecondCalculationsForTeams()
             print  "4"
             self.calculator.doMatchesCalculations()
+            print [str(m.calculatedData.predictedRedScore) + ' vs. ' + str(m.calculatedData.predictedBlueScore) for m in self.calculator.matches]
             print  "5"
             self.calculator.calculateCitrusDPRs()
             print  "6"
@@ -426,6 +429,9 @@ class Calculator(object):
         value = self.monteCarloForMeanForStDevForValueFunction(mean, stdDev, lambda crossings: 5 * min(crossings, 2))
         return value
 
+    # def defenseCrossesInTIMD(self, timd):
+    #     for defense in seldefensesFacedInTIMD:
+
     def defenseFacedForTIMD(self, timd, defenseKey):
         return defenseKey in self.defensesFacedInTIMD(timd)
 
@@ -469,8 +475,7 @@ class Calculator(object):
         return defenseAlpha / sumDefenseAlphas if sumDefenseAlphas > 0 else None
 
     def predictedCrosses(self, team, defenseKey):
-        defenseRetrievalFunction = self.getDefenseRetrievalFunctionForDefense(
-            lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele, defenseKey)
+        defenseRetrievalFunction = lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele[defenseKey]
         averageOfDefenseCrossingsAcrossCompetition = np.mean(
             [defenseRetrievalFunction(t) for t in self.teamsWhoHaveFacedDefense(defenseKey)])
         teamAverageDefenseCrossings = defenseRetrievalFunction(team) if defenseRetrievalFunction(team) != None else 0
@@ -1129,7 +1134,6 @@ class Calculator(object):
             t.avgDefense = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankDefense)  # Checked
             t.avgBallControl = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankBallControl)  # Checked
             t.avgDrivingAbility = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.calculatedData.drivingAbility)
-            print "Here"
             t.disabledPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
                 utils.convertFirebaseBoolean(timd.didGetDisabled)))
             t.incapacitatedPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
@@ -1142,7 +1146,6 @@ class Calculator(object):
                 lambda timd: timd.numHighShotsMadeAuto)  # Checked
             t.avgLowShotsAuto = self.getAverageForDataFunctionForTeam(team,
                                                                       lambda timd: timd.numLowShotsMadeAuto)  # Checked	
-            print "Here 2"
             t.reachPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
                 utils.convertFirebaseBoolean(timd.didReachAuto)))
             t.highShotAccuracyAuto = self.getAverageForDataFunctionForTeam(team,
@@ -1160,13 +1163,18 @@ class Calculator(object):
                 timd: timd.numLowShotsMadeAuto)  # Checked
             t.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda
                 timd: timd.numBallsKnockedOffMidlineAuto)  # Checked\
-            print "Here 3"
             t.avgSuccessfulTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
             t.avgSuccessfulTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
             t.avgFailedTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
             t.avgFailedTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
             t.avgTimeForDefenseCrossAuto = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
             t.avgTimeForDefenseCrossTele = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
+            t.sdSuccessfulDefenseCrossesAuto = self.getStdNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
+            t.sdSuccessfulDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
+            t.sdFailedDefenseCrossesAuto = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
+            t.sdFailedDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
+
+            # t.predictedSuccessfulCrossingsForDefenseTele = 
 
             # #Tele
             t.scalePercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
@@ -1190,7 +1198,6 @@ class Calculator(object):
             t.teleopShotAbility = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.calculatedData.teleopShotAbility)  # Checked
             t.siegeConsistency = self.getAverageForDataFunctionForTeam(team, lambda timd: utils.convertFirebaseBoolean(timd.didChallengeTele) or utils.convertFirebaseBoolean(timd.didScaleTele))  # Checked
             t.siegeAbility = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.calculatedData.siegeAbility)  # Checked
-            print "Here 4"
 
             t.sdHighShotsTele = self.getStandardDeviationForDataFunctionForTeam(team, lambda
                 timd: timd.numHighShotsMadeTele)  # Checked
@@ -1206,7 +1213,6 @@ class Calculator(object):
             t.numScaleAndChallengePoints = self.numScaleAndChallengePointsForTeam(team)  # Checked
             t.breachPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: 
                 utils.convertFirebaseBoolean(self.teamDidBreachInMatch(team, self.getMatchForNumber(timd.matchNumber))))
-            print "Here 5"
             # self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
             #     team,
             #     lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesTele,
@@ -1237,11 +1243,28 @@ class Calculator(object):
         valuesDict = {}
         for defense in self.defenseList:
             values = []
+            # if team.number == 6004:
+                # print [defense + ': ' + str(timd.matchNumber) for timd in self.timdsWhereTeamFacedDefense(team, defense)]
             for timd in self.timdsWhereTeamFacedDefense(team, defense):
                 valueDict = valueRetrievalFunction(timd)
                 if defense in valueDict:
                     values.append(len(valueDict[defense] if valueDict[defense] != None else []))
+                else: values.append(0)
             valuesDict[defense] = np.mean(values) if len(values) > 0 else None
+        return valuesDict
+
+    def getStdNumberDefenseValues(self, team, valueRetrievalFunction):
+        valuesDict = {}
+        for defense in self.defenseList:
+            values = []
+            # if team.number == 6004:
+                # print [defense + ': ' + str(timd.matchNumber) for timd in self.timdsWhereTeamFacedDefense(team, defense)]
+            for timd in self.timdsWhereTeamFacedDefense(team, defense):
+                valueDict = valueRetrievalFunction(timd)
+                if defense in valueDict:
+                    values.append(len(valueDict[defense] if valueDict[defense] != None else []))
+                else: values.append(0)
+            valuesDict[defense] = np.std(values) if len(values) > 0 else None
         return valuesDict
 
     def getAverageTimeDefenseValues(self, team, valueRetrievalFunction):
@@ -1286,11 +1309,13 @@ class Calculator(object):
         # else:
             # print("Beginning second calculations for team: " + str(team.number) + ", " + str(team.name))
             #print("#")
-            map(lambda dKey: utils.setDictionaryValue(
-                team.calculatedData.predictedSuccessfulCrossingsForDefenseTele, # TODO: Update with the correct key
-                dKey, 
-                self.predictedCrosses(team, dKey)),
-                self.defenseList)
+            for defense in self.defenseList:
+                team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[defense] = self.predictedCrosses(team, defense)
+            # map(lambda dKey: utils.setDictionaryValue(
+            #     team.calculatedData.predictedSuccessfulCrossingsForDefenseTele, # TODO: Update with the correct key
+            #     dKey, 
+            #     self.predictedCrosses(team, dKey)),
+            #     self.defenseList)
 
 
     def doSecondCalculationsForTeam(self, team):
@@ -1330,7 +1355,7 @@ class Calculator(object):
 
 
     def getOptimalDefensesForAlliance(self, alliance):
-        optimalDefenseCombination, optimalScore = 100000, 100000
+        optimalDefenseCombination, optimalScore = None, 100000
         defenseCombos = self.defenseCombinations()
         for combo in defenseCombos:
             comboScore = self.predictedScoreForAllianceWithDefenseCombination(combo)
@@ -1405,10 +1430,8 @@ class Calculator(object):
             map(lambda t: t.join(), threads)
             # print len(calculatedTIMDs)
             # print type(calculatedTIMDs)
-            print [timd.calculatedData.drivingAbility for timd in calculatedTIMDs]
             self.comp.TIMDs = [timd for timd in calculatedTIMDs]
             self.TIMDs = self.comp.TIMDs
-            pdb.set_trace()
             threads2 = []
             for timd in self.comp.TIMDs:
                 thread = SecondTIMDThread(timd, copy.deepcopy(self))
