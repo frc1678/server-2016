@@ -55,6 +55,12 @@ class FirstTIMDThread(multiprocessing.Process):
             c.highShotsAttemptedTele = self.timd.numHighShotsMadeTele + self.timd.numHighShotsMissedTele
             c.lowShotsAttemptedTele = self.timd.numLowShotsMadeTele + self.timd.numLowShotsMissedTele
             c.numBallsIntakedOffMidlineAuto = float(0.0)
+            c.numTimesSuccesfulCrossedDefensesAuto = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
+            c.numTimesFailedCrossedDefensesAuto = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesAuto)
+            c.numTimesSuccesfulCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
+            c.numTimesFailedCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesTele)
+            c.crossingsForDefensePercentageAuto = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesAuto, utils.dictSum(c.numTimesSuccesfulCrossedDefensesAuto, c.numTimesFailedCrossedDefensesAuto))
+            c.crossingsForDefensePercentageTele = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesTele, utils.dictSum(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele))
             self.calculatedTIMDsList.append(self.timd)
             return 
             
@@ -802,7 +808,7 @@ class Calculator(object):
         teams = self.teamsWithMatchesCompleted()
         mappableRetrievalFunction = lambda f: teams.sort(key=f)
         map(mappableRetrievalFunction, retrievalFunctions[::-1])
-        return teams       
+        return teams[::-1]       
 
     def numDefensesCrossedInMatch(self, allianceIsRed, match):
         alliance = map(self.getTeamForNumber, match.redAllianceTeamNumbers) if allianceIsRed else map(
@@ -1340,7 +1346,13 @@ class Calculator(object):
             #     lambda x: len(x) if x != None else 0,
             #     self.getStdDevAcrossMatchesTeamSawDefense) 
         else: print "No TIMDs for team " + str(team.number)
-                   
+    
+    def numCrossingsForTIMD(self, timd, dataDict):
+        valuesDict = {}
+        for defense in self.defensesFacedInTIMD(timd):
+            valuesDict[defense] = len(dataDict[defense]) if defense in dataDict and dataDict[defense] else 0
+        return valuesDict
+
     def getAverageNumberDefenseValues(self, team, valueRetrievalFunction):
         valuesDict = {}
         for defense in self.defenseList:
@@ -1494,6 +1506,7 @@ class Calculator(object):
         # print "Predicted RPs"
         match.calculatedData.predictedBlueRPs = self.predictedRPsForAllianceForMatch(False, match)
         match.calculatedData.predictedRedRPs = self.predictedRPsForAllianceForMatch(True, match)
+        
         match.calculatedData.optimalBlueDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(False, match)
         match.calculatedData.optimalRedDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(True, match)
         # print "Done!"

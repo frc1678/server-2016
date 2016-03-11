@@ -418,6 +418,7 @@ class TeamInMatchData(object):
 			'rw' : None,
 			'lb' : None
 		}
+	
 		self.superNotes = None
 
 		self.__dict__.update(args)		
@@ -451,50 +452,72 @@ class CalculatedTeamInMatchData(object):
 		self.firstPickAbility = None
 		self.secondPickAbility = {
 		}
-		# self.numTimesSuccesfulCrossedDefensesTele = {
-		# 	'pc' : None,
-		# 	'cdf' : None,
-		# 	'mt' : None,
-		# 	'rp' : None,
-		# 	'sp' : None,
-		# 	'db' : None,
-		# 	'rt' : None,
-		# 	'rw' : None,
-		# 	'lb' : None
-		# }
-		# self.numTimesSuccessfulCrossedDefensesAuto = {
-		# 	'pc' : None,
-		# 	'cdf' : None,
-		# 	'mt' : None,
-		# 	'rp' : None,
-		# 	'sp' : None,
-		# 	'db' : None,
-		# 	'rt' : None,
-		# 	'rw' : None,
-		# 	'lb' : None
-		# }
-		# self.numTimesFailedCrossedDefensesTele = {
-		# 	'pc' : None,
-		# 	'cdf' : None,
-		# 	'mt' : None,
-		# 	'rp' : None,
-		# 	'sp' : None,
-		# 	'db' : None,
-		# 	'rt' : None,
-		# 	'rw' : None,
-		# 	'lb' : None
-		# }
-		# self.numTimesFailedCrossedDefensesAuto = {
-		# 	'pc' : None,
-		# 	'cdf' : None,
-		# 	'mt' : None,
-		# 	'rp' : None,
-		# 	'sp' : None,
-		# 	'db' : None,
-		# 	'rt' : None,
-		# 	'rw' : None,
-		# 	'lb' : None
-		# }
+		self.numTimesSuccesfulCrossedDefensesTele = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.numTimesSuccessfulCrossedDefensesAuto = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.numTimesFailedCrossedDefensesTele = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.numTimesFailedCrossedDefensesAuto = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.crossingsForDefensePercentageAuto = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.crossingsForDefensePercentageTele = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
 		self.overallSecondPickAbility = None
 		self.scoreContribution = None #
 
