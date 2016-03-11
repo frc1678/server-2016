@@ -1,0 +1,1070 @@
+Teams Validation Problems: []
+Matches Validation Problems: []
+TIMD is not complete for team 3336 in match 41
+1
+TIMD is not complete for team 5679 in match 54
+2
+TIMD is not complete for team 2640 in match 51
+3
+TIMD is not complete for team 3506 in match 37
+4
+TIMD is not complete for team 2640 in match 56
+5
+TIMD is not complete for team 2655 in match 8
+6
+TIMD is not complete for team 2655 in match 5
+7
+TIMD is not complete for team 5679 in match 6
+8
+TIMD is not complete for team 1533 in match 20
+9
+TIMD is not complete for team 1533 in match 22
+10
+TIMD is not complete for team 3196 in match 3
+11
+TIMD is not complete for team 5679 in match 58
+12
+TIMD is not complete for team 4290 in match 8
+13
+TIMD is not complete for team 4290 in match 3
+14
+Beginning first calculations for team 5679 in match 23
+15
+TIMD is not complete for team 4561 in match 45
+16
+TIMD is not complete for team 4561 in match 47
+17
+TIMD is not complete for team 3506 in match 32
+18
+TIMD is not complete for team 5679 in match 29
+19
+Beginning first calculations for team 3331 in match 24
+20
+TIMD is not complete for team 3196 in match 38
+21
+TIMD is not complete for team 3822 in match 31
+22
+TIMD is not complete for team 3822 in match 36
+23
+TIMD is not complete for team 3196 in match 33
+24
+TIMD is not complete for team 1225 in match 50
+25
+TIMD is not complete for team 1225 in match 57
+26
+TIMD is not complete for team 6004 in match 29
+27
+TIMD is not complete for team 1225 in match 55
+28
+TIMD is not complete for team 5854 in match 47
+29
+TIMD is not complete for team 5854 in match 45
+30
+TIMD is not complete for team 5854 in match 40
+31
+TIMD is not complete for team 4935 in match 35
+32
+Beginning first calculations for team 3845 in match 24
+33
+TIMD is not complete for team 3845 in match 26
+34
+TIMD is not complete for team 3331 in match 58
+35
+TIMD is not complete for team 3845 in match 20
+36
+TIMD is not complete for team 4829 in match 29
+37
+TIMD is not complete for team 234 in match 1
+38
+Beginning first calculations for team 4829 in match 23
+39
+TIMD is not complete for team 2655 in match 47
+40
+TIMD is not complete for team 2655 in match 43
+41
+TIMD is not complete for team 2642 in match 6
+42
+TIMD is not complete for team 2642 in match 1
+43
+TIMD is not complete for team 5727 in match 30
+44
+TIMD is not complete for team 3402 in match 11
+45
+TIMD is not complete for team 5727 in match 33
+46
+TIMD is not complete for team 5727 in match 36
+47
+TIMD is not complete for team 3402 in match 19
+48
+TIMD is not complete for team 234 in match 22
+49
+TIMD is not complete for team 5679 in match 2
+50
+TIMD is not complete for team 234 in match 26
+51
+Beginning first calculations for team 6004 in match 17
+52
+TIMD is not complete for team 6004 in match 14
+53
+TIMD is not complete for team 2682 in match 9
+54
+TIMD is not complete for team 2682 in match 3
+55
+TIMD is not complete for team 4561 in match 6
+56
+TIMD is not complete for team 4561 in match 4
+57
+TIMD is not complete for team 5511 in match 53
+58
+TIMD is not complete for team 5511 in match 57
+59
+TIMD is not complete for team 1533 in match 60
+60
+TIMD is not complete for team 2642 in match 29
+61
+Beginning first calculations for team 2642 in match 24
+62
+TIMD is not complete for team 2642 in match 20
+63
+TIMD is not complete for team 4829 in match 36
+64
+TIMD is not complete for team 3971 in match 20
+65
+Beginning first calculations for team 3971 in match 25
+66
+TIMD is not complete for team 3971 in match 27
+67
+TIMD is not complete for team 1533 in match 42
+68
+Beginning first calculations for team 2640 in match 18
+69
+TIMD is not complete for team 2640 in match 14
+70
+TIMD is not complete for team 4290 in match 53
+71
+TIMD is not complete for team 4561 in match 38
+72
+TIMD is not complete for team 4561 in match 30
+73
+TIMD is not complete for team 4561 in match 35
+74
+TIMD is not complete for team 4829 in match 60
+75
+TIMD is not complete for team 435 in match 19
+76
+TIMD is not complete for team 3822 in match 44
+77
+TIMD is not complete for team 3822 in match 46
+78
+TIMD is not complete for team 435 in match 10
+79
+TIMD is not complete for team 435 in match 15
+80
+TIMD is not complete for team 4767 in match 2
+81
+TIMD is not complete for team 4935 in match 40
+82
+TIMD is not complete for team 4935 in match 43
+83
+TIMD is not complete for team 4935 in match 46
+84
+TIMD is not complete for team 1533 in match 39
+85
+TIMD is not complete for team 3331 in match 28
+86
+TIMD is not complete for team 6004 in match 52
+87
+TIMD is not complete for team 6004 in match 59
+88
+TIMD is not complete for team 3680 in match 37
+89
+TIMD is not complete for team 3680 in match 34
+90
+TIMD is not complete for team 1501 in match 56
+91
+TIMD is not complete for team 1501 in match 50
+92
+TIMD is not complete for team 1501 in match 53
+93
+TIMD is not complete for team 5727 in match 60
+94
+TIMD is not complete for team 5188 in match 44
+95
+TIMD is not complete for team 5727 in match 49
+96
+TIMD is not complete for team 5727 in match 43
+97
+TIMD is not complete for team 5511 in match 1
+98
+TIMD is not complete for team 5511 in match 6
+99
+TIMD is not complete for team 5679 in match 39
+100
+TIMD is not complete for team 3336 in match 52
+101
+TIMD is not complete for team 3506 in match 27
+102
+TIMD is not complete for team 3336 in match 50
+103
+Beginning first calculations for team 3506 in match 25
+104
+TIMD is not complete for team 3680 in match 42
+105
+TIMD is not complete for team 3215 in match 46
+106
+TIMD is not complete for team 3215 in match 42
+107
+TIMD is not complete for team 1533 in match 10
+108
+TIMD is not complete for team 1533 in match 15
+109
+TIMD is not complete for team 2642 in match 14
+110
+TIMD is not complete for team 3971 in match 52
+111
+TIMD is not complete for team 3971 in match 59
+112
+Beginning first calculations for team 4290 in match 18
+113
+TIMD is not complete for team 3336 in match 5
+114
+TIMD is not complete for team 3506 in match 58
+115
+Beginning first calculations for team 4290 in match 12
+116
+TIMD is not complete for team 2682 in match 34
+117
+TIMD is not complete for team 2682 in match 30
+118
+TIMD is not complete for team 435 in match 59
+119
+TIMD is not complete for team 435 in match 54
+120
+TIMD is not complete for team 2640 in match 43
+121
+TIMD is not complete for team 2640 in match 48
+122
+TIMD is not complete for team 1225 in match 42
+123
+TIMD is not complete for team 5854 in match 34
+124
+TIMD is not complete for team 3845 in match 11
+125
+TIMD is not complete for team 4829 in match 33
+126
+TIMD is not complete for team 4767 in match 33
+127
+TIMD is not complete for team 4767 in match 38
+128
+TIMD is not complete for team 4290 in match 60
+129
+TIMD is not complete for team 3331 in match 7
+130
+TIMD is not complete for team 3331 in match 4
+131
+Beginning first calculations for team 3402 in match 25
+132
+TIMD is not complete for team 3402 in match 27
+133
+TIMD is not complete for team 234 in match 38
+134
+Beginning first calculations for team 3331 in match 17
+135
+TIMD is not complete for team 234 in match 35
+136
+Beginning first calculations for team 3331 in match 12
+137
+TIMD is not complete for team 1225 in match 7
+138
+TIMD is not complete for team 1225 in match 2
+139
+TIMD is not complete for team 5511 in match 46
+140
+TIMD is not complete for team 5511 in match 41
+141
+TIMD is not complete for team 5188 in match 30
+142
+TIMD is not complete for team 5188 in match 32
+143
+TIMD is not complete for team 5188 in match 36
+144
+TIMD is not complete for team 3845 in match 5
+145
+TIMD is not complete for team 1501 in match 13
+146
+Beginning first calculations for team 1501 in match 16
+147
+TIMD is not complete for team 3845 in match 9
+148
+TIMD is not complete for team 2642 in match 55
+149
+TIMD is not complete for team 3506 in match 13
+150
+Beginning first calculations for team 3506 in match 16
+151
+TIMD is not complete for team 3336 in match 60
+152
+Beginning first calculations for team 3215 in match 17
+153
+TIMD is not complete for team 3215 in match 13
+154
+TIMD is not complete for team 6004 in match 8
+155
+TIMD is not complete for team 6004 in match 3
+156
+TIMD is not complete for team 3196 in match 49
+157
+TIMD is not complete for team 3196 in match 41
+158
+TIMD is not complete for team 3336 in match 15
+159
+TIMD is not complete for team 4561 in match 14
+160
+Beginning first calculations for team 3336 in match 18
+161
+TIMD is not complete for team 4290 in match 21
+162
+TIMD is not complete for team 3845 in match 56
+163
+TIMD is not complete for team 3845 in match 51
+164
+TIMD is not complete for team 4561 in match 21
+165
+TIMD is not complete for team 4290 in match 28
+166
+TIMD is not complete for team 2655 in match 39
+167
+TIMD is not complete for team 2655 in match 33
+168
+Beginning first calculations for team 3971 in match 12
+169
+TIMD is not complete for team 3822 in match 57
+170
+TIMD is not complete for team 3822 in match 55
+171
+TIMD is not complete for team 5854 in match 60
+172
+TIMD is not complete for team 1533 in match 52
+173
+TIMD is not complete for team 1225 in match 38
+174
+TIMD is not complete for team 3331 in match 55
+175
+TIMD is not complete for team 4935 in match 59
+176
+TIMD is not complete for team 1225 in match 32
+177
+Beginning first calculations for team 5511 in match 18
+178
+TIMD is not complete for team 6004 in match 45
+179
+TIMD is not complete for team 6004 in match 49
+180
+TIMD is not complete for team 3506 in match 9
+181
+TIMD is not complete for team 3506 in match 5
+182
+TIMD is not complete for team 5727 in match 54
+183
+Beginning first calculations for team 5511 in match 12
+184
+TIMD is not complete for team 4290 in match 40
+185
+TIMD is not complete for team 3971 in match 4
+186
+TIMD is not complete for team 2682 in match 15
+187
+TIMD is not complete for team 3336 in match 27
+188
+Beginning first calculations for team 3336 in match 24
+189
+TIMD is not complete for team 3680 in match 54
+190
+TIMD is not complete for team 3215 in match 58
+191
+TIMD is not complete for team 3680 in match 50
+192
+TIMD is not complete for team 3215 in match 51
+193
+TIMD is not complete for team 3680 in match 59
+194
+TIMD is not complete for team 1501 in match 10
+195
+TIMD is not complete for team 1501 in match 1
+196
+TIMD is not complete for team 2642 in match 58
+197
+TIMD is not complete for team 3971 in match 47
+198
+TIMD is not complete for team 3971 in match 41
+199
+TIMD is not complete for team 3506 in match 48
+200
+TIMD is not complete for team 3506 in match 45
+201
+Beginning first calculations for team 2682 in match 25
+202
+TIMD is not complete for team 3822 in match 10
+203
+TIMD is not complete for team 3196 in match 11
+204
+TIMD is not complete for team 435 in match 42
+205
+TIMD is not complete for team 435 in match 40
+206
+Beginning first calculations for team 3215 in match 23
+207
+TIMD is not complete for team 3196 in match 19
+208
+TIMD is not complete for team 2640 in match 36
+209
+TIMD is not complete for team 2640 in match 34
+210
+Beginning first calculations for team 4935 in match 16
+211
+TIMD is not complete for team 4935 in match 14
+212
+TIMD is not complete for team 5854 in match 22
+213
+TIMD is not complete for team 5854 in match 26
+214
+TIMD is not complete for team 4829 in match 42
+215
+TIMD is not complete for team 4767 in match 20
+216
+TIMD is not complete for team 4767 in match 26
+217
+TIMD is not complete for team 4829 in match 46
+218
+TIMD is not complete for team 4561 in match 19
+219
+TIMD is not complete for team 2682 in match 56
+220
+TIMD is not complete for team 2682 in match 54
+221
+TIMD is not complete for team 2682 in match 50
+222
+TIMD is not complete for team 435 in match 32
+223
+Beginning first calculations for team 5727 in match 12
+224
+TIMD is not complete for team 5727 in match 10
+225
+TIMD is not complete for team 3196 in match 7
+226
+Beginning first calculations for team 5727 in match 17
+227
+TIMD is not complete for team 3402 in match 35
+228
+TIMD is not complete for team 234 in match 49
+229
+TIMD is not complete for team 234 in match 43
+230
+TIMD is not complete for team 3822 in match 15
+231
+TIMD is not complete for team 4767 in match 56
+232
+TIMD is not complete for team 4767 in match 53
+233
+TIMD is not complete for team 6004 in match 32
+234
+TIMD is not complete for team 234 in match 9
+235
+TIMD is not complete for team 6004 in match 37
+236
+TIMD is not complete for team 3822 in match 19
+237
+TIMD is not complete for team 5511 in match 34
+238
+TIMD is not complete for team 435 in match 47
+239
+TIMD is not complete for team 5511 in match 39
+240
+Beginning first calculations for team 3680 in match 18
+241
+TIMD is not complete for team 1533 in match 46
+242
+TIMD is not complete for team 3680 in match 13
+243
+TIMD is not complete for team 5188 in match 21
+244
+TIMD is not complete for team 3402 in match 48
+245
+TIMD is not complete for team 3402 in match 45
+246
+TIMD is not complete for team 3402 in match 40
+247
+TIMD is not complete for team 1501 in match 29
+248
+Beginning first calculations for team 1501 in match 25
+249
+TIMD is not complete for team 2642 in match 44
+250
+TIMD is not complete for team 2642 in match 47
+251
+TIMD is not complete for team 5679 in match 41
+252
+TIMD is not complete for team 234 in match 58
+253
+TIMD is not complete for team 5679 in match 48
+254
+TIMD is not complete for team 1533 in match 35
+255
+TIMD is not complete for team 1533 in match 30
+256
+TIMD is not complete for team 2640 in match 1
+257
+TIMD is not complete for team 3196 in match 51
+258
+TIMD is not complete for team 3196 in match 57
+259
+TIMD is not complete for team 2640 in match 7
+260
+TIMD is not complete for team 1533 in match 1
+261
+TIMD is not complete for team 4561 in match 53
+262
+TIMD is not complete for team 4290 in match 31
+263
+TIMD is not complete for team 3845 in match 41
+264
+Beginning first calculations for team 2682 in match 17
+265
+TIMD is not complete for team 4561 in match 56
+266
+TIMD is not complete for team 3971 in match 7
+267
+TIMD is not complete for team 3845 in match 49
+268
+TIMD is not complete for team 3680 in match 2
+269
+TIMD is not complete for team 2655 in match 28
+270
+TIMD is not complete for team 435 in match 5
+271
+TIMD is not complete for team 3680 in match 6
+272
+Beginning first calculations for team 2655 in match 23
+273
+TIMD is not complete for team 3822 in match 28
+274
+TIMD is not complete for team 3196 in match 29
+275
+TIMD is not complete for team 3822 in match 22
+276
+TIMD is not complete for team 3196 in match 22
+277
+TIMD is not complete for team 5854 in match 51
+278
+TIMD is not complete for team 1225 in match 22
+279
+TIMD is not complete for team 1225 in match 20
+280
+TIMD is not complete for team 3215 in match 5
+281
+TIMD is not complete for team 3215 in match 7
+282
+TIMD is not complete for team 1225 in match 28
+283
+TIMD is not complete for team 3331 in match 44
+284
+TIMD is not complete for team 3331 in match 49
+285
+TIMD is not complete for team 4935 in match 27
+286
+Beginning first calculations for team 4935 in match 24
+287
+TIMD is not complete for team 3845 in match 36
+288
+TIMD is not complete for team 3845 in match 31
+289
+Beginning first calculations for team 4829 in match 18
+290
+TIMD is not complete for team 2655 in match 59
+291
+TIMD is not complete for team 4767 in match 10
+292
+TIMD is not complete for team 2655 in match 52
+293
+TIMD is not complete for team 4767 in match 15
+294
+TIMD is not complete for team 3402 in match 8
+295
+TIMD is not complete for team 3402 in match 2
+296
+TIMD is not complete for team 5727 in match 2
+297
+Beginning first calculations for team 5727 in match 25
+298
+TIMD is not complete for team 234 in match 13
+299
+TIMD is not complete for team 234 in match 19
+300
+TIMD is not complete for team 3336 in match 38
+301
+Beginning first calculations for team 4767 in match 23
+302
+TIMD is not complete for team 3336 in match 35
+303
+Beginning first calculations for team 5188 in match 16
+304
+TIMD is not complete for team 5188 in match 11
+305
+TIMD is not complete for team 4829 in match 11
+306
+TIMD is not complete for team 2642 in match 32
+307
+TIMD is not complete for team 2642 in match 37
+308
+TIMD is not complete for team 3822 in match 3
+309
+TIMD is not complete for team 3971 in match 31
+310
+TIMD is not complete for team 3971 in match 37
+311
+Beginning first calculations for team 5679 in match 16
+312
+Beginning first calculations for team 5679 in match 12
+313
+TIMD is not complete for team 4935 in match 3
+314
+TIMD is not complete for team 4935 in match 9
+315
+TIMD is not complete for team 3215 in match 37
+316
+TIMD is not complete for team 3215 in match 30
+317
+TIMD is not complete for team 3215 in match 33
+318
+Beginning first calculations for team 2640 in match 23
+319
+TIMD is not complete for team 2640 in match 27
+320
+TIMD is not complete for team 4935 in match 51
+321
+TIMD is not complete for team 5854 in match 4
+322
+TIMD is not complete for team 4829 in match 9
+323
+TIMD is not complete for team 5854 in match 8
+324
+TIMD is not complete for team 4829 in match 4
+325
+TIMD is not complete for team 4290 in match 48
+326
+TIMD is not complete for team 2655 in match 11
+327
+Beginning first calculations for team 2655 in match 17
+328
+TIMD is not complete for team 4829 in match 55
+329
+TIMD is not complete for team 2682 in match 45
+330
+TIMD is not complete for team 2682 in match 40
+331
+TIMD is not complete for team 4290 in match 44
+332
+Beginning first calculations for team 435 in match 24
+333
+TIMD is not complete for team 435 in match 26
+334
+TIMD is not complete for team 5679 in match 31
+335
+TIMD is not complete for team 3336 in match 8
+336
+TIMD is not complete for team 1225 in match 14
+337
+TIMD is not complete for team 3331 in match 39
+338
+TIMD is not complete for team 5188 in match 6
+339
+TIMD is not complete for team 5188 in match 4
+340
+TIMD is not complete for team 6004 in match 21
+341
+TIMD is not complete for team 234 in match 53
+342
+TIMD is not complete for team 3331 in match 34
+343
+TIMD is not complete for team 3506 in match 52
+344
+TIMD is not complete for team 4767 in match 44
+345
+Beginning first calculations for team 5854 in match 16
+346
+TIMD is not complete for team 5854 in match 13
+347
+TIMD is not complete for team 4767 in match 48
+348
+TIMD is not complete for team 5511 in match 21
+349
+TIMD is not complete for team 3680 in match 21
+350
+TIMD is not complete for team 5511 in match 26
+351
+TIMD is not complete for team 1501 in match 43
+352
+TIMD is not complete for team 3680 in match 28
+353
+TIMD is not complete for team 5188 in match 50
+354
+TIMD is not complete for team 5188 in match 57
+355
+TIMD is not complete for team 5188 in match 54
+356
+TIMD is not complete for team 3402 in match 55
+357
+TIMD is not complete for team 3402 in match 57
+358
+TIMD is not complete for team 1501 in match 39
+359
+TIMD is not complete for team 1501 in match 31
+360
+TIMD is not complete for team 3336 in match 41
+TIMD is not complete for team 5679 in match 54
+TIMD is not complete for team 2640 in match 51
+TIMD is not complete for team 3506 in match 37
+TIMD is not complete for team 2640 in match 56
+TIMD is not complete for team 2655 in match 8
+TIMD is not complete for team 2655 in match 5
+TIMD is not complete for team 5679 in match 6
+TIMD is not complete for team 1533 in match 20
+TIMD is not complete for team 1533 in match 22
+TIMD is not complete for team 3196 in match 3
+TIMD is not complete for team 5679 in match 58
+TIMD is not complete for team 4290 in match 8
+TIMD is not complete for team 4290 in match 3
+TIMD is not complete for team 4561 in match 45
+TIMD is not complete for team 4561 in match 47
+TIMD is not complete for team 3506 in match 32
+TIMD is not complete for team 5679 in match 29
+TIMD is not complete for team 3196 in match 38
+TIMD is not complete for team 3822 in match 31
+TIMD is not complete for team 3822 in match 36
+TIMD is not complete for team 3196 in match 33
+TIMD is not complete for team 1225 in match 50
+TIMD is not complete for team 1225 in match 57
+TIMD is not complete for team 6004 in match 29
+TIMD is not complete for team 1225 in match 55
+TIMD is not complete for team 5854 in match 47
+TIMD is not complete for team 5854 in match 45
+TIMD is not complete for team 5854 in match 40
+TIMD is not complete for team 4935 in match 35
+TIMD is not complete for team 3845 in match 26
+TIMD is not complete for team 3331 in match 58
+TIMD is not complete for team 3845 in match 20
+TIMD is not complete for team 4829 in match 29
+TIMD is not complete for team 234 in match 1
+TIMD is not complete for team 2655 in match 47
+TIMD is not complete for team 2655 in match 43
+TIMD is not complete for team 2642 in match 6
+TIMD is not complete for team 2642 in match 1
+TIMD is not complete for team 5727 in match 30
+TIMD is not complete for team 3402 in match 11
+TIMD is not complete for team 5727 in match 33
+TIMD is not complete for team 5727 in match 36
+TIMD is not complete for team 3402 in match 19
+TIMD is not complete for team 234 in match 22
+TIMD is not complete for team 5679 in match 2
+TIMD is not complete for team 234 in match 26
+TIMD is not complete for team 6004 in match 14
+TIMD is not complete for team 2682 in match 9
+TIMD is not complete for team 2682 in match 3
+TIMD is not complete for team 4561 in match 6
+TIMD is not complete for team 4561 in match 4
+TIMD is not complete for team 5511 in match 53
+TIMD is not complete for team 5511 in match 57
+TIMD is not complete for team 1533 in match 60
+TIMD is not complete for team 2642 in match 29
+TIMD is not complete for team 2642 in match 20
+TIMD is not complete for team 4829 in match 36
+TIMD is not complete for team 3971 in match 20
+TIMD is not complete for team 3971 in match 27
+TIMD is not complete for team 1533 in match 42
+TIMD is not complete for team 2640 in match 14
+TIMD is not complete for team 4290 in match 53
+TIMD is not complete for team 4561 in match 38
+TIMD is not complete for team 4561 in match 30
+TIMD is not complete for team 4561 in match 35
+TIMD is not complete for team 4829 in match 60
+TIMD is not complete for team 435 in match 19
+TIMD is not complete for team 3822 in match 44
+TIMD is not complete for team 3822 in match 46
+TIMD is not complete for team 435 in match 10
+TIMD is not complete for team 435 in match 15
+TIMD is not complete for team 4767 in match 2
+TIMD is not complete for team 4935 in match 40
+TIMD is not complete for team 4935 in match 43
+TIMD is not complete for team 4935 in match 46
+TIMD is not complete for team 1533 in match 39
+TIMD is not complete for team 3331 in match 28
+TIMD is not complete for team 6004 in match 52
+TIMD is not complete for team 6004 in match 59
+TIMD is not complete for team 3680 in match 37
+TIMD is not complete for team 3680 in match 34
+TIMD is not complete for team 1501 in match 56
+TIMD is not complete for team 1501 in match 50
+TIMD is not complete for team 1501 in match 53
+TIMD is not complete for team 5727 in match 60
+TIMD is not complete for team 5188 in match 44
+TIMD is not complete for team 5727 in match 49
+TIMD is not complete for team 5727 in match 43
+TIMD is not complete for team 5511 in match 1
+TIMD is not complete for team 5511 in match 6
+TIMD is not complete for team 5679 in match 39
+TIMD is not complete for team 3336 in match 52
+TIMD is not complete for team 3506 in match 27
+TIMD is not complete for team 3336 in match 50
+TIMD is not complete for team 3680 in match 42
+TIMD is not complete for team 3215 in match 46
+TIMD is not complete for team 3215 in match 42
+TIMD is not complete for team 1533 in match 10
+TIMD is not complete for team 1533 in match 15
+TIMD is not complete for team 2642 in match 14
+TIMD is not complete for team 3971 in match 52
+TIMD is not complete for team 3971 in match 59
+TIMD is not complete for team 3336 in match 5
+TIMD is not complete for team 3506 in match 58
+TIMD is not complete for team 2682 in match 34
+TIMD is not complete for team 2682 in match 30
+TIMD is not complete for team 435 in match 59
+TIMD is not complete for team 435 in match 54
+TIMD is not complete for team 2640 in match 43
+TIMD is not complete for team 2640 in match 48
+TIMD is not complete for team 1225 in match 42
+TIMD is not complete for team 5854 in match 34
+TIMD is not complete for team 3845 in match 11
+TIMD is not complete for team 4829 in match 33
+TIMD is not complete for team 4767 in match 33
+TIMD is not complete for team 4767 in match 38
+TIMD is not complete for team 4290 in match 60
+TIMD is not complete for team 3331 in match 7
+TIMD is not complete for team 3331 in match 4
+TIMD is not complete for team 3402 in match 27
+TIMD is not complete for team 234 in match 38
+TIMD is not complete for team 234 in match 35
+TIMD is not complete for team 1225 in match 7
+TIMD is not complete for team 1225 in match 2
+TIMD is not complete for team 5511 in match 46
+TIMD is not complete for team 5511 in match 41
+TIMD is not complete for team 5188 in match 30
+TIMD is not complete for team 5188 in match 32
+TIMD is not complete for team 5188 in match 36
+TIMD is not complete for team 3845 in match 5
+TIMD is not complete for team 1501 in match 13
+TIMD is not complete for team 3845 in match 9
+TIMD is not complete for team 2642 in match 55
+TIMD is not complete for team 3506 in match 13
+TIMD is not complete for team 3336 in match 60
+TIMD is not complete for team 3215 in match 13
+TIMD is not complete for team 6004 in match 8
+TIMD is not complete for team 6004 in match 3
+TIMD is not complete for team 3196 in match 49
+TIMD is not complete for team 3196 in match 41
+TIMD is not complete for team 3336 in match 15
+TIMD is not complete for team 4561 in match 14
+TIMD is not complete for team 4290 in match 21
+TIMD is not complete for team 3845 in match 56
+TIMD is not complete for team 3845 in match 51
+TIMD is not complete for team 4561 in match 21
+TIMD is not complete for team 4290 in match 28
+TIMD is not complete for team 2655 in match 39
+TIMD is not complete for team 2655 in match 33
+TIMD is not complete for team 3822 in match 57
+TIMD is not complete for team 3822 in match 55
+TIMD is not complete for team 5854 in match 60
+TIMD is not complete for team 1533 in match 52
+TIMD is not complete for team 1225 in match 38
+TIMD is not complete for team 3331 in match 55
+TIMD is not complete for team 4935 in match 59
+TIMD is not complete for team 1225 in match 32
+TIMD is not complete for team 6004 in match 45
+TIMD is not complete for team 6004 in match 49
+TIMD is not complete for team 3506 in match 9
+TIMD is not complete for team 3506 in match 5
+TIMD is not complete for team 5727 in match 54
+TIMD is not complete for team 4290 in match 40
+TIMD is not complete for team 3971 in match 4
+TIMD is not complete for team 2682 in match 15
+TIMD is not complete for team 3336 in match 27
+TIMD is not complete for team 3680 in match 54
+TIMD is not complete for team 3215 in match 58
+TIMD is not complete for team 3680 in match 50
+TIMD is not complete for team 3215 in match 51
+TIMD is not complete for team 3680 in match 59
+TIMD is not complete for team 1501 in match 10
+TIMD is not complete for team 1501 in match 1
+TIMD is not complete for team 2642 in match 58
+TIMD is not complete for team 3971 in match 47
+TIMD is not complete for team 3971 in match 41
+TIMD is not complete for team 3506 in match 48
+TIMD is not complete for team 3506 in match 45
+TIMD is not complete for team 3822 in match 10
+TIMD is not complete for team 3196 in match 11
+TIMD is not complete for team 435 in match 42
+TIMD is not complete for team 435 in match 40
+TIMD is not complete for team 3196 in match 19
+TIMD is not complete for team 2640 in match 36
+TIMD is not complete for team 2640 in match 34
+TIMD is not complete for team 4935 in match 14
+TIMD is not complete for team 5854 in match 22
+TIMD is not complete for team 5854 in match 26
+TIMD is not complete for team 4829 in match 42
+TIMD is not complete for team 4767 in match 20
+TIMD is not complete for team 4767 in match 26
+TIMD is not complete for team 4829 in match 46
+TIMD is not complete for team 4561 in match 19
+TIMD is not complete for team 2682 in match 56
+TIMD is not complete for team 2682 in match 54
+TIMD is not complete for team 2682 in match 50
+TIMD is not complete for team 435 in match 32
+TIMD is not complete for team 5727 in match 10
+TIMD is not complete for team 3196 in match 7
+TIMD is not complete for team 3402 in match 35
+TIMD is not complete for team 234 in match 49
+TIMD is not complete for team 234 in match 43
+TIMD is not complete for team 3822 in match 15
+TIMD is not complete for team 4767 in match 56
+TIMD is not complete for team 4767 in match 53
+TIMD is not complete for team 6004 in match 32
+TIMD is not complete for team 234 in match 9
+TIMD is not complete for team 6004 in match 37
+TIMD is not complete for team 3822 in match 19
+TIMD is not complete for team 5511 in match 34
+TIMD is not complete for team 435 in match 47
+TIMD is not complete for team 5511 in match 39
+TIMD is not complete for team 1533 in match 46
+TIMD is not complete for team 3680 in match 13
+TIMD is not complete for team 5188 in match 21
+TIMD is not complete for team 3402 in match 48
+TIMD is not complete for team 3402 in match 45
+TIMD is not complete for team 3402 in match 40
+TIMD is not complete for team 1501 in match 29
+TIMD is not complete for team 2642 in match 44
+TIMD is not complete for team 2642 in match 47
+TIMD is not complete for team 5679 in match 41
+TIMD is not complete for team 234 in match 58
+TIMD is not complete for team 5679 in match 48
+TIMD is not complete for team 1533 in match 35
+TIMD is not complete for team 1533 in match 30
+TIMD is not complete for team 2640 in match 1
+TIMD is not complete for team 3196 in match 51
+TIMD is not complete for team 3196 in match 57
+TIMD is not complete for team 2640 in match 7
+TIMD is not complete for team 1533 in match 1
+TIMD is not complete for team 4561 in match 53
+TIMD is not complete for team 4290 in match 31
+TIMD is not complete for team 3845 in match 41
+TIMD is not complete for team 4561 in match 56
+TIMD is not complete for team 3971 in match 7
+TIMD is not complete for team 3845 in match 49
+TIMD is not complete for team 3680 in match 2
+TIMD is not complete for team 2655 in match 28
+TIMD is not complete for team 435 in match 5
+TIMD is not complete for team 3680 in match 6
+TIMD is not complete for team 3822 in match 28
+TIMD is not complete for team 3196 in match 29
+TIMD is not complete for team 3822 in match 22
+TIMD is not complete for team 3196 in match 22
+TIMD is not complete for team 5854 in match 51
+TIMD is not complete for team 1225 in match 22
+TIMD is not complete for team 1225 in match 20
+TIMD is not complete for team 3215 in match 5
+TIMD is not complete for team 3215 in match 7
+TIMD is not complete for team 1225 in match 28
+TIMD is not complete for team 3331 in match 44
+TIMD is not complete for team 3331 in match 49
+TIMD is not complete for team 4935 in match 27
+TIMD is not complete for team 3845 in match 36
+TIMD is not complete for team 3845 in match 31
+TIMD is not complete for team 2655 in match 59
+TIMD is not complete for team 4767 in match 10
+TIMD is not complete for team 2655 in match 52
+TIMD is not complete for team 4767 in match 15
+TIMD is not complete for team 3402 in match 8
+TIMD is not complete for team 3402 in match 2
+TIMD is not complete for team 5727 in match 2
+TIMD is not complete for team 234 in match 13
+TIMD is not complete for team 234 in match 19
+TIMD is not complete for team 3336 in match 38
+TIMD is not complete for team 3336 in match 35
+TIMD is not complete for team 5188 in match 11
+TIMD is not complete for team 4829 in match 11
+TIMD is not complete for team 2642 in match 32
+TIMD is not complete for team 2642 in match 37
+TIMD is not complete for team 3822 in match 3
+TIMD is not complete for team 3971 in match 31
+TIMD is not complete for team 3971 in match 37
+TIMD is not complete for team 4935 in match 3
+TIMD is not complete for team 4935 in match 9
+TIMD is not complete for team 3215 in match 37
+TIMD is not complete for team 3215 in match 30
+TIMD is not complete for team 3215 in match 33
+TIMD is not complete for team 2640 in match 27
+TIMD is not complete for team 4935 in match 51
+TIMD is not complete for team 5854 in match 4
+TIMD is not complete for team 4829 in match 9
+TIMD is not complete for team 5854 in match 8
+TIMD is not complete for team 4829 in match 4
+TIMD is not complete for team 4290 in match 48
+TIMD is not complete for team 2655 in match 11
+TIMD is not complete for team 4829 in match 55
+TIMD is not complete for team 2682 in match 45
+TIMD is not complete for team 2682 in match 40
+TIMD is not complete for team 4290 in match 44
+TIMD is not complete for team 435 in match 26
+TIMD is not complete for team 5679 in match 31
+TIMD is not complete for team 3336 in match 8
+TIMD is not complete for team 1225 in match 14
+TIMD is not complete for team 3331 in match 39
+TIMD is not complete for team 5188 in match 6
+TIMD is not complete for team 5188 in match 4
+TIMD is not complete for team 6004 in match 21
+TIMD is not complete for team 234 in match 53
+TIMD is not complete for team 3331 in match 34
+TIMD is not complete for team 3506 in match 52
+TIMD is not complete for team 4767 in match 44
+TIMD is not complete for team 5854 in match 13
+TIMD is not complete for team 4767 in match 48
+TIMD is not complete for team 5511 in match 21
+TIMD is not complete for team 3680 in match 21
+TIMD is not complete for team 5511 in match 26
+TIMD is not complete for team 1501 in match 43
+TIMD is not complete for team 3680 in match 28
+TIMD is not complete for team 5188 in match 50
+TIMD is not complete for team 5188 in match 57
+TIMD is not complete for team 5188 in match 54
+TIMD is not complete for team 3402 in match 55
+TIMD is not complete for team 3402 in match 57
+TIMD is not complete for team 1501 in match 39
+TIMD is not complete for team 1501 in match 31
+No TIMDs for team 1225
+No TIMDs for team 3822
+No TIMDs for team 2655
+No TIMDs for team 4561
+No TIMDs for team 4767
+No TIMDs for team 234
+No TIMDs for team 3215
+No TIMDs for team 6004
+No TIMDs for team 4829
+No TIMDs for team 5727
+No TIMDs for team 3971
+No TIMDs for team 1501
+No TIMDs for team 1533
+No TIMDs for team 2682
+No TIMDs for team 2640
+No TIMDs for team 2642
+No TIMDs for team 3331
+No TIMDs for team 3402
+No TIMDs for team 3336
+No TIMDs for team 5511
+No TIMDs for team 5679
+No TIMDs for team 4935
+No TIMDs for team 5188
+No TIMDs for team 3680
+No TIMDs for team 4290
+No TIMDs for team 3506
+No TIMDs for team 5854
+No TIMDs for team 3196
+No TIMDs for team 3845
+No TIMDs for team 435

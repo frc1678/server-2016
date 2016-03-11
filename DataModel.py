@@ -51,7 +51,9 @@ class CalculatedTeamData(object):
 		self.lowShotAccuracyTele = None #Works
 		self.avgGroundIntakes = None #Works
 		self.avgHighShotsTele = None #Works
+		self.avgHighShotsAttemptedTele = None
 		self.avgLowShotsTele = None #Works
+		self.avgLowShotsAttemptedTele = None
 		self.avgShotsBlocked = None #Works
 		self.avgHighShotsAuto = None #Works
 		self.avgLowShotsAuto = None #Works
@@ -153,7 +155,7 @@ class CalculatedTeamData(object):
 		self.siegeAbility = None
 		self.autoAbility = None
 		self.predictedNumRPs = None
-		self.numRPs = None
+		self.actualNumRPs = None
 		self.numAutoPoints = None
 		self.numScaleAndChallengePoints = None
 		self.sdHighShotsAuto = None
@@ -404,6 +406,8 @@ class CalculatedTeamInMatchData(object):
 		self.lowShotAccuracyAuto = None #
 		self.highShotAccuracyTele = None #
 		self.lowShotAccuracyTele = None #
+		self.highShotsAttemptedTele = None
+		self.lowShotsAttemptedTele = None
 		self.teleopShotAbility = None
 		self.siegeAbility = None#
 		self.autoAbility = None

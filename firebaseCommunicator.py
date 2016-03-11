@@ -7,8 +7,8 @@ from os import listdir
 import pdb
 
 # (superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
-# (superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
-(superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
+(superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
+# (superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
 # (superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
@@ -61,7 +61,7 @@ class FirebaseCommunicator(object):
 
 	def addCalculatedMatchDataToFirebase(self, match):
 		calculatedMatchDataDict = utils.makeDictFromCalculatedMatchData(match.calculatedData)
-		pdb.set_trace()
+		# pdb.set_trace()
 		FBLocation = "/Matches/" + str(match.number)
 		result = firebase.put(FBLocation, 'calculatedData', calculatedMatchDataDict)
 
