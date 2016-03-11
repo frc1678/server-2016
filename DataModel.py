@@ -59,6 +59,8 @@ class CalculatedTeamData(object):
 		self.avgLowShotsAuto = None #Works
 		self.avgMidlineBallsIntakedAuto = None #Works
 		self.avgBallsKnockedOffMidlineAuto = None #Works
+		self.twoBallAutoAccuracy = None 
+		self.twoBallAutoAttemptedPercentage = None
 		self.avgTorque = None
 		self.avgSpeed = None
 		self.avgEvasion = None
@@ -141,6 +143,28 @@ class CalculatedTeamData(object):
 			'lb' : None
 		}
 		self.predictedSuccessfulCrossingsForDefenseTele = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.crossingsSuccessRateForDefenseAuto = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.crossingsSuccessRateForDefenseTele = {
 			'pc' : None,
 			'cdf' : None,
 			'mt' : None,

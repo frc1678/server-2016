@@ -315,33 +315,35 @@ class Calculator(object):
         return (float(madeFunction(timd)) / float(denominator)) if denominator != 0 else 0
 
     def getTIMDHighShotAccuracyTele(self, timd):
-        madeFunction = lambda t: t.numHighShotsMadeTele
-        missedFunction = lambda t: t.numHighShotsMissedTele
+        madeFunction = lambda t: float(t.numHighShotsMadeTele)
+        missedFunction = lambda t: float(t.numHighShotsMissedTele)
         return self.getAccuracyForTIMDForMadeFunctionForMissedFunction(timd, madeFunction, missedFunction)
 
     def getTIMDLowShotAccuracyTele(self, timd):
-        madeFunction = lambda t: t.numLowShotsMadeTele
-        missedFunction = lambda t: t.numLowShotsMissedTele
+        madeFunction = lambda t: float(t.numLowShotsMadeTele)
+        missedFunction = lambda t: float(t.numLowShotsMissedTele)
         return self.getAccuracyForTIMDForMadeFunctionForMissedFunction(timd, madeFunction, missedFunction)
 
     def getTIMDHighShotAccuracyAuto(self, timd):
-        madeFunction = lambda t: t.numHighShotsMadeAuto
-        missedFunction = lambda t: t.numHighShotsMissedAuto
+        madeFunction = lambda t: float(t.numHighShotsMadeAuto)
+        missedFunction = lambda t: float(t.numHighShotsMissedAuto)
         return self.getAccuracyForTIMDForMadeFunctionForMissedFunction(timd, madeFunction, missedFunction)
 
     def getTIMDLowShotAccuracyAuto(self, timd):
-        madeFunction = lambda t: t.numLowShotsMadeAuto
-        missedFunction = lambda t: t.numLowShotsMissedAuto
+        madeFunction = lambda t: float(t.numLowShotsMadeAuto)
+        missedFunction = lambda t: float(t.numLowShotsMissedAuto)
         return self.getAccuracyForTIMDForMadeFunctionForMissedFunction(timd, madeFunction, missedFunction)
 
+    def twoBallAutoTIMDsForTeam(self, team):
+        return filter(lambda timd: timd.calculatedData.highShotsAttemptedTele > 2, self.getCompletedTIMDsForTeam(team))
+
+    def twoBallAutoTriedPercentage(self, team):
+        return len(self.twoBallAutoTIMDsForTeam(team)) / len(self.getCompletedTIMDsForTeam(team)) 
+
     def twoBallAutoAccuracy(self, team):
-        timds = self.getCompletedTIMDsForTeam(team)
-        twoBallAutoCompleted = 0
-        for timd in timds:
-            totalNumShots = timd.numHighShotsMadeAuto + timd.numLowShotsMadeAuto + timd.numHighShotsMissedAuto + timd.numLowShotsMissedAuto
-            if totalNumShots > 2:
-                twoBallAutoCompleted += 1
-        return twoBallAutoCompleted / len(timds)
+        timds = self.twoBallAutoTIMDsForTeam(team)
+        if len(timds) > 0:
+            return np.mean([timd.calculatedData.highShotAccuracyAuto for timd in timds])
 
     def blockingAbility(self, team):
         avgHighShotAccuracy = sum(
@@ -376,8 +378,8 @@ class Calculator(object):
         for defense, value in timd.timesSuccessfulCrossedDefensesAuto.items():
             defenseCrossesInAuto += len(value) if value != None else 0
         if defenseCrossesInAuto > 1: defenseCrossesInAuto = 1
-        return 10 * int(timd.numHighShotsMadeAuto) + 5 * int(timd.numLowShotsMadeAuto) + 2 * (
-            1 if timd.didReachAuto else 0) + 10 * int(defenseCrossesInAuto)
+        print 2 * utils.convertFirebaseBoolean(timd.didReachAuto)
+        return 10 * int(timd.numHighShotsMadeAuto) + 5 * int(timd.numLowShotsMadeAuto) + 2 * utils.convertFirebaseBoolean(timd.didReachAuto) + 10 * int(defenseCrossesInAuto)
 
     def numRPsForTeam(self, team):
         return sum(map(lambda m: self.RPsGainedFromMatchForTeam(m, team), self.getCompletedMatchesForTeam(team)))
@@ -416,7 +418,7 @@ class Calculator(object):
     def probabilityDensity(self, x, mu, sigma):
         if sigma == 0.0:
             return int(x == mu)
-        if x != None and mu != None and sigma != None: return stats.norm.cdf(x, mu, sigma)
+        if x != None and mu != None and sigma != None: return 1.0 - stats.norm.cdf(x, mu, sigma)
 
     def monteCarloForMeanForStDevForValueFunction(self, mean, stDev, valueFunction):
         values = []
@@ -507,7 +509,7 @@ class Calculator(object):
         values = map(averageFunction, self.teamsWithMatchesCompleted())
         initialValue = values[0]
         for value in values[1:]:
-            if value != initialValue: impossible == False
+            if value != initialValue: impossible = False
         if impossible: 
             zscores = [0.0 for v in values]
         else: 
@@ -617,12 +619,16 @@ class Calculator(object):
         return self.getDefenseCombinations(self.categories)
 
     def getDefenseCombinations(self, categories):
-        if len(categories) == 0:
-            return []
+        # pdb.set_trace()
+        if len(categories) == 1:
+            return [self.defenseDictionary[categories[0]]]
         combos = []
         for defense in self.defenseDictionary[categories[0]]:
             for combo in self.getDefenseCombinations(categories[1:]):
-                combos.append([defense].append(combo))
+                newCombo = [defense]
+                newCombo.extend(combo)
+                combos.append(newCombo)
+
         return combos
 
     def stanDevForDefenseCategoryForKeyRetrievalFunctionForTeam(self, team, keyRetrievalFunction, category):
@@ -650,10 +656,18 @@ class Calculator(object):
         sumDefenseCrossingsDict = utils.dictSum(team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, team.calculatedData.avgSuccessfulTimesCrossedDefensesTele)
         return utils.rms(map(lambda dKey: sumDefenseCrossingsDict[dKey], filter(lambda d: self.teamFacedDefense(team, d), self.defenseDictionary[category])))
 
+    def autoCrossingsForCategory(self, team, category):
+        return np.mean([team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[defense] if team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[defense] != None else 0.0 for defense in self.defenseDictionary[category]])
+
+    def stdAutoCrossingsForCategory(self, team, category):
+        return utils.rms(filter(lambda x: x != None, [team.calculatedData.sdSuccessfulDefenseCrossesAuto[defense] for defense in self.defenseDictionary[category]]))
+
     def getDefenseDamageChanceForAllianceForCategory(self, alliance, category):
         crossings = sum(map(lambda t: self.predictedCrossingsForDefenseCategory(t, category), alliance))
         stdDev = utils.sumStdDevs(map(lambda t: self.standardDeviationForTeamForCategory(t, category), alliance))
-        return self.probabilityDensity(2.0, crossings, stdDev)
+        autoCrossings = sum(map(lambda t: self.autoCrossingsForCategory(t, category), alliance))
+        autoStd = utils.sumStdDevs(map(lambda t: self.stdAutoCrossingsForCategory(t, category), alliance))
+        return self.probabilityDensity(2.0, crossings + autoCrossings, utils.sumStdDevs([stdDev, autoStd]))
 
     def breachChanceForAlliance(self, alliance):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
@@ -688,7 +702,8 @@ class Calculator(object):
 
     def captureChanceForAlliance(self, alliance):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
-        return self.probabilityDensity(8.0, self.numShotsForAlliance(alliance), self.stdDevNumShotsForAlliance(alliance))
+        siegeChance = np.prod([t.calculatedData.siegeConsistency for t in alliance])
+        return siegeChance * self.probabilityDensity(8.0, self.numShotsForAlliance(alliance), self.stdDevNumShotsForAlliance(alliance))
 
     def captureChanceForAllianceNumbers(self, allianceNumbers):
         return self.captureChanceForAlliance(self.teamsForTeamNumbersOnAlliance(allianceNumbers))
@@ -713,7 +728,7 @@ class Calculator(object):
                                        sampleSize,
                                        opposingSampleSize)
 
-        scoreRPs = tscoreRPs * stats.t.pdf(tscoreRPs, np.mean([sampleSize, opposingSampleSize]))
+        scoreRPs = 2 * stats.t.cdf(tscoreRPs, np.mean([sampleSize, opposingSampleSize]))
         return breachRPs + captureRPs + scoreRPs
 
     def welchsTest(self, mean1, mean2, std1, std2, sampleSize1, sampleSize2):
@@ -1254,7 +1269,8 @@ class Calculator(object):
             t.sdSuccessfulDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
             t.sdFailedDefenseCrossesAuto = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
             t.sdFailedDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
-
+            t.crossingsSuccessRateForDefenseAuto = utils.dictQuotient(t.avgSuccessfulTimesCrossedDefensesAuto, utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto, t.avgFailedTimesCrossedDefensesAuto))
+            t.crossingsSuccessRateForDefenseTele = utils.dictQuotient(t.avgSuccessfulTimesCrossedDefensesTele, utils.dictSum(t.avgSuccessfulTimesCrossedDefensesTele, t.avgFailedTimesCrossedDefensesTele))
             # t.predictedSuccessfulCrossingsForDefenseTele = 
 
             # #Tele
@@ -1298,7 +1314,8 @@ class Calculator(object):
                 lambda timd: timd.calculatedData.highShotsAttemptedTele)
             t.avgLowShotsAttemptedTele = self.getAverageForDataFunctionForTeam(team,
                 lambda timd: timd.calculatedData.lowShotsAttemptedTele)
-
+            t.twoBallAutoTriedPercentage = self.twoBallAutoTriedPercentage(team)
+            t.twoBallAutoAccuracy = self.twoBallAutoAccuracy(team)
             # self.setDefenseValuesForKeyRetrievalFunctionForValuesRetrievalFunctionForModificationFunctionForTeam(
             #     team,
             #     lambda tm: tm.calculatedData.avgSuccessfulTimesCrossedDefensesTele,
@@ -1446,10 +1463,10 @@ class Calculator(object):
         optimalDefenseCombination, optimalScore = None, 100000
         defenseCombos = self.defenseCombinations()
         for combo in defenseCombos:
-            comboScore = self.predictedScoreForAllianceWithDefenseCombination(combo)
+            comboScore = self.predictedScoreForAllianceWithDefenseCombination(alliance, combo)
             if comboScore < optimalScore:
                 optimalDefenseCombination, optimalScore = combo, comboScore
-        return optimalDefenseCombination
+        return optimalDefenseCombination[:-1]
 
     def getOptimalDefensesForAllianceIsRedForMatch(self, allianceIsRed, match):
         alliance = self.getAllianceForMatch(match, allianceIsRed)
@@ -1478,7 +1495,6 @@ class Calculator(object):
         # print "Predicted RPs"
         match.calculatedData.predictedBlueRPs = self.predictedRPsForAllianceForMatch(False, match)
         match.calculatedData.predictedRedRPs = self.predictedRPsForAllianceForMatch(True, match)
-        # print "Optimal"
         match.calculatedData.optimalBlueDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(False, match)
         match.calculatedData.optimalRedDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(True, match)
         # print "Done!"
