@@ -691,6 +691,9 @@ class Calculator(object):
     def getCaptureChanceForMatchForAllianceIsRed(self, match, allianceIsRed):
         return match.calculatedData.redCaptureChance if allianceIsRed else match.calculatedData.blueCaptureChance
 
+    def getWinChanceForMatchForAllianceIsRed(self, match, allianceIsRed):
+        return match.calculatedData.redWinChance if allianceIsRed else match.calculatedData.blueWinChance
+
     def shotsForTeam(self, team):
         t = team.calculatedData
         return [t.avgHighShotsAuto, t.avgHighShotsTele, t.avgLowShotsAuto, t.avgLowShotsTele]
@@ -715,13 +718,8 @@ class Calculator(object):
     def captureChanceForAllianceNumbers(self, allianceNumbers):
         return self.captureChanceForAlliance(self.teamsForTeamNumbersOnAlliance(allianceNumbers))
 
-    def predictedRPsForAllianceForMatch(self, allianceIsRed, match):
+    def winChanceForMatchForAllianceIsRed(self, match, allianceIsRed):
         alliance = self.getAllianceForMatch(match, allianceIsRed)
-        alliance = map(self.replaceWithAverageIfNecessary, alliance)
-
-        breachRPs = self.getBreachChanceForMatchForAllianceIsRed(match, allianceIsRed)
-        captureRPs = self.getCaptureChanceForMatchForAllianceIsRed(match, allianceIsRed)
-
         predictedScore  = self.predictedScoreForMatchForAlliance(match, allianceIsRed)
         opposingPredictedScore = self.predictedScoreForMatchForAlliance(match, not allianceIsRed)
         sdPredictedScore = self.sdPredictedScoreForMatchForAlliance(match, allianceIsRed)
@@ -734,8 +732,16 @@ class Calculator(object):
                                        sdOpposingPredictedScore,
                                        sampleSize,
                                        opposingSampleSize)
+        return stats.t.cdf(tscoreRPs, np.mean([sampleSize, opposingSampleSize]))
 
-        scoreRPs = 2 * stats.t.cdf(tscoreRPs, np.mean([sampleSize, opposingSampleSize]))
+    def predictedRPsForAllianceForMatch(self, allianceIsRed, match):
+        alliance = self.getAllianceForMatch(match, allianceIsRed)
+        alliance = map(self.replaceWithAverageIfNecessary, alliance)
+
+        breachRPs = self.getBreachChanceForMatchForAllianceIsRed(match, allianceIsRed)
+        captureRPs = self.getCaptureChanceForMatchForAllianceIsRed(match, allianceIsRed)
+
+        scoreRPs = 2 * self.getWinChanceForMatchForAllianceIsRed(match, allianceIsRed)
         return breachRPs + captureRPs + scoreRPs
 
     def welchsTest(self, mean1, mean2, std1, std2, sampleSize1, sampleSize2):
@@ -1513,11 +1519,15 @@ class Calculator(object):
         match.calculatedData.sdPredictedBlueScore = self.stdDevPredictedScoreForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.sdPredictedRedScore = self.stdDevPredictedScoreForAllianceNumbers(match.redAllianceTeamNumbers)
         # print "Predicted RPs"
+        match.calculatedData.blueWinChance = self.winChanceForMatchForAllianceIsRed(match, False)
+        match.calculatedData.redWinChance = self.winChanceForMatchForAllianceIsRed(match, True)
+
         match.calculatedData.predictedBlueRPs = self.predictedRPsForAllianceForMatch(False, match)
         match.calculatedData.predictedRedRPs = self.predictedRPsForAllianceForMatch(True, match)
         
         match.calculatedData.optimalBlueDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(False, match)
         match.calculatedData.optimalRedDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(True, match)
+
         # print "Done!"
 
 
