@@ -518,6 +518,28 @@ class CalculatedTeamInMatchData(object):
 			'rw' : None,
 			'lb' : None
 		}
+		self.crossingTimeForDefensePercentageAuto = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
+		self.crossingTimeForDefensePercentageTele = {
+			'pc' : None,
+			'cdf' : None,
+			'mt' : None,
+			'rp' : None,
+			'sp' : None,
+			'db' : None,
+			'rt' : None,
+			'rw' : None,
+			'lb' : None
+		}
 		self.overallSecondPickAbility = None
 		self.scoreContribution = None #
 

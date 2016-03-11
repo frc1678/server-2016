@@ -61,6 +61,8 @@ class FirstTIMDThread(multiprocessing.Process):
             c.numTimesFailedCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesTele)
             c.crossingsForDefensePercentageAuto = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesAuto, utils.dictSum(c.numTimesSuccesfulCrossedDefensesAuto, c.numTimesFailedCrossedDefensesAuto))
             c.crossingsForDefensePercentageTele = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesTele, utils.dictSum(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele))
+            c.crossingTimeForDefensePercentageAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
+            c.crossingTimeForDefensePercentageTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
             self.calculatedTIMDsList.append(self.timd)
             return 
             
@@ -522,11 +524,11 @@ class Calculator(object):
         for i in range(len(self.teamsWithMatchesCompleted())):
             d[self.teamsWithMatchesCompleted()[i].number] = zscores[i]
 
-    torqueWeight = 0.2
+    torqueWeight = 0.1
     ballControlWeight = 0.2
-    evasionWeight = 0.2
-    defenseWeight = 0.2
-    speedWeight = 0.2
+    evasionWeight = 0.25
+    defenseWeight = 0.35
+    speedWeight = 0.1
     def drivingAbilityForTIMD(self, timd):
         return (self.torqueWeight * timd.rankTorque) + (
             self.ballControlWeight * timd.rankBallControl) + (
@@ -903,7 +905,7 @@ class Calculator(object):
 
     def getRankingForTeamByRetrievalFunctions(self, team, retrievalFunctions):
         if team in self.teamsWithCalculatedData():
-            return self.teamsSortedByRetrievalFunctions(retrievalFunctions).index(team)
+            return self.teamsSortedByRetrievalFunctions(retrievalFunctions).index(team) + 1
 
     def getSeedingFunctions(self):
         return [lambda t: t.calculatedData.actualNumRPs, self.cumulativeSumAutoPointsForTeam,
@@ -1350,7 +1352,14 @@ class Calculator(object):
     def numCrossingsForTIMD(self, timd, dataDict):
         valuesDict = {}
         for defense in self.defensesFacedInTIMD(timd):
-            valuesDict[defense] = len(dataDict[defense]) if defense in dataDict and dataDict[defense] else 0
+            valuesDict[defense] = len(dataDict[defense]) if defense in dataDict and dataDict[defense] != None else 0
+        return valuesDict
+
+    def valueCrossingsForTIMD(self, timd, dataDict):
+        valuesDict = {}
+        for defense in self.defensesFacedInTIMD(timd):
+            if defense in dataDict and dataDict[defense] != None and dataDict[defense] != []:
+                valuesDict[defense] = np.mean(dataDict[defense])
         return valuesDict
 
     def getAverageNumberDefenseValues(self, team, valueRetrievalFunction):
