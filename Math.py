@@ -378,7 +378,6 @@ class Calculator(object):
         for defense, value in timd.timesSuccessfulCrossedDefensesAuto.items():
             defenseCrossesInAuto += len(value) if value != None else 0
         if defenseCrossesInAuto > 1: defenseCrossesInAuto = 1
-        print 2 * utils.convertFirebaseBoolean(timd.didReachAuto)
         return 10 * int(timd.numHighShotsMadeAuto) + 5 * int(timd.numLowShotsMadeAuto) + 2 * utils.convertFirebaseBoolean(timd.didReachAuto) + 10 * int(defenseCrossesInAuto)
 
     def numRPsForTeam(self, team):
