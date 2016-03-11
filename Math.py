@@ -55,8 +55,8 @@ class FirstTIMDThread(multiprocessing.Process):
             c.highShotsAttemptedTele = self.timd.numHighShotsMadeTele + self.timd.numHighShotsMissedTele
             c.lowShotsAttemptedTele = self.timd.numLowShotsMadeTele + self.timd.numLowShotsMissedTele
             c.numBallsIntakedOffMidlineAuto = float(0.0)
-
             self.calculatedTIMDsList.append(self.timd)
+            return 
             
 
 class SecondTIMDThread(multiprocessing.Process):
@@ -137,8 +137,6 @@ class Calculator(object):
                                   'e': ['lb']
                                   }
 
-        self.matches = self.comp.matches
-        self.TIMDs = self.comp.TIMDs
         self.cachedTeamDatas = {}
         self.averageTeam = DataModel.Team()
         self.averageTeam.number = -1
@@ -165,7 +163,7 @@ class Calculator(object):
         return filter(lambda t: self.teamCalculatedDataHasValues(t.calculatedData), self.comp.teams)
 
     def getMatchesForTeam(self, team):
-        return [match for match in self.matches if self.teamInMatch(team, match)]
+        return [match for match in self.comp.matches if self.teamInMatch(team, match)]
 
     def getCompletedMatchesForTeam(self, team):
         return filter(self.matchIsCompleted, self.getMatchesForTeam(team))
@@ -199,7 +197,7 @@ class Calculator(object):
 
     # Match utility functions
     def getMatchForNumber(self, matchNumber):
-        return [match for match in self.matches if match.number == matchNumber][0]
+        return [match for match in self.comp.matches if match.number == matchNumber][0]
 
     def teamsInMatch(self, match):
         teamNumbersInMatch = []
@@ -217,7 +215,7 @@ class Calculator(object):
         return len(self.getCompletedTIMDsForMatchNumber(match.number)) == 6 and self.matchHasValuesSet(match)
 
     def getAllTIMDsForMatch(self, match):
-        return [timd for timd in self.TIMDs if timd.matchNumber == match.number]
+        return [timd for timd in self.comp.TIMDs if timd.matchNumber == match.number]
 
     def matchHasAllTeams(self, match):
         return len(self.getAllTIMDsForMatch(match)) == 6
@@ -225,8 +223,8 @@ class Calculator(object):
     # TIMD utility functions
     def getTIMDsForTeamNumber(self, teamNumber):
         if teamNumber == -1:
-            return self.TIMDs
-        return [timd for timd in self.TIMDs if timd.teamNumber == teamNumber]
+            return self.comp.TIMDs
+        return [timd for timd in self.comp.TIMDs if timd.teamNumber == teamNumber]
 
     def getCompletedTIMDsForTeamNumber(self, teamNumber):
         return filter(self.timdIsCompleted, self.getTIMDsForTeamNumber(teamNumber))
@@ -236,7 +234,7 @@ class Calculator(object):
         return cachedData.completedTIMDs
 
     def getTIMDsForMatchNumber(self, matchNumber):
-        return [timd for timd in self.TIMDs if timd.matchNumber == matchNumber]
+        return [timd for timd in self.comp.TIMDs if timd.matchNumber == matchNumber]
 
     def getCompletedTIMDsForMatchNumber(self, matchNumber):
         return filter(self.timdIsCompleted, self.getTIMDsForMatchNumber(matchNumber))
@@ -245,7 +243,7 @@ class Calculator(object):
         return [timd for timd in self.getTIMDsForTeamNumber(teamNumber) if timd.matchNumber == matchNumber][0]
 
     def getCompletedTIMDsInCompetition(self):
-        return [timd for timd in self.TIMDs if self.timdIsCompleted(timd)]
+        return [timd for timd in self.comp.TIMDs if self.timdIsCompleted(timd)]
 
     def teamCalculatedDataHasValues(self, calculatedData):
         return calculatedData.siegeAbility != None
@@ -876,12 +874,12 @@ class Calculator(object):
 
     # Competition wide Metrics
     def avgCompScore(self):
-        a = [(match.redScore + match.blueScore) for match in self.matches if
+        a = [(match.redScore + match.blueScore) for match in self.comp.matches if
              (match.blueScore != None and match.redScore != None)]
-        return sum(a) / len(self.matches)
+        return sum(a) / len(self.comp.matches)
 
     def numPlayedMatchesInCompetition(self):
-        return len([match for match in self.matches if self.matchIsPlayed(match)])
+        return len([match for match in self.comp.matches if self.matchIsPlayed(match)])
 
     def getRankingForTeamByRetrievalFunctions(self, team, retrievalFunctions):
         if team in self.teamsWithCalculatedData():
@@ -1041,7 +1039,7 @@ class Calculator(object):
         return filter(lambda t: self.defenseFacedForTIMD(t, defenseKey), self.getCompletedTIMDsInCompetition())
 
     def getAverageAcrossCompetitionTeamSawDefense(self, team, defenseKey, retrievalFunction):
-        return np.mean(map(retrievalFunction, self.timdsWithDefense(defenseKey)))
+        return np.mean(map(retrievalFunction, self.comp.TIMDsWithDefense(defenseKey)))
 
     def getAvgOfDefensesForRetrievalFunctionForTeam(self, team, teamRetrievalFunction):
         defenseRetrievalFunctions = self.getDefenseRetrievalFunctions(teamRetrievalFunction)
@@ -1332,7 +1330,7 @@ class Calculator(object):
         for defense in self.defenseList:
             values = []
             # if team.number == 6004:
-                # print [defense + ': ' + str(timd.matchNumber) for timd in self.timdsWhereTeamFacedDefense(team, defense)]
+                # print [defense + ': ' + str(timd.matchNumber) for timd in self.comp.TIMDsWhereTeamFacedDefense(team, defense)]
             for timd in self.timdsWhereTeamFacedDefense(team, defense):
                 valueDict = valueRetrievalFunction(timd)
                 if defense in valueDict:
@@ -1346,7 +1344,7 @@ class Calculator(object):
         for defense in self.defenseList:
             values = []
             # if team.number == 6004:
-                # print [defense + ': ' + str(timd.matchNumber) for timd in self.timdsWhereTeamFacedDefense(team, defense)]
+                # print [defense + ': ' + str(timd.matchNumber) for timd in self.comp.TIMDsWhereTeamFacedDefense(team, defense)]
             for timd in self.timdsWhereTeamFacedDefense(team, defense):
                 valueDict = valueRetrievalFunction(timd)
                 if defense in valueDict:
@@ -1487,8 +1485,8 @@ class Calculator(object):
 
 
     def restoreComp(self):
-        self.TIMDs = self.comp.TIMDs
-        self.matches = self.comp.matches
+        self.comp.TIMDs = self.comp.TIMDs
+        self.comp.matches = self.comp.matches
 
     def doFirstTeamCalculations(self):
         map(self.doFirstCalculationsForTeam, self.comp.teams)
@@ -1499,7 +1497,7 @@ class Calculator(object):
         self.getSecondCalculationsForAverageTeam()
 
     def doMatchesCalculations(self):
-        for match in self.matches:
+        for match in self.comp.matches:
             self.doFirstCalculationsForMatch(match)
     
     def writeCalculationDiagnostic(self, time):
@@ -1521,19 +1519,16 @@ class Calculator(object):
             	thread = FirstTIMDThread(timd, calculatedTIMDs, self)
                 threads.append(thread)
                 thread.start()
-                numTIMDsCalculating += 1 
-                print numTIMDsCalculating
             map(lambda t: t.join(), threads)
             # print len(calculatedTIMDs)
             # print type(calculatedTIMDs)
             self.comp.TIMDs = [timd for timd in calculatedTIMDs]
-            self.TIMDs = self.comp.TIMDs
-            threads2 = []
-            for timd in self.comp.TIMDs:
-                thread = SecondTIMDThread(timd, self)
-                threads2.append(thread)
-                thread.start()
-            map(lambda t: t.join(), threads2)
+            # threads2 = []
+            # for timd in self.comp.TIMDs:
+            #     thread = SecondTIMDThread(timd, self)
+            #     threads2.append(thread)
+            #     thread.start()
+            # map(lambda t: t.join(), threads2)
             # while True in map(lambda t: t.isAlive(),)
             # threads2 = []
             # for timd in self.comp.TIMDs:
