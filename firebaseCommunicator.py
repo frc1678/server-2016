@@ -61,7 +61,7 @@ class FirebaseCommunicator(object):
 
 	def addCalculatedMatchDataToFirebase(self, match):
 		calculatedMatchDataDict = utils.makeDictFromCalculatedMatchData(match.calculatedData)
-		# pdb.set_trace()
+		pdb.set_trace()
 		FBLocation = "/Matches/" + str(match.number)
 		result = firebase.put(FBLocation, 'calculatedData', calculatedMatchDataDict)
 
