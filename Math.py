@@ -1529,6 +1529,7 @@ class Calculator(object):
             #     threads2.append(thread)
             #     thread.start()
             # map(lambda t: t.join(), threads2)
+
             # while True in map(lambda t: t.isAlive(),)
             # threads2 = []
             # for timd in self.comp.TIMDs:
