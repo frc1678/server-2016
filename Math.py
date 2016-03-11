@@ -136,7 +136,7 @@ class Calculator(object):
         # self.comp.matches = filter(lambda m: m.number <= 12, self.comp.matches)
         self.categories = ['a', 'b', 'c', 'd', 'e']
         self.ourTeamNum = 4767
-        self.monteCarloIterations = 50
+        self.monteCarloIterations = 100
         self.defenseList = ['pc', 'cdf', 'mt', 'rt', 'rw', 'lb', 'rp', 'sp', 'db']
         self.defenseDictionary = {'a': ['pc', 'cdf'],
                                   'b': ['mt', 'rp'],
