@@ -977,9 +977,9 @@ class Calculator(object):
         return self.getPredictedResultOfRetrievalFunctionForAlliance(self.getAllianceForTeamInMatch(team, match), retrievalFunction)
 
     def getPredictedResultOfRetrievalFunctionForTeam(self, team, retrievalFunction):
-        print team.number
-        print self.getMatchesForTeam(team)
-        print map(retrievalFunction, self.getMatchesForTeam(team))
+        # print team.number
+        # print self.getMatchesForTeam(team)
+        # print map(retrievalFunction, self.getMatchesForTeam(team))
         return np.mean(map(retrievalFunction, self.getMatchesForTeam(team)))
 
     def getDefenseLength(self, dict, defenseKey):
