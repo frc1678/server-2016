@@ -886,7 +886,7 @@ class Calculator(object):
             return self.teamsSortedByRetrievalFunctions(retrievalFunctions).index(team)
 
     def getSeedingFunctions(self):
-        return [lambda t: t.calculatedData.numRPs, self.cumulativeSumAutoPointsForTeam,
+        return [lambda t: t.calculatedData.actualNumRPs, self.cumulativeSumAutoPointsForTeam,
                 self.cumulativeSumSiegePointsForTeam]
 
     def numDefensesCrossedForTimeDict(self, timdDict):
@@ -1193,7 +1193,7 @@ class Calculator(object):
         a.avgSuccessfulTimesCrossedDefenses = utils.dictSum(a.avgSuccessfulTimesCrossedDefensesAuto,
                                                             a.avgSuccessfulTimesCrossedDefensesTele)
         a.firstPickAbility = self.firstPickAbility(self.averageTeam)
-        a.numRPs = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numRPs)
+        # a. = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numRPs)
         a.predictedNumRPs = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.predictedNumRPs)
 
 
