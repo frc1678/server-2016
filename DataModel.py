@@ -518,7 +518,7 @@ class CalculatedTeamInMatchData(object):
 			'rw' : None,
 			'lb' : None
 		}
-		self.crossingTimeForDefensePercentageAuto = {
+		self.crossingTimeForDefenseAuto = {
 			'pc' : None,
 			'cdf' : None,
 			'mt' : None,
@@ -529,7 +529,7 @@ class CalculatedTeamInMatchData(object):
 			'rw' : None,
 			'lb' : None
 		}
-		self.crossingTimeForDefensePercentageTele = {
+		self.crossingTimeForDefenseTele = {
 			'pc' : None,
 			'cdf' : None,
 			'mt' : None,
