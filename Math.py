@@ -14,6 +14,8 @@ import time
 
 import multiprocessing
 import copy
+import warnings
+
 
 class FirstTIMDThread(multiprocessing.Process):
     def __init__(self, timd, calculatedTIMDsList, calculator):
@@ -21,6 +23,8 @@ class FirstTIMDThread(multiprocessing.Process):
         self.timd = timd
         self.calculatedTIMDsList = calculatedTIMDsList
         self.calculator = calculator
+        warnings.simplefilter('error', RuntimeWarning)
+
     def run(self):
         if (not self.calculator.timdIsCompleted(self.timd)):
             print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
@@ -58,6 +62,8 @@ class SecondTIMDThread(multiprocessing.Process):
         super(SecondTIMDThread, self).__init__()
         self.timd = timd
         self.calculator = calculator
+        warnings.simplefilter('error', RuntimeWarning)
+
     def run(self):
         if (not self.calculator.timdIsCompleted(self.timd)):
             print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
@@ -73,6 +79,7 @@ class SecondTIMDThread(multiprocessing.Process):
             self.calculator.cacheFirstTeamData()
             print  "1"
             self.calculator.doFirstTeamCalculations()
+            self.calculator.TIMDs = self.calculator.comp.TIMDs
             # print [t.calculatedData.avgSuccessfulTimesCrossedDefensesTele for t in self.calculator.comp.teams]
             print  "2"
             self.calculator.cacheSecondTeamData()
@@ -81,7 +88,6 @@ class SecondTIMDThread(multiprocessing.Process):
             self.calculator.doBetweenFirstAndSecondCalculationsForTeams()
             print  "4"
             self.calculator.doMatchesCalculations()
-            print [str(m.calculatedData.predictedRedScore) + ' vs. ' + str(m.calculatedData.predictedBlueScore) for m in self.calculator.matches]
             print  "5"
             self.calculator.calculateCitrusDPRs()
             print  "6"
@@ -113,6 +119,8 @@ class Calculator(object):
 
     def __init__(self, competition):
         super(Calculator, self).__init__()
+        warnings.simplefilter('error', RuntimeWarning)
+
         self.comp = competition
         # self.comp.TIMDs = filter(lambda timd: timd.matchNumber <= 12, self.comp.TIMDs)
         # self.comp.matches = filter(lambda m: m.number <= 12, self.comp.matches)
@@ -798,6 +806,8 @@ class Calculator(object):
         return self.getActualNumRPsForTeamForMatch(team, match) if self.matchIsCompleted(match) else self.getPredictedNumRPsForTeamForMatch(team, match)
 
     def predictedNumberOfRPs(self, team):
+        # print [m.calculatedData.predictedRedScore for m in self.getMatchesForTeam(team)]
+        # print [self.getUpdatedNumRPsForTeamForMatch(team, m) for m in self.getMatchesForTeam(team)]
         return sum([self.getUpdatedNumRPsForTeamForMatch(team, m) for m in self.getMatchesForTeam(team)])
 
     def getActualNumRPsForTeamForMatch(self, team, match):
@@ -1013,7 +1023,7 @@ class Calculator(object):
                     (lambda t: t.calculatedData.avgDrivingAbility, self.cachedComp.drivingAbilityZScores)]
 
     def cacheSecondTeamData(self):
-        print "Caching"
+        # print "Caching"
         # for func, dictionary in self.rScoreParams():
         #     self.rValuesForAverageFunctionForDict(func, dictionary)
         map(lambda (func, dictionary): self.rValuesForAverageFunctionForDict(func, dictionary), self.rScoreParams())
@@ -1122,7 +1132,7 @@ class Calculator(object):
         if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
             # print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
         # else:
-            print("Beginning first calculations for team: " + str(team.number) + ", " + str(team.name))
+            # print("Beginning first calculations for team: " + str(team.number) + ", " + str(team.name))
             # Super Scout Averages
             # print map(utils.makeDictFromMatch, self.getCompletedTIMDsForTeam(team))
             if not self.teamCalculatedDataHasValues(team.calculatedData):
@@ -1409,8 +1419,9 @@ class Calculator(object):
         self.getSecondCalculationsForAverageTeam()
 
     def doMatchesCalculations(self):
-        for match in self.comp.matches:
+        for match in self.matches:
             self.doFirstCalculationsForMatch(match)
+    
     def writeCalculationDiagnostic(self, time):
         with open('./diagnostics.txt', 'a') as file:
             file.write('Time: ' + str(time) + '    TIMDs: ' + str(len(self.getCompletedTIMDsInCompetition())) + '\n')
