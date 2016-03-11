@@ -61,8 +61,8 @@ class FirstTIMDThread(multiprocessing.Process):
             c.numTimesFailedCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesTele)
             c.crossingsForDefensePercentageAuto = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesAuto, utils.dictSum(c.numTimesSuccesfulCrossedDefensesAuto, c.numTimesFailedCrossedDefensesAuto))
             c.crossingsForDefensePercentageTele = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesTele, utils.dictSum(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele))
-            c.crossingTimeForDefensePercentageAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
-            c.crossingTimeForDefensePercentageTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
+            c.crossingTimeForDefenseAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
+            c.crossingTimeForDefenseTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
             self.calculatedTIMDsList.append(self.timd)
             return 
             
