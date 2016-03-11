@@ -1486,7 +1486,7 @@ class Calculator(object):
             manager = multiprocessing.Manager()
             calculatedTIMDs = manager.list()
             for timd in self.comp.TIMDs:
-            	thread = FirstTIMDThread(timd, calculatedTIMDs, copy.deepcopy(self))
+            	thread = FirstTIMDThread(timd, calculatedTIMDs, self)
                 threads.append(thread)
                 thread.start()
             map(lambda t: t.join(), threads)
@@ -1496,7 +1496,7 @@ class Calculator(object):
             self.TIMDs = self.comp.TIMDs
             threads2 = []
             for timd in self.comp.TIMDs:
-                thread = SecondTIMDThread(timd, copy.deepcopy(self))
+                thread = SecondTIMDThread(timd, self)
                 threads2.append(thread)
                 thread.start()
             map(lambda t: t.join(), threads2)
