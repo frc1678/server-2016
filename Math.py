@@ -806,9 +806,9 @@ class Calculator(object):
 
     gamma = 0.5
     def secondPickAbilityForTeamWithTeam(self, team1, team2):
-        if team1.calculatedData.citrusDPR != None:
-            return self.gamma * team1.calculatedData.citrusDPR + (1 - self.gamma) * self.predictedScoreForAlliance([self.getOurTeam(), team2, team1])
-        else:
+        #if team1.calculatedData.citrusDPR != None:
+         #   return self.gamma * team1.calculatedData.citrusDPR + (1 - self.gamma) * self.predictedScoreForAlliance([self.getOurTeam(), team2, team1])
+        #else:
             return self.predictedScoreForAlliance([self.getOurTeam(), team2, team1])
 
     def secondPickAbility(self, team):
