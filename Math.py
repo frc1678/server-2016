@@ -461,7 +461,6 @@ class Calculator(object):
         return filter(lambda timd: self.defenseFacedForTIMD(timd, defenseKey), self.getCompletedTIMDsForTeam(team))
 
     def numTimesTeamFacedDefense(self, team, defenseKey):
-        print len(self.timdsWhereTeamFacedDefense(team, defenseKey))
         return len(self.timdsWhereTeamFacedDefense(team, defenseKey))
 
     def getTeamFacedDefense(self, team, defenseKey):
