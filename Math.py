@@ -135,7 +135,7 @@ class Calculator(object):
         # self.comp.TIMDs = filter(lambda timd: timd.matchNumber <= 12, self.comp.TIMDs)
         # self.comp.matches = filter(lambda m: m.number <= 12, self.comp.matches)
         self.categories = ['a', 'b', 'c', 'd', 'e']
-        self.ourTeamNum = 4767
+        self.ourTeamNum = 1678
         self.monteCarloIterations = 100
         self.defenseList = ['pc', 'cdf', 'mt', 'rt', 'rw', 'lb', 'rp', 'sp', 'db']
         self.defenseDictionary = {'a': ['pc', 'cdf'],
@@ -461,6 +461,7 @@ class Calculator(object):
         return filter(lambda timd: self.defenseFacedForTIMD(timd, defenseKey), self.getCompletedTIMDsForTeam(team))
 
     def numTimesTeamFacedDefense(self, team, defenseKey):
+        print len(self.timdsWhereTeamFacedDefense(team, defenseKey))
         return len(self.timdsWhereTeamFacedDefense(team, defenseKey))
 
     def getTeamFacedDefense(self, team, defenseKey):
@@ -492,13 +493,13 @@ class Calculator(object):
         return defenseAlpha / sumDefenseAlphas if sumDefenseAlphas > 0 else None
 
     def predictedCrosses(self, team, defenseKey):
+        competitionDefenseSightings = self.numTimesCompetitionFacedDefense(defenseKey)
+        if competitionDefenseSightings == 0:
+            return None
         defenseRetrievalFunction = lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele[defenseKey]
         averageOfDefenseCrossingsAcrossCompetition = np.mean(
             [defenseRetrievalFunction(t) for t in self.teamsWhoHaveFacedDefense(defenseKey)])
         teamAverageDefenseCrossings = defenseRetrievalFunction(team) if defenseRetrievalFunction(team) != None else 0
-        competitionDefenseSightings = self.numTimesCompetitionFacedDefense(defenseKey)
-        if competitionDefenseSightings == 0:
-            return None
         teamDefenseSightings = self.numTimesTeamFacedDefense(team, defenseKey)
         competitionTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsInCompetition())
         teamTotalNumberOfDefenseSightings = 5 * len(self.getCompletedTIMDsForTeam(team))
@@ -546,6 +547,8 @@ class Calculator(object):
         return team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[defenseKey]
 
     def getPredictedCrossingsForAllianceForDefense(self, alliance, defenseKey):
+        if self.numTimesCompetitionFacedDefense(defenseKey) <= 0:
+            return None
         predictedCrossingsRetrievalFunction = lambda t: self.predictedCrossingsForDefense(t, defenseKey)
         return sum(map(predictedCrossingsRetrievalFunction, alliance))
 
@@ -557,6 +560,9 @@ class Calculator(object):
         return 5 * min(self.getPredictedCrossingsForAllianceForCategory(alliance, category), 2)
 
     def predictedTeleDefensePointsForAllianceForDefense(self, alliance, defenseKey):
+        predCrosses = self.getPredictedCrossingsForAllianceForDefense(alliance, defenseKey)
+        if predCrosses == None:
+            return None
         return 5 * min(self.getPredictedCrossingsForAllianceForDefense(alliance, defenseKey), 2)
 
     def predictedScoreForAllianceWithNumbers(self, allianceNumbers):
@@ -616,7 +622,7 @@ class Calculator(object):
             [t.calculatedData.autoAbility for t in alliance if t.calculatedData.autoAbility])
         # print "Auto"
         alliancePredictedCrossingsRetrievalFunction = lambda dKey: self.predictedTeleDefensePointsForAllianceForDefense(
-            alliance, dKey)
+            alliance, dKey) if self.numTimesCompetitionFacedDefense(dKey) > 0 else None
         allianceDefensePointsTele = sum(map(alliancePredictedCrossingsRetrievalFunction, defenses))
         # print "Predicted Crossings"
         total = allianceTeleopShotPoints + allianceSiegePoints + allianceAutoPoints + allianceDefensePointsTele
@@ -631,10 +637,11 @@ class Calculator(object):
             return [self.defenseDictionary[categories[0]]]
         combos = []
         for defense in self.defenseDictionary[categories[0]]:
-            for combo in self.getDefenseCombinations(categories[1:]):
-                newCombo = [defense]
-                newCombo.extend(combo)
-                combos.append(newCombo)
+            if self.numTimesCompetitionFacedDefense(defense) > 0:
+                for combo in self.getDefenseCombinations(categories[1:]):
+                    newCombo = [defense]
+                    newCombo.extend(combo)
+                    combos.append(newCombo)
 
         return combos
 
@@ -745,7 +752,7 @@ class Calculator(object):
         return breachRPs + captureRPs + scoreRPs
 
     def welchsTest(self, mean1, mean2, std1, std2, sampleSize1, sampleSize2):
-        if std1 == 0.0 or std2 == 0.0:
+        if std1 == 0.0 or std2 == 0.0 or sampleSize1 <= 0 or sampleSize2 <= 0:
             return float(mean1 > mean2)
         numerator = mean1 - mean2
         denominator = ((std1 ** 2) / sampleSize1 + (std2 ** 2) / sampleSize2) ** 0.5
