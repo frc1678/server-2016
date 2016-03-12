@@ -24,23 +24,11 @@ class Competition(object):
 
 	def updateTIMDsFromFirebase(self):
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
-
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
 		self.secondPickAbility = {
-		}
-		self.avgSuccessfulTimesCrossedDefenses = {
-			'pc' : None,
-			'cdf' : None,
-			'mt' : None,
-			'rp' : None,
-			'sp' : None,
-			'db' : None,
-			'rt' : None,
-			'rw' : None,
-			'lb' : None
 		}
 		self.firstPickAbility = None
 		self.overallSecondPickAbility = None
