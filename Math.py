@@ -700,7 +700,8 @@ class Calculator(object):
         return match.calculatedData.redCaptureChance if allianceIsRed else match.calculatedData.blueCaptureChance
 
     def getWinChanceForMatchForAllianceIsRed(self, match, allianceIsRed):
-        return match.calculatedData.redWinChance if allianceIsRed else match.calculatedData.blueWinChance
+        winChance = match.calculatedData.redWinChance if allianceIsRed else match.calculatedData.blueWinChance
+        return winChance if not math.isnan(winChance) else None
 
     def shotsForTeam(self, team):
         t = team.calculatedData
@@ -749,8 +750,10 @@ class Calculator(object):
         breachRPs = self.getBreachChanceForMatchForAllianceIsRed(match, allianceIsRed)
         captureRPs = self.getCaptureChanceForMatchForAllianceIsRed(match, allianceIsRed)
 
+
         scoreRPs = 2 * self.getWinChanceForMatchForAllianceIsRed(match, allianceIsRed)
-        return breachRPs + captureRPs + scoreRPs
+        RPs = breachRPs + captureRPs + scoreRPs
+        return RPs if not math.isnan(RPs) else None
 
     def welchsTest(self, mean1, mean2, std1, std2, sampleSize1, sampleSize2):
         if std1 == 0.0 or std2 == 0.0 or sampleSize1 <= 0 or sampleSize2 <= 0:
@@ -1602,6 +1605,8 @@ class Calculator(object):
             self.doSecondTeamCalculations()
             endTime = time.time()
             self.writeCalculationDiagnostic(endTime - startTime)
+            
+            
             for team in self.comp.teams:
                 # if team in self.teamsWithMatchesCompleted():
                 print "Writing team " + str(team.number) + " to Firebase..."
@@ -1612,8 +1617,10 @@ class Calculator(object):
                 FBC.addCalculatedTIMDataToFirebase(timd)
             for match in self.comp.matches:
                 # if self.matchIsCompleted(match):
-                print "Writing match " + str(match.number) + " to Firebase..."
-                FBC.addCalculatedMatchDataToFirebase(match)
+                if match.calculatedData != None and match.calculatedData != DataModel.CalculatedMatchData():
+                    print "Writing match " + str(match.number) + " to Firebase..."
+                    FBC.addCalculatedMatchDataToFirebase(match)
+            
             # Competition metrics
             if self.numPlayedMatchesInCompetition() > 0:
                 self.comp.averageScore = self.avgCompScore()
