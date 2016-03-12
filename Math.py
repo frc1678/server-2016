@@ -316,6 +316,8 @@ class Calculator(object):
 
     def getStandardDeviationForDataFunctionForTeam(self, team, dataFunction):
         validTIMDs = filter(lambda timd: dataFunction(timd) != None, self.getCompletedTIMDsForTeam(team))
+        if len(validTIMDs) == 0:
+            return None
         return np.std(map(dataFunction, validTIMDs))
 
     def getAccuracyForTIMDForMadeFunctionForMissedFunction(self, timd, madeFunction, missedFunction):
@@ -540,7 +542,7 @@ class Calculator(object):
         return self.drivingAbilityForTIMD(self.getTIMDForTeamNumberAndMatchNumber(team, match))
 
     def predictedCrossingsForDefenseCategory(self, team, category):
-        return np.mean([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey)]) # TODO: Update with actual correct key
+        return np.mean([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None]) # TODO: Update with actual correct key
 
     def predictedCrossingsForDefense(self, team, defenseKey):
         return team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[defenseKey]
