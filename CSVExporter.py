@@ -9,9 +9,11 @@ def TSVExport(comp):
 			cd = team.calculatedData.__dict__
 			if firstTeam:
 				firstTeam = False
+				s += "number" + "	"
 				for key in cd.keys():
 					s += key + "	"
 				s += "\n"
+			s += str(team.number) + "	"
 			for value in cd.values():
 				s += str(value) + "	"
 			s += "\n"

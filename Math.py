@@ -1151,7 +1151,6 @@ class Calculator(object):
         a.avgDefense = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgDefense)  # Checked
         a.avgBallControl = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgBallControl)  # Checked
         a.avgDrivingAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgDrivingAbility)
-
         a.disabledPercentage = self.getAverageOfDataFunctionAcrossCompetition( 
             lambda t: t.calculatedData.disabledPercentage)
         a.incapacitatedPercentage = self.getAverageOfDataFunctionAcrossCompetition( 
@@ -1180,13 +1179,11 @@ class Calculator(object):
         a.sdSuccessfulDefenseCrossesAuto = self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesAuto, utils.rms)
         # self.defenseValuesForAverageTeam(lamdba t: t.calculatedData.sdFailedDefenseCrossesAuto, utils.rms)
         a.sdSuccessfulDefenseCrossesTele = self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, utils.rms)
-
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, lambda x: np.mean(x))
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesAuto, lambda x: np.mean(x))
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgTimeForDefenseCrossAuto, lambda x: np.mean(x))
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesAuto, lambda x: utils.rms(x))
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x))
-
         #Tele
         a.scalePercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.scalePercentage)
         a.challengePercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.challengePercentage)
@@ -1204,6 +1201,7 @@ class Calculator(object):
             t: t.calculatedData.sdHighShotsTele)  # Checked
         a.sdLowShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda
             t: t.calculatedData.sdLowShotsTele)  # Checked
+        
         a.sdGroundIntakes = self.getAverageOfDataFunctionAcrossCompetition(lambda
             t: t.calculatedData.sdGroundIntakes)  # Checked
         a.sdShotsBlocked = self.getAverageOfDataFunctionAcrossCompetition(lambda
@@ -1216,9 +1214,10 @@ class Calculator(object):
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgTimeForDefenseCrossTele, lambda x: np.mean(x))
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, lambda x: utils.rms(x))
         # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x))
-
         a.numScaleAndChallengePoints = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
+        
         a.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
+        #here
 
     def getSecondCalculationsForAverageTeam(self):
         a = self.averageTeam.calculatedData
@@ -1510,26 +1509,29 @@ class Calculator(object):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
         return self.getOptimalDefensesForAlliance(alliance)
 
-    def doFirstCalculationsForMatch(self, match):
+    def doFirstCalculationsForMatch(self, match): #This entire thing being looped is what takes a while
         # print "Performing calculations for match Q" + str(match.number)
         if self.matchIsCompleted(match):
             match.calculatedData.actualBlueRPs = self.RPsGainedFromMatchForAlliance(True, match)
+            #print "a"
             match.calculatedData.actualRedRPs = self.RPsGainedFromMatchForAlliance(False, match)
+            #print "b"
             match.calculatedData.numDefensesCrossedByBlue = self.numDefensesCrossedInMatch(False, match)
+            #print "c"
             match.calculatedData.numDefensesCrossedByRed = self.numDefensesCrossedInMatch(True, match)
-        # print "Breach Chance"
+        #print "Breach Chance"
         match.calculatedData.blueBreachChance = self.breachChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.redBreachChance = self.breachChanceForAllianceNumbers(match.redAllianceTeamNumbers)
-        # print "Capture Chance"
+        #print "Capture Chance"
         match.calculatedData.blueCaptureChance = self.captureChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.redCaptureChance = self.captureChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
-        # print "Predicted Score"
+        #print "Predicted Score"
         match.calculatedData.predictedBlueScore = self.predictedScoreForAllianceWithNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.predictedRedScore = self.predictedScoreForAllianceWithNumbers(match.redAllianceTeamNumbers)
-        # print "SD Predicted Score"
+        #print "SD Predicted Score"
         match.calculatedData.sdPredictedBlueScore = self.stdDevPredictedScoreForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.sdPredictedRedScore = self.stdDevPredictedScoreForAllianceNumbers(match.redAllianceTeamNumbers)
-        # print "Predicted RPs"
+        #print "Predicted RPs"
         match.calculatedData.blueWinChance = self.winChanceForMatchForAllianceIsRed(match, False)
         match.calculatedData.redWinChance = self.winChanceForMatchForAllianceIsRed(match, True)
 
@@ -1539,7 +1541,7 @@ class Calculator(object):
         match.calculatedData.optimalBlueDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(False, match)
         match.calculatedData.optimalRedDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(True, match)
 
-        # print "Done!"
+        print "Done! Match " + str(match.number)
 
 
     def restoreComp(self):
@@ -1600,12 +1602,21 @@ class Calculator(object):
             self.doFirstTeamCalculations()
             self.cacheSecondTeamData()
             self.doBetweenFirstAndSecondCalculationsForTeams()
-            self.doMatchesCalculations()
+            print "a"
+            self.doMatchesCalculations() #here
+            print "b"
+
             self.calculateCitrusDPRs()
+            print "c"
+
             self.doSecondTeamCalculations()
+            print "d"
+
             endTime = time.time()
+            print "e"
+
             self.writeCalculationDiagnostic(endTime - startTime)
-            
+
             
             for team in self.comp.teams:
                 # if team in self.teamsWithMatchesCompleted():
