@@ -1467,7 +1467,8 @@ class Calculator(object):
             #print("#")
 
             t = team.calculatedData
-            t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
+           # print sum(filter(t.averagen))
+	    t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]
             t.RScoreEvasion = self.cachedComp.evasionZScores[team.number]
             t.RScoreDefense = self.cachedComp.defenseZScores[team.number]
@@ -1563,7 +1564,24 @@ class Calculator(object):
             file.write('Time: ' + str(time) + '    TIMDs: ' + str(len(self.getCompletedTIMDsInCompetition())) + '\n')
             file.close()
 
+    def replaceFunction(self, t, v):
+	if not t.didGetIncapacitated:
+	    if not t.didGetDisabled:
+		if v == 0 or v == 0.0:
+		    return 2
+	return v
 
+    def replaceSuperValues(self, timd):
+	#replaceFunction = lambda t, v: 2 if ((not t.didGetIncapacitated) and (not t.didGetDisabled) and (v == 0)) else 0
+	
+	print(self.replaceFunction(timd, timd.rankTorque))
+	timd.rankTorque = self.replaceFunction(timd, timd.rankTorque)
+	timd.rankDefense = self.replaceFunction(timd, timd.rankDefense)
+	timd.rankBallControl = self.replaceFunction(timd, timd.rankBallControl)
+	timd.rankEvasion = self.replaceFunction(timd, timd.rankEvasion)
+	timd.rankSpeed = self.replaceFunction(timd, timd.rankSpeed)
+	return timd
+	
 
     def doCalculations(self, FBC):
         isData = len(self.getCompletedTIMDsInCompetition()) > 0
@@ -1573,7 +1591,9 @@ class Calculator(object):
             manager = multiprocessing.Manager()
             calculatedTIMDs = manager.list()
             numTIMDsCalculating = 0
-            for timd in self.comp.TIMDs:
+            #for timd in self.comp.TIMDs:
+		#timd = self.replaceSuperValues(timd)
+	    for timd in self.comp.TIMDs:
             	thread = FirstTIMDThread(timd, calculatedTIMDs, self)
                 threads.append(thread)
                 thread.start()
