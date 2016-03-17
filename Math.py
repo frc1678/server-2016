@@ -50,7 +50,7 @@ class FirstTIMDThread(multiprocessing.Process):
             c.drivingAbility = self.calculator.drivingAbilityForTIMD(self.timd)
             c.siegeConsistency = utils.convertFirebaseBoolean(self.timd.didChallengeTele) + utils.convertFirebaseBoolean(self.timd.didScaleTele)
             c.numRPs = self.calculator.RPsGainedFromMatchForTeam(match, team)
-            c.numAutoPoints = self.calculator.numAutoPointsForTIMD(self.timd)
+            c.numAutoPoints = self.calculator.autoAbility(self.timd)
             c.numScaleAndChallengePoints = c.siegeAbility  # they are the same
             c.highShotsAttemptedTele = self.timd.numHighShotsMadeTele + self.timd.numHighShotsMissedTele
             c.lowShotsAttemptedTele = self.timd.numLowShotsMadeTele + self.timd.numLowShotsMissedTele
@@ -64,7 +64,7 @@ class FirstTIMDThread(multiprocessing.Process):
             c.crossingTimeForDefenseAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
             c.crossingTimeForDefenseTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
             self.calculatedTIMDsList.append(self.timd)
-            return 
+            
             
 
 class SecondTIMDThread(multiprocessing.Process):
@@ -382,13 +382,6 @@ class Calculator(object):
 
     def siegeConsistency(self, team):
         return team.calculatedData.scalePercentage + team.calculatedData.challengePercentage if team.calculatedData.scalePercentage != None and team.calculatedData.challengePercentage != None else None
-
-    def numAutoPointsForTIMD(self, timd):
-        defenseCrossesInAuto = 0
-        for defense, value in timd.timesSuccessfulCrossedDefensesAuto.items():
-            defenseCrossesInAuto += len(value) if value != None else 0
-        if defenseCrossesInAuto > 1: defenseCrossesInAuto = 1
-        return 10 * int(timd.numHighShotsMadeAuto) + 5 * int(timd.numLowShotsMadeAuto) + 2 * utils.convertFirebaseBoolean(timd.didReachAuto) + 10 * int(defenseCrossesInAuto)
 
     def numRPsForTeam(self, team):
         return sum(map(lambda m: self.RPsGainedFromMatchForTeam(m, team), self.getCompletedMatchesForTeam(team)))
@@ -837,24 +830,13 @@ class Calculator(object):
         numCrossesForTeamFunction = lambda t: sum(numCrossesDictForTeamFunction(t).values())
         return sum(map(numCrossesForTeamFunction, alliance))
 
-    def getPredictedNumRPsForTeamForMatch(self, team, match):
-        teamIsOnRedAlliance = self.getTeamAllianceIsRedInMatch(team, match)
-        return match.calculatedData.predictedRedRPs if teamIsOnRedAlliance else match.calculatedData.predictedBlueRPs
-
-    def getUpdatedNumRPsForTeamForMatch(self, team, match):
-        return self.getActualNumRPsForTeamForMatch(team, match) if self.matchIsCompleted(match) else self.getPredictedNumRPsForTeamForMatch(team, match)
-
     def predictedNumberOfRPs(self, team):
-        # print [m.calculatedData.predictedRedScore for m in self.getMatchesForTeam(team)]
-        # print [self.getUpdatedNumRPsForTeamForMatch(team, m) for m in self.getMatchesForTeam(team)]
-        return sum([self.getUpdatedNumRPsForTeamForMatch(team, m) for m in self.getMatchesForTeam(team)])
-
-    def getActualNumRPsForTeamForMatch(self, team, match):
-        teamIsOnRedAlliance = self.getTeamAllianceIsRedInMatch(team, match)
-        return match.calculatedData.actualRedRPs if teamIsOnRedAlliance else match.calculatedData.actualBlueRPs
+        predictedRPsFunction = lambda m: self.predictedRPsForAllianceForMatch(self.getTeamAllianceIsRedInMatch(team, m), m)
+        predictedRPs = sum([predictedRPsFunction(m) for m in self.getMatchesForTeam(team) if not self.matchIsCompleted(m) and predictedRPsFunction(m) != None])
+        return predictedRPs + self.actualNumberOfRPs(team)
 
     def actualNumberOfRPs(self, team):
-        return sum([self.getActualNumRPsForTeamForMatch(team, m) for m in self.getCompletedMatchesForTeam(team)])
+        return sum([self.RPsGainedFromMatchForTeam(team, m) for m in self.getCompletedMatchesForTeam(team)])
 
     def getFieldsForAllianceForMatch(self, allianceIsRed, match):
         return (match.redScore, match.redAllianceDidBreach, match.redAllianceDidCapture) if allianceIsRed else (
@@ -875,13 +857,11 @@ class Calculator(object):
         return map(lambda m: self.getTeamScoreInMatch(team, m), self.getCompletedMatchesForTeam(team))
 
     def RPsGainedFromMatchForAlliance(self, allianceIsRed, match):
-        numRPs = 0
         ourFields = self.getFieldsForAllianceForMatch(allianceIsRed, match)
         opposingFields = self.getFieldsForAllianceForMatch(not allianceIsRed, match)
-        numRPs += self.scoreRPsGainedFromMatchWithScores(ourFields[0], opposingFields[0])
-        numRPs += int(utils.convertFirebaseBoolean(ourFields[1]))
-        numRPs += int(utils.convertFirebaseBoolean(ourFields[2]))
-        return numRPs
+        numRPs = self.scoreRPsGainedFromMatchWithScores(ourFields[0], opposingFields[0])
+        return numRPs + int(utils.convertFirebaseBoolean(ourFields[1])) + int(utils.convertFirebaseBoolean(ourFields[2])) 
+        
 
     def getTeamAllianceIsRedInMatch(self, team, match):
         if team.number == -1:
@@ -1271,7 +1251,7 @@ class Calculator(object):
                                                                            self.getTIMDHighShotAccuracyAuto)  # Checked
             t.lowShotAccuracyAuto = self.getAverageForDataFunctionForTeam(team,
                                                                           self.getTIMDLowShotAccuracyAuto)  # Checked
-            t.numAutoPoints = self.getAverageForDataFunctionForTeam(team, self.numAutoPointsForTIMD)  # Checked
+            t.numAutoPoints = self.getAverageForDataFunctionForTeam(team, self.autoAbility)  # Checked
             t.avgMidlineBallsIntakedAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: len(
                 timd.ballsIntakedAuto))
             t.sdMidlineBallsIntakedAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: len(
