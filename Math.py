@@ -49,7 +49,7 @@ class FirstTIMDThread(multiprocessing.Process):
             c.autoAbility = self.calculator.autoAbility(self.timd)
             c.drivingAbility = self.calculator.drivingAbilityForTIMD(self.timd)
             c.siegeConsistency = utils.convertFirebaseBoolean(self.timd.didChallengeTele) + utils.convertFirebaseBoolean(self.timd.didScaleTele)
-            c.numRPs = self.calculator.RPsGainedFromMatchForTeam(match, team)
+            c.numRPs = self.calculator.RPsGainedFromMatchForTeam(team, match)
             c.numAutoPoints = self.calculator.autoAbility(self.timd)
             c.numScaleAndChallengePoints = c.siegeAbility  # they are the same
             c.highShotsAttemptedTele = self.timd.numHighShotsMadeTele + self.timd.numHighShotsMissedTele
@@ -144,7 +144,7 @@ class Calculator(object):
                                   'd': ['rw', 'rt'],
                                   'e': ['lb']
                                   }
-
+        self.defenseCombos = []
         self.cachedTeamDatas = {}
         self.averageTeam = DataModel.Team()
         self.averageTeam.number = -1
@@ -382,9 +382,6 @@ class Calculator(object):
 
     def siegeConsistency(self, team):
         return team.calculatedData.scalePercentage + team.calculatedData.challengePercentage if team.calculatedData.scalePercentage != None and team.calculatedData.challengePercentage != None else None
-
-    def numRPsForTeam(self, team):
-        return sum(map(lambda m: self.RPsGainedFromMatchForTeam(m, team), self.getCompletedMatchesForTeam(team)))
 
     def numScaleAndChallengePointsForTeam(self, team):
         if team.calculatedData.siegeAbility != None:
@@ -816,12 +813,6 @@ class Calculator(object):
         teams = self.teamsSortedByRetrievalFunctions([lambda t: calcData.secondPickAbility[t.number]])[:16]
         return np.mean(map(lambda t: calcData.secondPickAbility[t.number], teams))
 
-    def teamsSortedByRetrievalFunctions(self, retrievalFunctions):
-        teams = self.teamsWithMatchesCompleted()
-        mappableRetrievalFunction = lambda f: teams.sort(key=f)
-        map(mappableRetrievalFunction, retrievalFunctions[::-1])
-        return teams[::-1]       
-
     def numDefensesCrossedInMatch(self, allianceIsRed, match):
         alliance = map(self.getTeamForNumber, match.redAllianceTeamNumbers) if allianceIsRed else map(
             self.getTeamForNumber, match.blueAllianceTeamNumbers)
@@ -888,7 +879,7 @@ class Calculator(object):
     def sampleSizeForMatchForAlliance(self, alliance):
         return self.getAvgNumCompletedTIMDsForAlliance(alliance)
 
-    def RPsGainedFromMatchForTeam(self, match, team):
+    def RPsGainedFromMatchForTeam(self, team, match):
         return self.RPsGainedFromMatchForAlliance(self.getTeamAllianceIsRedInMatch(team, match), match)
 
     # Competition wide Metrics
@@ -963,6 +954,12 @@ class Calculator(object):
 
     def getPredictedSeedingFunctions(self):
         return [lambda t: t.calculatedData.predictedNumRPs, self.cumulativeSumAutoPointsForTeam, self.cumulativeSumSiegePointsForTeam]
+
+    def teamsSortedByRetrievalFunctions(self, retrievalFunctions):
+        teams = self.teamsWithMatchesCompleted()
+        mappableRetrievalFunction = lambda f: teams.sort(key=f)
+        map(mappableRetrievalFunction, retrievalFunctions[::-1])
+        return teams[::-1]       
 
     def teamsForTeamNumbersOnAlliance(self, alliance):
         return map(self.getTeamForNumber, alliance)
@@ -1478,8 +1475,7 @@ class Calculator(object):
 
     def getOptimalDefensesForAlliance(self, alliance):
         optimalDefenseCombination, optimalScore = None, 100000
-        defenseCombos = self.defenseCombinations()
-        for combo in defenseCombos:
+        for combo in self.defenseCombos:
             comboScore = self.predictedScoreForAllianceWithDefenseCombination(alliance, combo)
             if comboScore < optimalScore:
                 optimalDefenseCombination, optimalScore = combo, comboScore
@@ -1494,33 +1490,30 @@ class Calculator(object):
         # print "Performing calculations for match Q" + str(match.number)
         if self.matchIsCompleted(match):
             match.calculatedData.actualBlueRPs = self.RPsGainedFromMatchForAlliance(True, match)
-            #print "a"
             match.calculatedData.actualRedRPs = self.RPsGainedFromMatchForAlliance(False, match)
-            #print "b"
             match.calculatedData.numDefensesCrossedByBlue = self.numDefensesCrossedInMatch(False, match)
-            #print "c"
             match.calculatedData.numDefensesCrossedByRed = self.numDefensesCrossedInMatch(True, match)
-        #print "Breach Chance"
         match.calculatedData.blueBreachChance = self.breachChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.redBreachChance = self.breachChanceForAllianceNumbers(match.redAllianceTeamNumbers)
-        #print "Capture Chance"
         match.calculatedData.blueCaptureChance = self.captureChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.redCaptureChance = self.captureChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
-        #print "Predicted Score"
+        
         match.calculatedData.predictedBlueScore = self.predictedScoreForAllianceWithNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.predictedRedScore = self.predictedScoreForAllianceWithNumbers(match.redAllianceTeamNumbers)
-        #print "SD Predicted Score"
+     
         match.calculatedData.sdPredictedBlueScore = self.stdDevPredictedScoreForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.sdPredictedRedScore = self.stdDevPredictedScoreForAllianceNumbers(match.redAllianceTeamNumbers)
-        #print "Predicted RPs"
+        
         match.calculatedData.blueWinChance = self.winChanceForMatchForAllianceIsRed(match, False)
         match.calculatedData.redWinChance = self.winChanceForMatchForAllianceIsRed(match, True)
 
+
         match.calculatedData.predictedBlueRPs = self.predictedRPsForAllianceForMatch(False, match)
         match.calculatedData.predictedRedRPs = self.predictedRPsForAllianceForMatch(True, match)
-        
+   
         match.calculatedData.optimalBlueDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(False, match)
         match.calculatedData.optimalRedDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(True, match)
+      
 
         print "Done! Match " + str(match.number)
 
@@ -1538,8 +1531,8 @@ class Calculator(object):
         self.getSecondCalculationsForAverageTeam()
 
     def doMatchesCalculations(self):
-        for match in self.comp.matches:
-            self.doFirstCalculationsForMatch(match)
+        self.defenseCombos = self.defenseCombinations()
+        map(self.doFirstCalculationsForMatch, self.comp.matches)
     
     def writeCalculationDiagnostic(self, time):
         with open('./diagnostics.txt', 'a') as file:
@@ -1619,7 +1612,6 @@ class Calculator(object):
 
             
             for team in self.comp.teams:
-                # if team in self.teamsWithMatchesCompleted():
                 print "Writing team " + str(team.number) + " to Firebase..."
                 FBC.addCalculatedTeamDataToFirebase(team)
             for timd in self.comp.TIMDs:
