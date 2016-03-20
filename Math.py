@@ -232,7 +232,9 @@ class Calculator(object):
 	def getTIMDsForTeamNumber(self, teamNumber):
 		if teamNumber == -1:
 			return self.comp.TIMDs
-		return [timd for timd in self.comp.TIMDs if timd.teamNumber == teamNumber]
+		timds = filter(lambda t: t.teamNumber == teamNumber , self.comp.TIMDs)
+		print len(timds)
+		return timds
 
 	def getCompletedTIMDsForTeamNumber(self, teamNumber):
 		return filter(self.timdIsCompleted, self.getTIMDsForTeamNumber(teamNumber))
@@ -726,6 +728,12 @@ class Calculator(object):
 		sdOpposingPredictedScore = self.sdPredictedScoreForMatchForAlliance(match, not allianceIsRed)
 		sampleSize = self.sampleSizeForMatchForAlliance(alliance)
 		opposingSampleSize = self.sampleSizeForMatchForAlliance(alliance)
+		print (predictedScore,
+									   opposingPredictedScore,
+									   sdPredictedScore,
+									   sdOpposingPredictedScore,
+									   sampleSize,
+									   opposingSampleSize)
 		tscoreRPs = self.welchsTest(predictedScore,
 									   opposingPredictedScore,
 									   sdPredictedScore,
@@ -819,7 +827,7 @@ class Calculator(object):
 
 	def overallSecondPickAbility(self, team): 
 		# 3/20/16
-		return 1.0 * team.calculatedData.avgDrivingAbility + 1.0 * team.calculatedData.autoAbility + 18.48040625 * team.calculatedData.siegeConsistency + 38.49845903 * (1.0 - team.calculatedData.disfunctionalPercentage)
+		return 1.0 * team.calculatedData.avgDrivingAbility + 1.0 * team.calculatedData.autoAbility + 1.0 * team.calculatedData.siegeConsistency + 1.0 * (1.0 - team.calculatedData.disfunctionalPercentage)
 
 	def numDefensesCrossedInMatch(self, allianceIsRed, match):
 		alliance = map(self.getTeamForNumber, match.redAllianceTeamNumbers) if allianceIsRed else map(
@@ -1218,9 +1226,9 @@ class Calculator(object):
 
 
 	def doFirstCalculationsForTeam(self, team):
-		if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
+		if len(self.getCompletedTIMDsForTeam(team)) >= 0:
 			# print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
-		# else:
+			# else:
 			# print("Beginning first calculations for team: " + str(team.number) + ", " + str(team.name))
 			# Super Scout Averages
 			# print map(utils.makeDictFromMatch, self.getCompletedTIMDsForTeam(team))
@@ -1343,7 +1351,8 @@ class Calculator(object):
 			#     lambda timd: timd.timesSuccessfulCrossedDefensesTele,
 			#     lambda x: len(x) if x != None else 0,
 			#     self.getStdDevAcrossMatchesTeamSawDefense) 
-		else: print "No TIMDs for team " + str(team.number)
+		else: 
+			print "No TIMDs for team " + str(team.number)
 	
 	def numCrossingsForTIMD(self, timd, dataDict):
 		valuesDict = {}
