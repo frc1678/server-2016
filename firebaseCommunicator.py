@@ -61,8 +61,8 @@ class FirebaseCommunicator(object):
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTIMDataDict)
 
 	def addCalculatedMatchDataToFirebase(self, match):
-		print "calc D"
-		print match.calculatedData.predictedRedScore
+		#print "calc D"
+		#print match.calculatedData.predictedRedScore
 		calculatedMatchDataDict = utils.makeDictFromCalculatedMatchData(match.calculatedData)
 		'''for (key, value) in calculatedMatchDataDict:
 			if math.isnan(value):
