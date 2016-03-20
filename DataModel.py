@@ -24,7 +24,6 @@ class Competition(object):
 
 	def updateTIMDsFromFirebase(self):
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
-
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
 	def __init__(self, **args):

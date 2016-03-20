@@ -15,15 +15,13 @@ for fake database creation purposes it is not worth it'''
 # 	retrievalFunction(object) = value
 
 def sumStdDevs(stdDevs):
-	stdDevs = filter(lambda s: s != None, stdDevs)
 	return sum(map(lambda x: x ** 2, stdDevs)) ** 0.5
 
 def convertFirebaseBoolean(fbBool):
 	return True if fbBool == 'true' else False
 
 def rms(values):
-	m = map(lambda x: x**2, values)
-	return math.sqrt(np.mean(m)) if len(m) > 0 else None
+	return math.sqrt(np.mean(map(lambda x: x**2, values)))
 
 def convertNoneToIdentity(x, identity):
 	return identity if x == None else x

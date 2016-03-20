@@ -18,10 +18,7 @@ comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()
 
-CSVExporter.TSVExportAll(comp)
-CSVExporter.TSVExportCVR(comp)
-CSVExporter.TSVExportMini(comp)
-
+CSVExporter.TSVExport(comp)
 dv = DataValidator.DataValidator(comp)
 
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
