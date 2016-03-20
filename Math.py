@@ -99,7 +99,7 @@ class SecondTIMDThread(multiprocessing.Process):
             # print  "4"
             self.calculator.doMatchesCalculations()
             # print  "5"
-            self.calculator.calculateCitrusDPRs()
+            #self.calculator.calculateCitrusDPRs()
             # print  "6"
             self.calculator.doSecondTeamCalculations()
 
@@ -363,12 +363,35 @@ class Calculator(object):
 
     def autoAbility(self, timd):
         crossesDict = timd.timesSuccessfulCrossedDefensesAuto
-        crossesDict = crossesDict if crossesDict != None else {}
-        defensesCrossed = sum([np.mean(len(crossesDict[category]) if category in crossesDict else 0) for category in self.categories if crossesDict != None])
-        return sum([10 * timd.numHighShotsMadeAuto,
-                   5 * timd.numLowShotsMadeAuto,
-                   2 * int(utils.convertFirebaseBoolean(timd.didReachAuto)),
-                   10 if defensesCrossed >= 1 else 0])
+        crossesDict = crossesDict if crossesDict != None else ValueError("noCrossesDict")
+        #defensesCrossed = sum(
+        #[
+        #np.mean(len(crossesDict[category]) if category in crossesDict else 0) for category in self.categories if crossesDict != None
+        #]
+        #)
+        # doesnt work
+
+        defensesCrossed = 0
+        for category in self.defenseList:
+            if category in crossesDict:
+                defensesCrossed += len(crossesDict[category] if crossesDict[category] != None else [])
+            
+
+        defensePoints = 0
+        if defensesCrossed == 1: 
+            defensePoints = 10
+        elif defensesCrossed == 2:
+            defensePoints = 20
+
+        return (10 * timd.numHighShotsMadeAuto + 5 * timd.numLowShotsMadeAuto + 2 * int(utils.convertFirebaseBoolean(timd.didReachAuto)) + defensePoints)
+
+
+    #     crossesDict = timd.timesSuccessfulCrossedDefensesAuto or {}
+    #     defensesCrossed = sum([np.mean(len(crossesDict[category]) if category in crossesDict else 0) for category in self.categories])
+    #     return sum([10 * timd.numHighShotsMadeAuto,
+    #                5 * timd.numLowShotsMadeAuto,
+    #                2 * int(utils.convertFirebaseBoolean(timd.didReachAuto)),
+    #                10 if defensesCrossed >= 1 else 0])
 
 
     def stdDevTeleopShotAbility(self, team):
@@ -752,24 +775,24 @@ class Calculator(object):
         denominator = ((std1 ** 2) / sampleSize1 + (std2 ** 2) / sampleSize2) ** 0.5
         return numerator / denominator
 
-    def calculateCitrusDPRs(self):
-        teamsInValidMatches = self.teamsWithMatchesCompleted()
-        numTimesTogetherFunction = lambda t1, t2: sum(
-            map(lambda m: self.teamsAreOnSameAllianceInMatch(t1, t2, m), self.getCompletedMatchesForTeam(t1)))
-        getRowForTeamFunction = lambda t1: map(lambda t: numTimesTogetherFunction(t1, t), teamsInValidMatches)
-        matrixOfMatchesTogether = np.matrix(map(getRowForTeamFunction, teamsInValidMatches))
-        if np.linalg.det(matrixOfMatchesTogether) == 0:
-            print 'Cannot invert matrix.'
-            return None
-        else:
-            inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatchesTogether)
-        deltaFunction = lambda t: [sum(map(self.predictedScoreForAlliance, self.getAllTeamOppositionAlliances(t))) - sum(
-            self.getTeamMatchScores(t))]
-        teamDeltas = map(deltaFunction, teamsInValidMatches)
-        citrusDPRMatrix = np.dot(inverseMatrixOfMatchOccurrences, teamDeltas)
-        for i in range(len(teamsInValidMatches)):
-            self.cachedComp.citrusDPRs[teamsInValidMatches[i].number] = citrusDPRMatrix.item(i, 0)
-        self.cachedComp.citrusDPRs[-1] = np.mean(citrusDPRMatrix)
+    # def calculateCitrusDPRs(self):
+    #     teamsInValidMatches = self.teamsWithMatchesCompleted()
+    #     numTimesTogetherFunction = lambda t1, t2: sum(
+    #         map(lambda m: self.teamsAreOnSameAllianceInMatch(t1, t2, m), self.getCompletedMatchesForTeam(t1)))
+    #     getRowForTeamFunction = lambda t1: map(lambda t: numTimesTogetherFunction(t1, t), teamsInValidMatches)
+    #     matrixOfMatchesTogether = np.matrix(map(getRowForTeamFunction, teamsInValidMatches))
+    #     if np.linalg.det(matrixOfMatchesTogether) == 0:
+    #         print 'Cannot invert matrix.'
+    #         return None
+    #     else:
+    #         inverseMatrixOfMatchOccurrences = np.linalg.inv(matrixOfMatchesTogether)
+    #     deltaFunction = lambda t: [sum(map(self.predictedScoreForAlliance, self.getAllTeamOppositionAlliances(t))) - sum(
+    #         self.getTeamMatchScores(t))]
+    #     teamDeltas = map(deltaFunction, teamsInValidMatches)
+    #     citrusDPRMatrix = np.dot(inverseMatrixOfMatchOccurrences, teamDeltas)
+    #     for i in range(len(teamsInValidMatches)):
+    #         self.cachedComp.citrusDPRs[teamsInValidMatches[i].number] = citrusDPRMatrix.item(i, 0)
+    #     self.cachedComp.citrusDPRs[-1] = np.mean(citrusDPRMatrix)
 
     def firstPickAbility(self, team):
         ourTeam = self.getTeamForNumber(self.ourTeamNum)
@@ -808,10 +831,13 @@ class Calculator(object):
         map(secondPickAbilityFunction, self.teamsWithMatchesCompleted())
         return secondPickAbilityDict
 
-    def overallSecondPickAbility(self, team):
-        calcData = team.calculatedData
-        teams = self.teamsSortedByRetrievalFunctions([lambda t: calcData.secondPickAbility[t.number]])[:16]
-        return np.mean(map(lambda t: calcData.secondPickAbility[t.number], teams))
+    # def overallSecondPickAbility(self, team):
+    #     calcData = team.calculatedData
+    #     teams = self.teamsSortedByRetrievalFunctions([lambda t: calcData.secondPickAbility[t.number]])[:16]
+    #     return np.mean(map(lambda t: calcData.secondPickAbility[t.number], teams))
+    
+    def overallSecondPickAbility(self, team): 
+        return(1.0 * team.calculatedData.avgDrivingAbility + 1.0 * team.calculatedData.autoAbility + 1.0 * team.calculatedData.siegeConsistency + 1.0 * team.calculatedData.disfunctionalPercentage)
 
     def numDefensesCrossedInMatch(self, allianceIsRed, match):
         alliance = map(self.getTeamForNumber, match.redAllianceTeamNumbers) if allianceIsRed else map(
@@ -1444,7 +1470,7 @@ class Calculator(object):
 
             t = team.calculatedData
            # print sum(filter(t.averagen))
-	    t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
+            t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]
             t.RScoreEvasion = self.cachedComp.evasionZScores[team.number]
             t.RScoreDefense = self.cachedComp.defenseZScores[team.number]
@@ -1458,7 +1484,7 @@ class Calculator(object):
             t.firstPickAbility = self.firstPickAbility(team) # Checked	
             t.secondPickAbility = self.secondPickAbility(team) # Checked
             t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
-            if team.number in self.cachedComp.citrusDPRs: t.citrusDPR = self.cachedComp.citrusDPRs[team.number]
+            #if team.number in self.cachedComp.citrusDPRs: t.citrusDPR = self.cachedComp.citrusDPRs[team.number]
             t.actualNumRPs = self.getSumForDataFunctionForTeam(team, lambda timd: timd.calculatedData.numRPs)
             t.actualSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getSeedingFunctions()) # Checked
             t.predictedSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getPredictedSeedingFunctions()) # Checked
@@ -1473,18 +1499,18 @@ class Calculator(object):
     #         t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked        
 
 
-    def getOptimalDefensesForAlliance(self, alliance):
-        optimalDefenseCombination, optimalScore = None, 100000
-        for combo in self.defenseCombos:
-            comboScore = self.predictedScoreForAllianceWithDefenseCombination(alliance, combo)
-            if comboScore < optimalScore:
-                optimalDefenseCombination, optimalScore = combo, comboScore
-        return optimalDefenseCombination[:-1]
+    # def getOptimalDefensesForAlliance(self, alliance):
+    #     optimalDefenseCombination, optimalScore = None, 100000
+    #     for combo in self.defenseCombos:
+    #         comboScore = self.predictedScoreForAllianceWithDefenseCombination(alliance, combo)
+    #         if comboScore < optimalScore:
+    #             optimalDefenseCombination, optimalScore = combo, comboScore
+    #     return optimalDefenseCombination[:-1]
 
-    def getOptimalDefensesForAllianceIsRedForMatch(self, allianceIsRed, match):
-        alliance = self.getAllianceForMatch(match, allianceIsRed)
-        alliance = map(self.replaceWithAverageIfNecessary, alliance)
-        return self.getOptimalDefensesForAlliance(alliance)
+    # def getOptimalDefensesForAllianceIsRedForMatch(self, allianceIsRed, match):
+    #     alliance = self.getAllianceForMatch(match, allianceIsRed)
+    #     alliance = map(self.replaceWithAverageIfNecessary, alliance)
+    #     return self.getOptimalDefensesForAlliance(alliance)
 
     def doFirstCalculationsForMatch(self, match): #This entire thing being looped is what takes a while
         # print "Performing calculations for match Q" + str(match.number)
@@ -1511,8 +1537,8 @@ class Calculator(object):
         match.calculatedData.predictedBlueRPs = self.predictedRPsForAllianceForMatch(False, match)
         match.calculatedData.predictedRedRPs = self.predictedRPsForAllianceForMatch(True, match)
    
-        match.calculatedData.optimalBlueDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(False, match)
-        match.calculatedData.optimalRedDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(True, match)
+        #match.calculatedData.optimalBlueDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(False, match)
+        #match.calculatedData.optimalRedDefenses = self.getOptimalDefensesForAllianceIsRedForMatch(True, match)
       
 
         print "Done! Match " + str(match.number)
@@ -1595,18 +1621,13 @@ class Calculator(object):
             self.doFirstTeamCalculations()
             self.cacheSecondTeamData()
             self.doBetweenFirstAndSecondCalculationsForTeams()
-            print "a"
             self.doMatchesCalculations() #here
-            print "b"
 
-            self.calculateCitrusDPRs()
-            print "c"
+           # self.calculateCitrusDPRs()
 
             self.doSecondTeamCalculations()
-            print "d"
 
             endTime = time.time()
-            print "e"
 
             self.writeCalculationDiagnostic(endTime - startTime)
 
