@@ -97,6 +97,14 @@ class DataValidator(object):
 	def validateMatches(self, matches):
 		problems = []
 		for matchL in matches:
+			matchNumbers = {}
+			for timd in self.competition.TIMDs:
+				if timd.matchNumber not in matchNumbers.keys(): 
+					matchNumbers[timd.matchNumber] = []
+				matchNumbers[timd.matchNumber].append(timd.teamNumber)
+			for key in matchNumbers.keys():
+				if len(matchNumbers[key]) > 6:
+					problems.append("There are more than 6 TIMDs for match " + str(key) + ". The teams are " + str(matchNumbers[key]) + ".")
 			match = utils.makeDictFromMatch(matchL)
 			if match["redScore"] > -0.5 or match["blueScore"] > -0.5:
 				for timd in match["TIMDs"]:

@@ -1366,6 +1366,7 @@ class Calculator(object):
             #     lambda timd: timd.timesSuccessfulCrossedDefensesTele,
             #     lambda x: len(x) if x != None else 0,
             #     self.getStdDevAcrossMatchesTeamSawDefense) 
+            print "Completed first calcs for " + str(team.number)
         else: print "No TIMDs for team " + str(team.number)
     
     def numCrossingsForTIMD(self, timd, dataDict):
