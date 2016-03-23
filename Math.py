@@ -641,15 +641,15 @@ class Calculator(object):
     def getAllianceForTeamInMatch(self, team, match):
         return self.getAllianceForMatch(match, self.getTeamAllianceIsRedInMatch(team, match))
 
-    def setDefenseValuesForTeam(self, team, keyDict, valueRetrieval, dataModification):
+    def setDefenseValuesForTeam(self, team, keyDict, valueRetrieval, dataModification, valueModification):
         getValueFunc = lambda x, dKey: valueRetrieval(x)[dKey]
-        avgFunc = lambda dKey: dataModification([getValueFunc(t, dKey) for t in self.getCompletedTIMDsForTeam(team) if self.defenseFacedForTIMD(t, dKey)])
+        avgFunc = lambda dKey: dataModification([valueModification(getValueFunc(t, dKey)) for t in self.timdsWhereTeamFacedDefense(team, dKey)])
         map(lambda dKey: utils.setDictionaryValue(defenseDict, dKey, avgFunc(dKey)), self.defenseList)
 
     def defenseValuesForAverageTeam(self, team, retrievalFunction, dataModification):
         defenseDict = retrievalFunction(team)
         getValueFunc = lambda x, dKey: retrievalFunction(x)[dKey]
-        avgFunc = lambda dKey: dataModification([getValueFunc(t, dKey) for t in self.teamsWithCalculatedData() if t in self.teamsWhoHaveFacedDefense(dKey)])
+        avgFunc = lambda dKey: dataModification([getValueFunc(t, dKey) for t in self.teamsWhoHaveFacedDefense(dKey)])
         map(lambda dKey: utils.setDictionaryValue(defenseDict, dKey, avgFunc(dKey)), self.defenseList)
         
     def teamDidBreachInMatch(self, team, match):
@@ -677,6 +677,19 @@ class Calculator(object):
                     (lambda t: t.calculatedData.avgDefense, self.cachedComp.defenseZScores),
                     (lambda t: t.calculatedData.avgBallControl, self.cachedComp.ballControlZScores),
                     (lambda t: t.calculatedData.avgDrivingAbility, self.cachedComp.drivingAbilityZScores)]
+
+    def getAverageForDataFunctionForTIMDValues(self, timds, dataFunction):
+        values = [dataFunction(timd) for timd in timds]
+        return np.mean(values) if len(values) > 0 else None
+
+    def categoryAAverageForDataFunction(self, team, defenseKey, dataFunction):
+        return self.getAverageForDataFunctionForTIMDValues(self.timdsWhereTeamFacedDefense(team, defenseKey), dataFunction)
+
+    def categoryAAverageDictForDataFunction(self, team, dataFunction):
+        return {
+            'pc' : self.categoryAAverageForDataFunction(team, 'pc', dataFunction),
+            'cdf' : self.categoryAAverageForDataFunction(team, 'cdf', dataFunction)
+        }
 
     def cacheSecondTeamData(self):
         map(lambda (func, dictionary): self.rValuesForAverageFunctionForDict(func, dictionary), self.rScoreParams())
@@ -855,6 +868,27 @@ class Calculator(object):
                 lambda timd: timd.calculatedData.lowShotsAttemptedTele)
             t.twoBallAutoTriedPercentage = self.twoBallAutoTriedPercentage(team)
             t.twoBallAutoAccuracy = self.twoBallAutoAccuracy(team)
+
+            t.avgNumTimesBeached = self.categoryAAverageDictForDataFunction(team, lambda timd: timd.numTimesBeached)
+            t.avgNumTimesSlowed = self.categoryAAverageDictForDataFunction(team, lambda timd: timd.numTimesSlowed)
+            t.avgNumTimesUnaffected = self.categoryAAverageDictForDataFunction(team, lambda timd: timd.numTimesUnaffected)
+            sumCategoryADataPointDict = utils.dictSum(t.avgNumTimesUnaffected, utils.dictSum(t.avgNumTimesBeached, t.avgNumTimesSlowed))
+            t.beachedPercentage = utils.dictPercentage(t.avgNumTimesBeached, sumCategoryADataPointDict)
+            t.slowedPercentage = utils.dictPercentage(t.avgNumTimesSlowed, sumCategoryADataPointDict)
+            t.unaffectedPercentage = utils.dictPercentage(t.avgNumTimesUnaffected, sumCategoryADataPointDict)
+            self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
+                lambda x: np.mean(x) if x!= None, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto, 
+                lambda x: np.mean(x) if x!= None, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgFailedTimesCrossedDefensesTele, lambda tm: tm.timesFailedCrossedDefensesTele, 
+                lambda x: np.mean(x) if x!= None, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgFailedTimesCrossedDefensesAuto, lambda tm: tm.timesFailedCrossedDefensesAuto, 
+                lambda x: np.mean(x) if x!= None, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgTimeForDefenseCrossTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
+                lambda x: np.mean(x) if x!= None, lambda y: np.mean(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgTimeForDefenseCrossAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto, 
+                lambda x: np.mean(x) if x!= None, lambda y: np.mean(y) if y != None else 0)
+           #I WILL ADD standard dev later. PLEASE PUSH THIS CODE
             print "Completed first calcs for " + str(team.number)
     
     def numCrossingsForTIMD(self, timd, dataDict):
@@ -917,10 +951,6 @@ class Calculator(object):
 
     def doBetweenFirstAndSecondCalculationsForTeam(self, team):
         if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
-            # print "No Complete TIMDs for team " + str(team.number) + ", " + str(team.name)
-        # else:
-            # print("Beginning second calculations for team: " + str(team.number) + ", " + str(team.name))
-            #print("#")
             for defense in self.defenseList:
                 team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[defense] = self.predictedCrosses(team, defense)
             
@@ -939,7 +969,6 @@ class Calculator(object):
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
             t.actualNumRPs = self.actualNumberOfRPs(team)
             t.firstPickAbility = self.firstPickAbility(team) # Checked	
-            t.secondPickAbility = self.secondPickAbility(team) # Checked
             t.overallSecondPickAbility = self.overallSecondPickAbility(team) # Checked
             t.actualNumRPs = self.getSumForDataFunctionForTeam(team, lambda timd: timd.calculatedData.numRPs)
             t.actualSeed = self.getRankingForTeamByRetrievalFunctions(team, self.getSeedingFunctions()) # Checked

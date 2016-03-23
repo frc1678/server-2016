@@ -42,8 +42,12 @@ class FirstTIMDProcess(multiprocessing.Process):
             c.numTimesFailedCrossedDefensesAuto = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesAuto)
             c.numTimesSuccesfulCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
             c.numTimesFailedCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesTele)
-            c.crossingsForDefensePercentageAuto = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesAuto, utils.dictSum(c.numTimesSuccesfulCrossedDefensesAuto, c.numTimesFailedCrossedDefensesAuto))
-            c.crossingsForDefensePercentageTele = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesTele, utils.dictSum(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele))
+            c.crossingsForDefensePercentageAuto = utils.dictPercentage(c.numTimesSuccesfulCrossedDefensesAuto, c.numTimesFailedCrossedDefensesAuto)
+            c.crossingsForDefensePercentageTele = utils.dictPercentage(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele)
+            numCategoryADataPoints = self.timd.numTimesBeached + self.timd.numTimesSlowed + self.timd.numTimesUnaffected
+            c.beachedPercentage = float(self.timd.numTimesBeached) / numCategoryADataPoints
+            c.slowedPercentage = float(self.timd.numTimesSlowed) / numCategoryADataPoints
+            c.unaffectedPercentage = float(self.timd.numTimesUnaffected) / numCategoryADataPoints
             c.crossingTimeForDefenseAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
             c.crossingTimeForDefenseTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
             self.calculatedTIMDsList.append(self.timd)            

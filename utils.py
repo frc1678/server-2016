@@ -43,6 +43,9 @@ def dictProduct(dict1, dict2):
 def dictQuotient(dict1, dict2):
 	return dictOperation(dict1, dict2, lambda x, y: x / y if y != 0 else None, 1)
 
+def dictPercenatege(dict1, dict2):
+	return dictQuotient(dict1, dictSum(dict1, dict2))
+
 def stdDictSum(dict1, dict2):
 	return dictOperation(dict1, dict2, lambda x, y: sumStdDevs([x, y]))
 
