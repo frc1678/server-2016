@@ -1,4 +1,7 @@
 import multiprocessing
+import warnings
+import DataModel
+import utils
 
 class FirstTIMDProcess(multiprocessing.Process):
     def __init__(self, timd, calculatedTIMDsList, calculator):
@@ -45,9 +48,10 @@ class FirstTIMDProcess(multiprocessing.Process):
             c.crossingsForDefensePercentageAuto = utils.dictPercentage(c.numTimesSuccesfulCrossedDefensesAuto, c.numTimesFailedCrossedDefensesAuto)
             c.crossingsForDefensePercentageTele = utils.dictPercentage(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele)
             numCategoryADataPoints = self.timd.numTimesBeached + self.timd.numTimesSlowed + self.timd.numTimesUnaffected
-            c.beachedPercentage = float(self.timd.numTimesBeached) / numCategoryADataPoints
-            c.slowedPercentage = float(self.timd.numTimesSlowed) / numCategoryADataPoints
-            c.unaffectedPercentage = float(self.timd.numTimesUnaffected) / numCategoryADataPoints
+            if numCategoryADataPoints != 0:
+                c.beachedPercentage = float(self.timd.numTimesBeached) / numCategoryADataPoints
+                c.slowedPercentage = float(self.timd.numTimesSlowed) / numCategoryADataPoints
+                c.unaffectedPercentage = float(self.timd.numTimesUnaffected) / numCategoryADataPoints
             c.crossingTimeForDefenseAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
             c.crossingTimeForDefenseTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
             self.calculatedTIMDsList.append(self.timd)            
