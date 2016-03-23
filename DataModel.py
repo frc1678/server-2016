@@ -57,9 +57,9 @@ class CalculatedTeamData(object):
 		self.challengePercentage = None
 		self.breachPercentage = None
 		self.teleopShotAbility = None
-		self.numTimesBeached = None
-		self.numTimesSlowed = None
-		self.numTimesUnaffected = None 
+		self.avgNumTimesBeached = None
+		self.avgNumTimesSlowed = None
+		self.avgNumTimesUnaffected = None 
 		self.avgSuccessfulTimesCrossedDefensesAuto = {
 		  	'pc' : None,
 			'cdf' : None,
@@ -304,6 +304,11 @@ class TeamInMatchData(object):
 		self.rankAgility = None
 		self.rankDefense = None
 		self.rankBallControl = None
+
+		self.numTimesUnaffected = None
+		self.numTimesSlowed = None
+		self.numTimesBeached = None
+
 
 		#Auto
 		self.ballsIntakedAuto = []
