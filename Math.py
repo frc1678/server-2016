@@ -63,64 +63,7 @@ class FirstTIMDProcess(multiprocessing.Process):
             c.crossingsForDefensePercentageTele = utils.dictQuotient(c.numTimesSuccesfulCrossedDefensesTele, utils.dictSum(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele))
             c.crossingTimeForDefenseAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
             c.crossingTimeForDefenseTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
-            self.calculatedTIMDsList.append(self.timd)
-            
-            
-
-class SecondTIMDProcess(multiprocessing.Process):
-    def __init__(self, timd, calculator):
-        super(SecondTIMDProcess, self).__init__()
-        self.timd = timd
-        self.calculator = calculator
-        warnings.simplefilter('error', RuntimeWarning)
-
-    def run(self):
-        if (not self.calculator.timdIsCompleted(self.timd)):
-            print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
-        else:
-            print "Beginning second calculations for team " + str(self.timd.teamNumber) + " in match " + str(
-                self.timd.matchNumber)
-            # print utils.makeDictFromTIMD(self.timd)
-            c = self.timd.calculatedData
-            team = self.calculator.getTeamForNumber(self.timd.teamNumber)
-            match = self.calculator.getMatchForNumber(self.timd.matchNumber)
-            # for match2 in self.calculator.comp.matches:
-                # print utils.makeDictFromMatch(match2)
-            self.calculator.cacheFirstTeamData()
-            # print  "1"
-            self.calculator.doFirstTeamCalculations()
-            self.calculator.TIMDs = self.calculator.comp.TIMDs
-            # print [t.calculatedData.avgSuccessfulTimesCrossedDefensesTele for t in self.calculator.comp.teams]
-            # print  "2"
-            self.calculator.cacheSecondTeamData()
-            # print  "3"
-            # print calculator.cachedTeamDatas[team.number].defensesFaced
-            self.calculator.doBetweenFirstAndSecondCalculationsForTeams()
-            # print  "4"
-            self.calculator.doMatchesCalculations()
-            # print  "5"
-            #self.calculator.calculateCitrusDPRs()
-            # print  "6"
-            self.calculator.doSecondTeamCalculations()
-
-            # print  "7"
-            c.RScoreTorque = team.calculatedData.RScoreTorque
-            # print  "8"
-            c.RScoreSpeed = team.calculatedData.RScoreSpeed
-            # print  "9"
-            # c.RScoreAgility = team.calculatedData.RScoreAgility
-            # print  "10"
-            c.RScoreDefense = team.calculatedData.RScoreDefense
-            # print  "11"
-            c.RScoreBallControl = team.calculatedData.RScoreBallControl
-            # print  "12"
-            c.RScoreDrivingAbility = team.calculatedData.RScoreDrivingAbility
-            # print  "13"
-            c.firstPickAbility = team.calculatedData.firstPickAbility
-            # print  "14"
-            c.scoreContribution = self.calculator.scoreContributionForTeamForMatch(team, match)
-            # print  "15"
-            
+            self.calculatedTIMDsList.append(self.timd)            
 
             
 
@@ -132,8 +75,6 @@ class Calculator(object):
         warnings.simplefilter('error', RuntimeWarning)
 
         self.comp = competition
-        # self.comp.TIMDs = filter(lambda timd: timd.matchNumber <= 12, self.comp.TIMDs)
-        # self.comp.matches = filter(lambda m: m.number <= 12, self.comp.matches)
         self.categories = ['a', 'b', 'c', 'd', 'e']
         self.ourTeamNum = 1678
         self.monteCarloIterations = 100
@@ -1078,7 +1019,6 @@ class Calculator(object):
             self.doCachingForTeam(team)
         self.doCachingForTeam(self.averageTeam)
         self.cachedComp.teamsWithMatchesCompleted = self.findTeamsWithMatchesCompleted()
-        # self.comp.sdRScores = self.sdOfRValuesAcrossCompetition()
 
     def scoreContributionForTeamForMatch(self, team, match):
         alliance = self.getAllianceForTeamInMatch(team, match)
@@ -1531,9 +1471,6 @@ class Calculator(object):
                     print "Writing match " + str(match.number) + " to Firebase..."
                     FBC.addCalculatedMatchDataToFirebase(match)
             
-            # Competition metrics
-            if self.numPlayedMatchesInCompetition() > 0:
-                self.comp.averageScore = self.avgCompScore()
         else:
             print "No Data"
 
