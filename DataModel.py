@@ -51,7 +51,7 @@ class CalculatedTeamData(object):
 		self.twoBallAutoAttemptedPercentage = None
 		self.avgTorque = None
 		self.avgSpeed = None
-		self.avgEvasion = None
+		self.avgAgility = None
 		self.avgDefense = None
 		self.avgBallControl = None
 		self.avgDrivingAbility = None
@@ -226,7 +226,7 @@ class CalculatedTeamData(object):
 		}
 		self.RScoreTorque = None
 		self.RScoreSpeed = None
-		self.RScoreEvasion = None		
+		self.RScoreAgility = None		
 		self.RScoreDefense = None
 		self.RScoreBallControl = None
 		self.RScoreDrivingAbility = None
@@ -432,7 +432,7 @@ class CalculatedTeamInMatchData(object):
 		self.numBallsIntakedOffMidlineAuto = None
 		self.RScoreTorque = None
 		self.RScoreSpeed = None
-		self.RScoreEvasion = None		
+		self.RScoreAgility = None		
 		self.RScoreDefense = None
 		self.RScoreBallControl = None
 		self.RScoreDrivingAbility = None
