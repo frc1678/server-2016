@@ -64,6 +64,9 @@ class CalculatedTeamData(object):
 		self.challengePercentage = None
 		self.breachPercentage = None
 		self.teleopShotAbility = None
+		self.numTimesBeached = None
+		self.numTimesSlowed = None
+		self.numTimesUnaffected = None 
 		self.avgSuccessfulTimesCrossedDefensesAuto = { #Works
 		  	'pc' : None,
 			'cdf' : None,
@@ -296,8 +299,7 @@ class CalculatedMatchData(object):
 		self.actualRedRPs = None	
 		self.redAllianceDidBreach = None
 		self.blueAllianceDidBreach = None
-		self.optimalRedDefenses = None
-		self.optimalBlueDefenses = None
+	
 
 		self.__dict__.update(args)
 
@@ -335,7 +337,7 @@ class TeamInMatchData(object):
 		self.didGetDisabled = None
 		self.rankTorque = None
 		self.rankSpeed = None
-		self.rankEvasion = None
+		self.rankAgility = None
 		self.rankDefense = None
 		self.rankBallControl = None
 
