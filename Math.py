@@ -1163,15 +1163,6 @@ class Calculator(object):
         a.sdHighShotsAuto = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdHighShotsAuto)  # Checked
         a.sdLowShotsAuto = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdLowShotsAuto)  # Checked
         a.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdBallsKnockedOffMidlineAuto)  # Checked
-        a.avgSuccessfulTimesCrossedDefensesAuto = self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, np.mean)
-        # self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesAuto, lambda x: np.mean(x))
-        # self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgTimeForDefenseCrossAuto, lambda x: np.mean(x))
-        a.avgSuccessfulTimesCrossedDefensesTele = self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele, np.mean)
-        # self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesTele, lambda x: np.mean(x))
-        # self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgTimeForDefenseCrossTele, )
-        a.sdSuccessfulDefenseCrossesAuto = self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesAuto, utils.rms)
-        # self.defenseValuesForAverageTeam(lamdba t: t.calculatedData.sdFailedDefenseCrossesAuto, )
-        a.sdSuccessfulDefenseCrossesTele = self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, utils.rms)
         a.scalePercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.scalePercentage)
         a.challengePercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.challengePercentage)
         a.avgGroundIntakes = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.avgGroundIntakes)
@@ -1184,27 +1175,23 @@ class Calculator(object):
         a.teleopShotAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.teleopShotAbility)  # Checked
         a.siegeConsistency = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.challengePercentage + t.calculatedData.scalePercentage)  # Checked
         a.siegeAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeAbility)  # Checked
-        a.sdHighShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda
-            t: t.calculatedData.sdHighShotsTele)  # Checked
-        a.sdLowShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda
-            t: t.calculatedData.sdLowShotsTele)  # Checked
-        
-        a.sdGroundIntakes = self.getAverageOfDataFunctionAcrossCompetition(lambda
-            t: t.calculatedData.sdGroundIntakes)  # Checked
-        a.sdShotsBlocked = self.getAverageOfDataFunctionAcrossCompetition(lambda
-            t: t.calculatedData.sdShotsBlocked)  # Checked
+        a.sdHighShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdHighShotsTele)  # Checked
+        a.sdLowShotsTele = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdLowShotsTele)  # Checked
+        a.sdGroundIntakes = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdGroundIntakes)  # Checked
+        a.sdShotsBlocked = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.sdShotsBlocked)  # Checked
         a.sdTeleopShotAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.teleopShotAbility)
         a.sdSiegeAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeAbility)
         a.sdAutoAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.autoAbility)
-        # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele, lambda x: np.mean(x))
-        # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesTele, lambda x: np.mean(x))
-        # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.avgTimeForDefenseCrossTele, lambda x: np.mean(x))
-        # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, lambda x: utils.rms(x))
-        # self.setDefenseValuesForForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x))
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, np.mean)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesAuto, lambda x: np.mean(x))
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele, np.mean)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesTele, lambda x: np.mean(x))
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesAuto, lambda x: utils.rms(x))
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesAuto, lambda x: utils.rms(x))
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, lambda x: utils.rms(x))
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x))
         a.numScaleAndChallengePoints = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
-        
         a.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
-        #here
 
     def getSecondCalculationsForAverageTeam(self):
         a = self.averageTeam.calculatedData
@@ -1218,7 +1205,7 @@ class Calculator(object):
         a.avgSuccessfulTimesCrossedDefenses = utils.dictSum(a.avgSuccessfulTimesCrossedDefensesAuto,
                                                             a.avgSuccessfulTimesCrossedDefensesTele)
         a.firstPickAbility = self.firstPickAbility(self.averageTeam)
-        # a. = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numRPs)
+        a.numRPs = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numRPs)
         a.predictedNumRPs = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.predictedNumRPs)
 
 
@@ -1240,35 +1227,24 @@ class Calculator(object):
             t.avgDefense = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankDefense)  # Checked
             t.avgBallControl = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.rankBallControl)  # Checked
             t.avgDrivingAbility = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.calculatedData.drivingAbility)
-            t.disabledPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
-                utils.convertFirebaseBoolean(timd.didGetDisabled)))
-            t.incapacitatedPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
-                utils.convertFirebaseBoolean(timd.didGetIncapacitated)))
+            t.disabledPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: utils.convertFirebaseBoolean(timd.didGetDisabled)))
+            t.incapacitatedPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: utils.convertFirebaseBoolean(timd.didGetIncapacitated)))
             t.disfunctionalPercentage = t.disabledPercentage + t.incapacitatedPercentage
+            
             # Auto
-            t.autoAbility = self.getAverageForDataFunctionForTeam(team,
-                lambda timd: timd.calculatedData.autoAbility)
-            t.avgHighShotsAuto = self.getAverageForDataFunctionForTeam(team, 
-                lambda timd: timd.numHighShotsMadeAuto)  # Checked
-            t.avgLowShotsAuto = self.getAverageForDataFunctionForTeam(team,
-                                                                      lambda timd: timd.numLowShotsMadeAuto)  # Checked	
-            t.reachPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: int(
-                utils.convertFirebaseBoolean(timd.didReachAuto)))
-            t.highShotAccuracyAuto = self.getAverageForDataFunctionForTeam(team,
-                                                                           self.getTIMDHighShotAccuracyAuto)  # Checked
+            t.autoAbility = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.calculatedData.autoAbility)
+            t.avgHighShotsAuto = self.getAverageForDataFunctionForTeam(team,  lambda timd: timd.numHighShotsMadeAuto)  # Checked
+            t.avgLowShotsAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: timd.numLowShotsMadeAuto)  # Checked	
+            t.reachPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: utils.convertFirebaseBoolean(timd.didReachAuto)))
+            t.highShotAccuracyAuto = self.getAverageForDataFunctionForTeam(team, self.getTIMDHighShotAccuracyAuto)  # Checked
             t.lowShotAccuracyAuto = self.getAverageForDataFunctionForTeam(team,
                                                                           self.getTIMDLowShotAccuracyAuto)  # Checked
             t.numAutoPoints = self.getAverageForDataFunctionForTeam(team, self.autoAbility)  # Checked
-            t.avgMidlineBallsIntakedAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: len(
-                timd.ballsIntakedAuto))
-            t.sdMidlineBallsIntakedAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: len(
-                timd.ballsIntakedAuto))
-            t.sdHighShotsAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda
-                timd: timd.numHighShotsMadeAuto)  # Checked
-            t.sdLowShotsAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda
-                timd: timd.numLowShotsMadeAuto)  # Checked
-            t.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda
-                timd: timd.numBallsKnockedOffMidlineAuto)  # Checked\
+            t.avgMidlineBallsIntakedAuto = self.getAverageForDataFunctionForTeam(team, lambda timd: len(timd.ballsIntakedAuto))
+            t.sdMidlineBallsIntakedAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: len( timd.ballsIntakedAuto))
+            t.sdHighShotsAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numHighShotsMadeAuto)  # Checked
+            t.sdLowShotsAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numLowShotsMadeAuto)  # Checked
+            t.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numBallsKnockedOffMidlineAuto)  # Checked\
             t.avgSuccessfulTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
             t.avgSuccessfulTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
             t.avgFailedTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
