@@ -11,6 +11,7 @@ import unicodedata
 import time
 import DataValidator
 import CSVExporter
+import pdb
 
 shouldCacheJSONCopies = False
 
@@ -29,7 +30,7 @@ secsBetweenCalc = 0
 shouldCacheSecsCounter = 0
 cycle = 1
 
-numHoursBetweenCaches = 1.0 #1.0/360.0
+numHoursBetweenCaches = 1.0/360.0
 
 while(1):
 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
@@ -45,8 +46,7 @@ while(1):
 	cycle += 1
 	print("\nCalcs Cycle " + str(cycle) + "...")
 
-''' # DEBUG
-teams = []
-for i in teams:
-	updateFirebaseWithTeam(makeTeamObjectWithNumberAndName(i, "none"))
-'''
+# # DEBUG
+# teams = []
+# for i in teams:
+# 	updateFirebaseWithTeam(makeTeamObjectWithNumberAndName(i, "none"))

@@ -7,51 +7,44 @@ class Competition(object):
 	def __init__(self):
 		super(Competition, self).__init__()
 		self.code = ""
-		self.teams = TeamList([])
+		self.teams = []
 		self.matches = []
 		self.TIMDs = []
-		self.averageScore = None
 		self.predictedSeeding = []
 		self.actualSeeding = []
-		self.sdRScores = []
 	
 	def updateTeamsAndMatchesFromFirebase(self):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
-		# if doneCallback == None: return 
-		# while 1: 
-		# 	if len(self.teams) > 0 and len(self.matches) > 0: doneCallback()
 
 	def updateTIMDsFromFirebase(self):
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
+
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
 	def __init__(self, **args):
 		super(CalculatedTeamData, self).__init__()
-		self.secondPickAbility = {
-		}
 		self.firstPickAbility = None
 		self.overallSecondPickAbility = None
-		self.citrusDPR = None
-		self.highShotAccuracyAuto = None #Works
-		self.lowShotAccuracyAuto = None #Works
-		self.highShotAccuracyTele = None #Works
-		self.lowShotAccuracyTele = None #Works
-		self.avgGroundIntakes = None #Works
-		self.avgHighShotsTele = None #Works
+		self.highShotAccuracyAuto = None
+		self.lowShotAccuracyAuto = None
+		self.highShotAccuracyTele = None
+		self.lowShotAccuracyTele = None
+		self.avgGroundIntakes = None
+		self.avgHighShotsTele = None
 		self.avgHighShotsAttemptedTele = None
-		self.avgLowShotsTele = None #Works
+		self.avgLowShotsTele = None
 		self.avgLowShotsAttemptedTele = None
-		self.avgShotsBlocked = None #Works
-		self.avgHighShotsAuto = None #Works
-		self.avgLowShotsAuto = None #Works
-		self.avgMidlineBallsIntakedAuto = None #Works
-		self.avgBallsKnockedOffMidlineAuto = None #Works
-		self.twoBallAutoAccuracy = None 
+		self.avgShotsBlocked = None
+		self.avgHighShotsAuto = None
+		self.avgLowShotsAuto = None
+		self.avgMidlineBallsIntakedAuto = None
+		self.avgBallsKnockedOffMidlineAuto = None
+		self.twoBallAutoAccuracy = None
 		self.twoBallAutoAttemptedPercentage = None
 		self.avgTorque = None
 		self.avgSpeed = None
-		self.avgEvasion = None
+		self.avgAgility = None
 		self.avgDefense = None
 		self.avgBallControl = None
 		self.avgDrivingAbility = None
@@ -64,7 +57,31 @@ class CalculatedTeamData(object):
 		self.challengePercentage = None
 		self.breachPercentage = None
 		self.teleopShotAbility = None
-		self.avgSuccessfulTimesCrossedDefensesAuto = { #Works
+		self.beachedPercentage = {
+			'pc' : None,
+			'cdf' : None
+		}
+		self.slowedPercentage = {
+			'pc' : None,
+			'cdf' : None
+		} 
+		self.unaffectedPercentage = {
+			'pc' : None,
+			'cdf' : None
+		}
+		self.avgNumTimesBeached = {
+			'pc' : None,
+			'cdf' : None
+		}
+		self.avgNumTimesSlowed = {
+			'pc' : None,
+			'cdf' : None
+		}
+		self.avgNumTimesUnaffected = {
+			'pc' : None,
+			'cdf' : None
+		} 
+		self.avgSuccessfulTimesCrossedDefensesAuto = {
 		  	'pc' : None,
 			'cdf' : None,
 			'mt' : None,
@@ -75,7 +92,7 @@ class CalculatedTeamData(object):
 			'rw' : None,
 			'lb' : None
 		}
-		self.avgSuccessfulTimesCrossedDefensesTele = { #Works
+		self.avgSuccessfulTimesCrossedDefensesTele = {
 		  	'pc' : None,
 			'cdf' : None,
 			'mt' : None,
@@ -169,7 +186,6 @@ class CalculatedTeamData(object):
 		self.predictedNumRPs = None
 		self.actualNumRPs = None
 		self.numAutoPoints = None
-		self.numScaleAndChallengePoints = None
 		self.sdHighShotsAuto = None
 		self.sdHighShotsTele = None
 		self.sdLowShotsAuto = None
@@ -226,7 +242,7 @@ class CalculatedTeamData(object):
 		}
 		self.RScoreTorque = None
 		self.RScoreSpeed = None
-		self.RScoreEvasion = None		
+		self.RScoreAgility = None		
 		self.RScoreDefense = None
 		self.RScoreBallControl = None
 		self.RScoreDrivingAbility = None
@@ -235,33 +251,21 @@ class CalculatedTeamData(object):
 		self.__dict__.update(args)
 
 		
-
 class Team(object):
 	"""An FRC Team object"""
 	def __init__(self, **args):
 		super(Team, self).__init__()
 		self.name = None
 		self.number = None
-		self.teamInMatchDatas = None
 		self.calculatedData = CalculatedTeamData()
 		self.selectedImageUrl = None
 		self.otherImageUrls = {
 			 'not0' : None
 		}
-		self.pitHeightOfBallLeavingShooter = None
-		self.pitLowBarCapability = None
-		self.pitPotentialLowBarCapability = None
-		#self.pitPotentialCDFAndPCCapability = None
-		self.pitPotentialMidlineBallCapability = None
-		#self.pitFrontBumperWidth = None
-		self.pitDriveBaseWidth = None
-		self.pitDriveBaseLength = None
-		self.pitBumperHeight = None
-		self.pitPotentialShotBlockerCapability = None
+		self.pitCheesecakeAbility = None
 		self.pitNotes = None
 		self.pitOrganization = None
 		self.pitNumberOfWheels = None
-		#self.pitHeightOfRobot = None
 		self.__dict__.update(args)
 
 
@@ -273,17 +277,6 @@ class CalculatedMatchData(object):
 		self.predictedBlueScore = None
 		self.sdPredictedRedScore = None
 		self.sdPredictedBlueScore = None
-
-		self.numDefensesCrossedByBlue = None
-		self.numDefensesCrossedByRed = None 
-		self.redScoresForDefenses = {None : None}
-		self.redWinningChanceForDefenses = {None : None}
-		self.redBreachChanceForDefenses = {None : None}
-		self.redRPsForDefenses = {None : None}
-		self.blueScoresForDefenses = {None : None}
-		self.blueWinningChanceForDefenses = {None : None}
-		self.blueBreachChanceForDefenses = {None : None}
-		self.blueRPsForDefenses = {None: None}
 		self.redWinChance = None
 		self.redBreachChance = None
 		self.redCaptureChance = None
@@ -293,12 +286,7 @@ class CalculatedMatchData(object):
 		self.predictedBlueRPs = None
 		self.actualBlueRPs = None
 		self.predictedRedRPs = None
-		self.actualRedRPs = None	
-		self.redAllianceDidBreach = None
-		self.blueAllianceDidBreach = None
-		self.optimalRedDefenses = None
-		self.optimalBlueDefenses = None
-
+		self.actualRedRPs = None		
 		self.__dict__.update(args)
 
 
@@ -318,7 +306,6 @@ class Match(object):
 		self.blueAllianceDidCapture = None
 		self.blueAllianceDidBreach = None
 		self.redAllianceDidBreach = None
-		self.TIMDs = []
 		self.__dict__.update(args)
 		
 class TeamInMatchData(object):
@@ -335,9 +322,14 @@ class TeamInMatchData(object):
 		self.didGetDisabled = None
 		self.rankTorque = None
 		self.rankSpeed = None
-		self.rankEvasion = None
+		self.rankAgility = None
 		self.rankDefense = None
 		self.rankBallControl = None
+
+		self.numTimesUnaffected = None
+		self.numTimesSlowed = None
+		self.numTimesBeached = None
+
 
 		#Auto
 		self.ballsIntakedAuto = []
@@ -408,7 +400,6 @@ class TeamInMatchData(object):
 		}
 	
 		self.superNotes = None
-
 		self.__dict__.update(args)		
 
 class CalculatedTeamInMatchData(object):
@@ -430,16 +421,9 @@ class CalculatedTeamInMatchData(object):
 		self.numAutoPoints = None#
 		self.numScaleAndChallengePoints = None#
 		self.numBallsIntakedOffMidlineAuto = None
-		self.RScoreTorque = None
-		self.RScoreSpeed = None
-		self.RScoreEvasion = None		
-		self.RScoreDefense = None
-		self.RScoreBallControl = None
-		self.RScoreDrivingAbility = None
-		self.citrusDPR = None 
-		self.firstPickAbility = None
-		self.secondPickAbility = {
-		}
+		self.beachedPercentage = None
+		self.slowedPercentage = None 
+		self.unaffectedPercentage = None 
 		self.numTimesSuccesfulCrossedDefensesTele = {
 			'pc' : None,
 			'cdf' : None,
@@ -529,39 +513,5 @@ class CalculatedTeamInMatchData(object):
 			'lb' : None
 		}
 		self.overallSecondPickAbility = None
-		self.scoreContribution = None #
-
 		self.__dict__.update(args)
 
-#Making Fake Type safety is very much NOT A PYTHON PRACTICE, but may be needed. 
-class TeamList(list):
-    def __init__(self, iterable=None):
-        """Override initializer which can accept iterable"""
-        super(TeamList, self).__init__()
-        if iterable:
-            for item in iterable:
-                self.append(item)
-
-    def append(self, item):
-        if isinstance(item, Team):
-            super(TeamList, self).append(item)
-        else:
-            raise ValueError('Teams allowed only')
-
-    def insert(self, index, item):
-        if isinstance(item, Team):
-            super(TeamList, self).insert(index, item)
-        else:
-            raise ValueError('Teams allowed only')
-
-    def __add__(self, item):
-        if isinstance(item, Team):
-            super(TeamList, self).__add__(item)
-        else:
-            raise ValueError('Teams allowed only')
-
-    def __iadd__(self, item):
-        if isinstance(item, Team):
-            super(TeamList, self).__iadd__(item)
-        else:
-            raise ValueError('Teams allowed only')
