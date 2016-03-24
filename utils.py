@@ -205,10 +205,5 @@ def printWarningForSeconds(numSeconds):
 		print str(numSeconds) + ' SECONDS UNTIL FIREBASE WIPES'
 		time.sleep(1)
 
-def getDictValue(di, k, de):
-	for key in di.keys():
-		if k == key:
-			return di[k]
-	return de
 
 
