@@ -317,7 +317,7 @@ class Calculator(object):
         proportionOfTeamDefenseSightings = teamDefenseSightings / teamTotalNumberOfDefenseSightings if teamTotalNumberOfDefenseSightings > 0 else 0
         theta = sum([self.betaForTeamForDefense(team, dKey) for dKey in self.defenseList if
                      self.betaForTeamForDefense(team, dKey) != None])  # TODO: Rename theta something better
-        if team.number == -1: pdb.set_trace()
+        #if team.number == -1: pdb.set_trace()
 	return (averageOfDefenseCrossingsAcrossCompetition * theta + teamAverageDefenseCrossings * teamDefenseSightings) / (teamDefenseSightings + 1)
 
     def rValuesForAverageFunctionForDict(self, averageFunction, d):
@@ -426,7 +426,7 @@ class Calculator(object):
 
     def breachChanceForAlliance(self, alliance):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
-	pdb.set_trace()
+	#pdb.set_trace()
         defenseDamageChances = [self.getDefenseDamageChanceForAllianceForCategory(alliance, cKey) for cKey in self.categories]
         defenseDamageChances.remove(min(defenseDamageChances))
         return np.prod(defenseDamageChances)
@@ -485,7 +485,8 @@ class Calculator(object):
                                        sdOpposingPredictedScore,
                                        sampleSize,
                                        opposingSampleSize)
-        return stats.t.cdf(tscoreRPs, np.mean([sampleSize, opposingSampleSize]))
+        returnMe = stats.t.cdf(tscoreRPs, np.mean([sampleSize, opposingSampleSize]))
+        return returnMe if not math.isnan(returnMe) else 0
 
     def predictedRPsForAllianceForMatch(self, allianceIsRed, match):
         alliance = self.getAllianceForMatch(match, allianceIsRed)
@@ -495,7 +496,7 @@ class Calculator(object):
         captureRPs = self.getCaptureChanceForMatchForAllianceIsRed(match, allianceIsRed)
 
 
-        scoreRPs = 2 * self.getWinChanceForMatchForAllianceIsRed(match, allianceIsRed)
+        scoreRPs = 2 * (self.getWinChanceForMatchForAllianceIsRed(match, allianceIsRed) or 0)
         RPs = breachRPs + captureRPs + scoreRPs
         return RPs if not math.isnan(RPs) else None
 
@@ -656,7 +657,7 @@ class Calculator(object):
         map(lambda dKey: utils.setDictionaryValue(keyDict, dKey, avgFunc(dKey)), self.defenseList)
 
     def defenseValuesForAverageTeam(self, team, keyDict, dataModification):
-	pdb.set_trace()
+	#pdb.set_trace()
 	defDict = keyDict(self.averageTeam)
         avgFunc = lambda dKey: map(lambda x: keyDict(x)[dKey], self.teamsWhoHaveFacedDefense(dKey))
         for d in self.defenseList:
@@ -973,7 +974,7 @@ class Calculator(object):
             t = team.calculatedData
             t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]
-            t.RScoreAgility = self.cachedComp.agilityZScores[team.number]
+            t.RScoreAgility = utils.getDictValue(self.cachedComp.agilityZScores, team.number, 0)
             t.RScoreDefense = self.cachedComp.defenseZScores[team.number]
             t.RScoreBallControl = self.cachedComp.ballControlZScores[team.number]
             t.RScoreDrivingAbility = self.cachedComp.drivingAbilityZScores[team.number]
