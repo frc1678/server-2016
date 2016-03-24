@@ -8,7 +8,7 @@ import time
 basicURL = "http://www.thebluealliance.com/api/v2/"
 headerKey = "X-TBA-App-Id"
 headerValue = "blm:serverProof1678:004" # set to "<your initials>:TBA_communicator:0"
-eventCode = 'cama'
+eventCode = 'cada'
 year = 2016
 
 competition = DataModel.Competition()
