@@ -690,7 +690,8 @@ class Calculator(object):
                     (lambda t: t.calculatedData.avgTorque, self.cachedComp.torqueZScores),
                     (lambda t: t.calculatedData.avgDefense, self.cachedComp.defenseZScores),
                     (lambda t: t.calculatedData.avgBallControl, self.cachedComp.ballControlZScores),
-                    (lambda t: t.calculatedData.avgDrivingAbility, self.cachedComp.drivingAbilityZScores)]
+                    (lambda t: t.calculatedData.avgAgility, self.cachedComp.agilityZScores),
+		    (lambda t: t.calculatedData.avgDrivingAbility, self.cachedComp.drivingAbilityZScores)]
 
     def getAverageForDataFunctionForTIMDValues(self, timds, dataFunction):
         values = [dataFunction(timd) for timd in timds]
@@ -974,7 +975,7 @@ class Calculator(object):
             t = team.calculatedData
             t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]
-            t.RScoreAgility = utils.getDictValue(self.cachedComp.agilityZScores, team.number, 0)
+            t.RScoreAgility = self.cachedComp.agilityZScores[team.number]
             t.RScoreDefense = self.cachedComp.defenseZScores[team.number]
             t.RScoreBallControl = self.cachedComp.ballControlZScores[team.number]
             t.RScoreDrivingAbility = self.cachedComp.drivingAbilityZScores[team.number]
