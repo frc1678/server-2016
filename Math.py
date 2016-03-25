@@ -238,6 +238,7 @@ class Calculator(object):
 
     def probabilityDensity(self, x, mu, sigma):
         if sigma == 0.0:
+            print "sigma is 0"
             return int(x == mu)
         if x != None and mu != None and sigma != None: return 1.0 - stats.norm.cdf(x, mu, sigma)
 
@@ -334,16 +335,18 @@ class Calculator(object):
             d[self.teamsWithMatchesCompleted()[i].number] = zscores[i]
 
     torqueWeight = 0.1
-    ballControlWeight = 0.2
-    agilityWeight = 0.25
-    defenseWeight = 0.35
-    speedWeight = 0.1
+    ballControlWeight = 0
+    agilityWeight = 0.4
+    defenseWeight = 0
+    speedWeight = 0.4
+    crossingTimeWeight = 0.2
     def drivingAbilityForTIMD(self, timd):
         return (self.torqueWeight * timd.rankTorque) + (
             self.ballControlWeight * timd.rankBallControl) + (
             self.agilityWeight * timd.rankAgility) + (
             self.defenseWeight * timd.rankDefense) + (
-            self.speedWeight * timd.rankSpeed)
+            self.speedWeight * timd.rankSpeed) + (
+            self.crossingTimeWeight * timd.avgTimeForDefenseCrossTele)
 
     def drivingAbility(self, team, match):
         return self.drivingAbilityForTIMD(self.getTIMDForTeamNumberAndMatchNumber(team, match))
@@ -421,7 +424,7 @@ class Calculator(object):
         stdDev = utils.sumStdDevs(map(lambda t: self.standardDeviationForTeamForCategory(t, category), alliance))
         autoCrossings = sum(map(lambda t: self.autoCrossingsForCategory(t, category), alliance))
         print str((map(lambda t: self.stdAutoCrossingsForCategory(t, category), alliance))) 
-	autoStd = utils.sumStdDevs(map(lambda t: self.stdAutoCrossingsForCategory(t, category), alliance))
+        autoStd = utils.sumStdDevs(map(lambda t: self.stdAutoCrossingsForCategory(t, category), alliance))
         return self.probabilityDensity(2.0, crossings + autoCrossings, utils.sumStdDevs([stdDev, autoStd]))
 
     def breachChanceForAlliance(self, alliance):
