@@ -23,7 +23,7 @@ CSVExporter.TSVExport(comp)
 dv = DataValidator.DataValidator(comp)
 
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
-FBC.wipeDatabase()
+#FBC.wipeDatabase()
 calculator = Math.Calculator(comp)
 
 secsBetweenCalc = 0
