@@ -42,7 +42,7 @@ def dictProduct(dict1, dict2):
 	return dictOperation(dict1, dict2, lambda x, y: x * y, 1)
 
 def dictQuotient(dict1, dict2):
-	return dictOperation(dict1, dict2, lambda x, y: x / y if float(y) != 0.0 else None, 1)
+	return dictOperation(dict1, dict2, lambda x, y: float(x) / float(y) if float(y) != 0.0 else None, 1.0)
 
 def dictPercentage(dict1, dict2):
 	print dictSum(dict1, dict2)

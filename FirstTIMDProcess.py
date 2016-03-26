@@ -33,7 +33,6 @@ class FirstTIMDProcess(multiprocessing.Process):
             c.lowShotAccuracyAuto = self.calculator.getTIMDLowShotAccuracyAuto(self.timd)  # Checked
             c.siegeAbility = self.calculator.singleSiegeAbility(self.timd)
             c.autoAbility = self.calculator.autoAbility(self.timd)
-            c.drivingAbility = self.calculator.drivingAbilityForTIMD(self.timd)
             c.siegeConsistency = utils.convertFirebaseBoolean(self.timd.didChallengeTele) or utils.convertFirebaseBoolean(self.timd.didScaleTele)
             c.numRPs = self.calculator.RPsGainedFromMatchForTeam(team, match)
             c.numAutoPoints = self.calculator.autoAbility(self.timd)
