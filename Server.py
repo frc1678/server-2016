@@ -12,6 +12,7 @@ import time
 import DataValidator
 import CSVExporter
 import pdb
+import scoutPerformance
 
 shouldCacheJSONCopies = False
 
@@ -22,7 +23,8 @@ comp.updateTIMDsFromFirebase()
 CSVExporter.TSVExportSAC(comp)
 CSVExporter.TSVExportAll(comp)
 CSVExporter.TSVExportMini(comp)
-
+SPA = scoutPerformance.ScoutPerformance(comp)
+SPA.analyzeScouts()
 dv = DataValidator.DataValidator(comp)
 
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
@@ -34,6 +36,7 @@ shouldCacheSecsCounter = 0
 cycle = 1
 
 numHoursBetweenCaches = 1.0/360.0
+print "s" + 2
 
 while(1):
 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):

@@ -617,8 +617,8 @@ class Calculator(object):
     def getAutoPointsForMatchForAllianceIsRed(self, match, allianceIsRed):
         timds = [self.getTIMDForTeamNumberAndMatchNumber(t.number, match.number) for t in self.getAllianceForMatch(match, allianceIsRed)]
         reachPoints = sum([2 * utils.convertFirebaseBoolean(timd.didReachAuto) for timd in timds])
-        highShotPoints = sum([10 * timd.numHighShotsMadeAuto for timd in timds])
-        lowShotPoints = sum([5 * timd.numLowShotsMadeAuto for timd in timds])
+        highShotPoints = sum([10 * (timd.numHighShotsMadeAuto or 0) for timd in timds])
+        lowShotPoints = sum([5 * (timd.numLowShotsMadeAuto or 0) for timd in timds])
         defensePoints = sum(5 * [self.didCrossDefenseAutoForTIMD(timd) for timd in timds]) # Not perfect, since all three teams could theoretically cross the same defense
         return reachPoints + highShotPoints + lowShotPoints + defensePoints
 
