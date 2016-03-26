@@ -35,7 +35,8 @@ cycle = 1
 
 numHoursBetweenCaches = 1.0/360.0
 
-while(1):
+while(cycle <= 1):
+	print("\nCalcs Cycle " + str(cycle) + "...")
 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
 		shouldCacheSecsCounter = 0
 	if(shouldCacheSecsCounter == 0):
@@ -46,8 +47,15 @@ while(1):
 	comp.updateTIMDsFromFirebase()
 	calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
+	if len(calculator.getCompletedTIMDsInCompetition) == len(comp.timds): break 
 	cycle += 1
-	print("\nCalcs Cycle " + str(cycle) + "...")
+
+elimsAlliances = []
+for i in range(8):
+	a, b, c = raw_input("Input team numbers for alliance " + str(i + 1)).split()
+	elimsAlliances.append([a,b,c])
+
+
 
 # # DEBUG
 # teams = []

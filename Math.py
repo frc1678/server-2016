@@ -368,7 +368,9 @@ class Calculator(object):
      #   return self.drivingAbilityForTIMD(self.getTIMDForTeamNumberAndMatchNumber(team, match))
 
     def predictedCrossingsForDefenseCategory(self, team, category):
-        return np.mean([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None]) # TODO: Update with actual correct key
+        c = sum([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None])
+        return c / len(self.defenseDictionary[category])
+        # return np.mean([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None]) # TODO: Update with actual correct key
 
     def predictedCrossingsForDefense(self, team, defenseKey):
         return team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[defenseKey]
@@ -425,9 +427,15 @@ class Calculator(object):
         allianceDefensePointsTele = sum(map(alliancePredictedCrossingsRetrievalFunction, self.categories))
         return allianceTeleopShotPoints + allianceSiegePoints + allianceAutoPoints + allianceDefensePointsTele
 
+    def predictedScoreForAllianceElims(self, alliance):
+        return 20 * self.breachChanceForAlliance(alliance) + 25 * self.captureChanceForAlliance(alliance) + self.predictedScoreForAlliance(alliance)
+
+    def predictedScoreForAllianceElimsWithNumbers(self, allianceNumbers):
+        return self.predictedScoreForAllianceElims(map(self.getTeamForNumber, allianceNumbers))
+
     def standardDeviationForTeamForCategory(self, team, category):
-        sumDefenseCrossingsDict = utils.dictSum(team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto, team.calculatedData.avgSuccessfulTimesCrossedDefensesTele)
-        return utils.rms(map(lambda dKey: sumDefenseCrossingsDict[dKey], filter(lambda d: self.teamFacedDefense(team, d), self.defenseDictionary[category])))
+        sdCrossFunc = lambda x: utils.sumStdDevs([team.calculatedData.sdSuccessfulDefenseCrossesAuto[x], team.calculatedData.sdSuccessfulDefenseCrossesTele[x]])
+        return utils.rms([sdCrossFunc(dKey) for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey)])
 
     def autoCrossingsForCategory(self, team, category):
         return np.mean([team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[defense] if team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[defense] != None else 0.0 for defense in self.defenseDictionary[category]])
@@ -437,14 +445,17 @@ class Calculator(object):
 
     def getDefenseDamageChanceForAllianceForCategory(self, alliance, category):
         crossings = sum(map(lambda t: self.predictedCrossingsForDefenseCategory(t, category), alliance))
+        print "1"
         stdDev = utils.sumStdDevs(map(lambda t: self.standardDeviationForTeamForCategory(t, category), alliance))
+        print "2"
         autoCrossings = sum(map(lambda t: self.autoCrossingsForCategory(t, category), alliance))
+        print "3"
         autoStd = utils.sumStdDevs(map(lambda t: self.stdAutoCrossingsForCategory(t, category), alliance))
+        print "4"
         return self.probabilityDensity(2.0, crossings + autoCrossings, utils.sumStdDevs([stdDev, autoStd]))
 
     def breachChanceForAlliance(self, alliance):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
-	#pdb.set_trace()
         defenseDamageChances = [self.getDefenseDamageChanceForAllianceForCategory(alliance, cKey) for cKey in self.categories]
         defenseDamageChances.remove(min(defenseDamageChances))
         return np.prod(defenseDamageChances)
