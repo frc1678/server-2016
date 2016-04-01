@@ -204,6 +204,10 @@ class Calculator(object):
             defensePoints = 10
         return (10 * timd.numHighShotsMadeAuto + 5 * timd.numLowShotsMadeAuto + 2 * int(utils.convertFirebaseBoolean(timd.didReachAuto)) + defensePoints)
 
+    def defensesCrossedInAutoByTeam(self, team):
+        func = lambda d: team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[d]
+        return [dKey for dKey in self.defenseList if func(dKey) != None and func(dKey) > 0] 
+
     def stdDevTeleopShotAbility(self, team):
         return utils.sumStdDevs(5 * team.calculatedData.sdHighShotsTele, 2 * team.calculatedData.sdLowShotsTele)
 
@@ -659,10 +663,8 @@ class Calculator(object):
 
     def teamsSortedByRetrievalFunctions(self, retrievalFunctions):
         teams = self.teamsWithMatchesCompleted()
-        mappableRetrievalFunction = lambda f: teams.sort(key=f)
-        map(mappableRetrievalFunction, retrievalFunctions[::-1])
-        return teams[::-1]       
-
+        return sorted(teams, key=lambda t: (retrievalFunctions[0](t), retrievalFunctions[1](t), retrievalFunctions[2](t)), reverse=True)
+     
     def teamsForTeamNumbersOnAlliance(self, alliance):
         return map(self.getTeamForNumber, alliance)
 
