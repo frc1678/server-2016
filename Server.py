@@ -12,6 +12,7 @@ import time
 import DataValidator
 import CSVExporter
 import utils
+import pdb
 import scoutPerformance
 
 shouldCacheJSONCopies = False
@@ -50,6 +51,8 @@ while(cycle <= 1):
 	calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
 	cycle += 1
+
+pdb.set_trace()
 
 elimsAlliances, i = {}, 1
 while i <= 8:
