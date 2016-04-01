@@ -2,6 +2,7 @@
 
 import json
 import sys
+import traceback
 
 #Our Modules
 import DataModel
@@ -13,6 +14,7 @@ import DataValidator
 import CSVExporter
 import utils
 import scoutPerformance
+import CrashReporter
 
 shouldCacheJSONCopies = False
 
@@ -34,8 +36,10 @@ calculator = Math.Calculator(comp)
 secsBetweenCalc = 0
 shouldCacheSecsCounter = 0
 cycle = 1
+shouldEmail = False
 
 numHoursBetweenCaches = 1.0/360.0
+emailer = CrashReporter.EmailThread()
 
 while(cycle <= 1):
 	print("\nCalcs Cycle " + str(cycle) + "...")
@@ -47,7 +51,14 @@ while(cycle <= 1):
 	dv.validateFirebase()
 	comp.updateTeamsAndMatchesFromFirebase()
 	comp.updateTIMDsFromFirebase()
-	calculator.doCalculations(FBC)
+	if shouldEmail:
+		try:
+			calculator.doCalculations(FBC)
+		except:
+			emailer.reportServerCrash(traceback.format_exc())
+			sys.exit(0)
+	else: 
+		calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
 	cycle += 1
 
