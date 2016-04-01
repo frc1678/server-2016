@@ -61,8 +61,8 @@ class FirebaseCommunicator(object):
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTIMDataDict)
 
 	def addCalculatedMatchDataToFirebase(self, match):
-		print "calc D"
-		print match.calculatedData.predictedRedScore
+		# print "calc D"
+		# print match.calculatedData.predictedRedScore
 		calculatedMatchDataDict = utils.makeDictFromCalculatedMatchData(match.calculatedData)
 		'''for (key, value) in calculatedMatchDataDict:
 			if math.isnan(value):
@@ -139,7 +139,7 @@ class FirebaseCommunicator(object):
 		result = firebase.put(FBLocation, 'code', self.competition.code)
 		result = firebase.put(FBLocation, 'averageScore', self.competition.averageScore)
 		
-		self.competition.averageScore = -1
+		self.competition.averageScore = None
 
 	def wipeDatabase(self):
 		map(utils.printWarningForSeconds, range(10, 0, -1))
@@ -148,6 +148,11 @@ class FirebaseCommunicator(object):
 		firebase.put(FBLocation, 'Teams', [])
 		firebase.put(FBLocation, 'Matches', [])
 		firebase.put(FBLocation, 'TeamInMatchDatas', [])
+
+	def addElimsAlliances(self, alliancesDict):
+		FBLocation = "/"
+		firebase.put(FBLocation, 'Elimination Alliances', alliancesDict)
+
 
 	def cacheFirebase(self):
 		numFiles = len(listdir("CachedFirebases"))

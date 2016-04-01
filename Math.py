@@ -327,10 +327,7 @@ class Calculator(object):
         return np.mean(defenseTimes)
 
     def meanDefenseCrossingTimeForCompetition(self):
-        totalTime = 0
-        for team in self.teamsWithMatchesCompleted():
-            totalTime += self.meanDefenseCrossingTimeForTeam(team) or 0
-        return totalTime / len(self.teamsWithMatchesCompleted())
+        return np.mean([self.meanDefenseCrossingTimeForTeam(t) for t in self.comp.teams if self.meanDefenseCrossingTimeForTeam(t) != None])
 
     def rValuesForAverageFunctionForDict(self, averageFunction, d):
         impossible = True
@@ -351,6 +348,7 @@ class Calculator(object):
     defenseWeight = 0
     speedWeight = 0.4
     crossingTimeWeight = -0.2
+
     def drivingAbility(self, team):
         meanDefenseCrossingTimeForTeam = self.meanDefenseCrossingTimeForTeam(team)
         if meanDefenseCrossingTimeForTeam == None: return 0
@@ -364,20 +362,14 @@ class Calculator(object):
         
         return defenseCrossTime + torque + agility + defense + speed
 
-    #def drivingAbility(self, team, match):
-     #   return self.drivingAbilityForTIMD(self.getTIMDForTeamNumberAndMatchNumber(team, match))
-
     def predictedCrossingsForDefenseCategory(self, team, category):
-        c = sum([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None])
-        return c / len(self.defenseDictionary[category])
-        # return np.mean([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None]) # TODO: Update with actual correct key
+        return np.mean([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None]) # TODO: Update with actual correct key
 
     def predictedCrossingsForDefense(self, team, defenseKey):
         return team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[defenseKey]
 
     def getPredictedCrossingsForAllianceForDefense(self, alliance, defenseKey):
-        if self.numTimesCompetitionFacedDefense(defenseKey) <= 0:
-            return None
+        if self.numTimesCompetitionFacedDefense(defenseKey) <= 0: return None
         predictedCrossingsRetrievalFunction = lambda t: self.predictedCrossingsForDefense(t, defenseKey)
         return sum(map(predictedCrossingsRetrievalFunction, alliance))
 
@@ -405,7 +397,8 @@ class Calculator(object):
         allianceTeleopShotPointStdDev = utils.sumStdDevs(map(lambda t: t.calculatedData.sdTeleopShotAbility, alliance))
         allianceSiegePointsStdDev = utils.sumStdDevs(map(lambda t: t.calculatedData.sdSiegeAbility, alliance))
         allianceAutoPointsStdDev = utils.sumStdDevs(map(lambda t: t.calculatedData.sdAutoAbility, alliance))
-        allianceDefensePointsTeleStdDev = utils.sumStdDevs(map(lambda cKey: self.stdDevForPredictedDefenseScoreForAllianceForCategory(alliance, cKey), self.categories))
+        allianceDefensePointsTeleStdDev = utils.sumStdDevs(map(lambda cKey: self.stdDevForPredictedDefenseScoreForAllianceForCategory(alliance, cKey), self.categories))          
+
         return utils.sumStdDevs([allianceTeleopShotPointStdDev,
                                  allianceSiegePointsStdDev,
                                  allianceAutoPointsStdDev,
@@ -427,12 +420,6 @@ class Calculator(object):
         allianceDefensePointsTele = sum(map(alliancePredictedCrossingsRetrievalFunction, self.categories))
         return allianceTeleopShotPoints + allianceSiegePoints + allianceAutoPoints + allianceDefensePointsTele
 
-    def predictedScoreForAllianceElims(self, alliance):
-        return 20 * self.breachChanceForAlliance(alliance) + 25 * self.captureChanceForAlliance(alliance) + self.predictedScoreForAlliance(alliance)
-
-    def predictedScoreForAllianceElimsWithNumbers(self, allianceNumbers):
-        return self.predictedScoreForAllianceElims(map(self.getTeamForNumber, allianceNumbers))
-
     def standardDeviationForTeamForCategory(self, team, category):
         sdCrossFunc = lambda x: utils.sumStdDevs([team.calculatedData.sdSuccessfulDefenseCrossesAuto[x], team.calculatedData.sdSuccessfulDefenseCrossesTele[x]])
         return utils.rms([sdCrossFunc(dKey) for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey)])
@@ -445,20 +432,17 @@ class Calculator(object):
 
     def getDefenseDamageChanceForAllianceForCategory(self, alliance, category):
         crossings = sum(map(lambda t: self.predictedCrossingsForDefenseCategory(t, category), alliance))
-        print "1"
         stdDev = utils.sumStdDevs(map(lambda t: self.standardDeviationForTeamForCategory(t, category), alliance))
-        print "2"
         autoCrossings = sum(map(lambda t: self.autoCrossingsForCategory(t, category), alliance))
-        print "3"
         autoStd = utils.sumStdDevs(map(lambda t: self.stdAutoCrossingsForCategory(t, category), alliance))
-        print "4"
         return self.probabilityDensity(2.0, crossings + autoCrossings, utils.sumStdDevs([stdDev, autoStd]))
 
     def breachChanceForAlliance(self, alliance):
-        alliance = map(self.replaceWithAverageIfNecessary, alliance)
-        defenseDamageChances = [self.getDefenseDamageChanceForAllianceForCategory(alliance, cKey) for cKey in self.categories]
-        defenseDamageChances.remove(min(defenseDamageChances))
-        return np.prod(defenseDamageChances)
+        # alliance = map(self.replaceWithAverageIfNecessary, alliance)
+        # defenseDamageChances = [self.getDefenseDamageChanceForAllianceForCategory(alliance, cKey) for cKey in self.categories]
+        # defenseDamageChances.remove(min(defenseDamageChances))
+        # return np.prod(defenseDamageChances)
+        return max(map(lambda t: t.calculatedData.breachPercentage, alliance))
 
     def breachChanceForAllianceNumbers(self, allianceNumbers):
         return self.breachChanceForAlliance(self.teamsForTeamNumbersOnAlliance(allianceNumbers))
@@ -533,13 +517,13 @@ class Calculator(object):
         denominator = ((std1 ** 2) / sampleSize1 + (std2 ** 2) / sampleSize2) ** 0.5
         return numerator / denominator
 
+    def predictedScoreForAllianceWithCaptureAndBreachPoints(self, alliance):
+        return 20 * self.breachChanceForAlliance(alliance) + 25 * self.captureChanceForAlliance(alliance) + self.predictedScoreForAlliance(alliance)
+
     def firstPickAbility(self, team):
         ourTeam = self.getTeamForNumber(self.ourTeamNum)
         if self.predictedScoreForAlliance([ourTeam, team]) == None or math.isnan(self.predictedScoreForAlliance([ourTeam, team])): return 
-        return self.predictedScoreForAlliance([ourTeam, team])
-
-    def getOurTeam(self):
-        return self.getTeamForNumber(self.ourTeamNum)
+        return self.predictedScoreForAllianceWithCaptureAndBreachPoints([ourTeam, team])
     
     def overallSecondPickAbility(self, team): 
         functionalPercentage = (1 - team.calculatedData.disfunctionalPercentage)
@@ -575,7 +559,7 @@ class Calculator(object):
         return numRPs + int(utils.convertFirebaseBoolean(ourFields[1])) + int(utils.convertFirebaseBoolean(ourFields[2])) 
         
     def getTeamAllianceIsRedInMatch(self, team, match):
-        if team.number == -1:
+        if team.number == -1: 
             return True
         if team.number in match.redAllianceTeamNumbers:
             return True
@@ -591,7 +575,7 @@ class Calculator(object):
         return match.calculatedData.sdPredictedRedScore if allianceIsRed else match.calculatedData.sdPredictedBlueScore
 
     def getAvgNumCompletedTIMDsForTeamsOnAlliance(self, alliance):
-        return np.sum(map(lambda t: len(self.getCompletedTIMDsForTeam(t)), alliance)) # TODO:WATCHOUT!!!
+        return np.mean(map(lambda t: len(self.getCompletedTIMDsForTeam(t)), alliance)) # TODO:WATCHOUT!!!
 
     def getAvgNumCompletedTIMDsForAlliance(self, alliance):
         return self.getAvgNumCompletedTIMDsForTeamsOnAlliance(alliance)
@@ -690,17 +674,15 @@ class Calculator(object):
         return self.getAllianceForMatch(match, self.getTeamAllianceIsRedInMatch(team, match))
 
     def setDefenseValuesForTeam(self, team, keyDict, valueRetrieval, dataModification, valueModification):
-        getValueFunc = lambda x, dKey: valueRetrieval(x)[dKey]
+        getValueFunc = lambda x, dKey: valueRetrieval(x)[dKey] if dKey in valueRetrieval(x) else []
         avgFunc = lambda dKey: dataModification([valueModification(getValueFunc(t, dKey)) for t in self.timdsWhereTeamFacedDefense(team, dKey)])
         map(lambda dKey: utils.setDictionaryValue(keyDict, dKey, avgFunc(dKey)), self.defenseList)
 
-    def defenseValuesForAverageTeam(self, team, keyDict, dataModification):
-	#pdb.set_trace()
-	defDict = keyDict(self.averageTeam)
-        avgFunc = lambda dKey: map(lambda x: keyDict(x)[dKey], self.teamsWhoHaveFacedDefense(dKey))
-        for d in self.defenseList:
-	    avg = dataModification(avgFunc(d))
-	    utils.setDictionaryValue(defDict, d, avg)
+    def defenseValuesForAverageTeam(self, keyDict, dataModification):
+        defDict = keyDict(self.averageTeam)
+        avgFunc = lambda dKey: dataModification(map(lambda x: keyDict(x)[dKey], self.teamsWhoHaveFacedDefense(dKey)))
+        setDictValueFunc = lambda dKey: utils.setDictionaryValue(defDict, dKey, avgFunc(dKey))
+        map(setDictValueFunc, self.defenseList)
 		
 
         
@@ -737,9 +719,6 @@ class Calculator(object):
 
     def categoryAAverageForDataFunction(self, team, defenseKey, dataFunction):
         a = self.getAverageForDataFunctionForTIMDValues(self.timdsWhereTeamFacedDefense(team, defenseKey), dataFunction)
-        if team.number == 1678:
-            print "hi " + defenseKey
-            print a
         return a
 
     def categoryAAverageDictForDataFunction(self, team, dataFunction):
@@ -825,14 +804,14 @@ class Calculator(object):
         a.sdTeleopShotAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.teleopShotAbility)
         a.sdSiegeAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeAbility)
         a.sdAutoAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.autoAbility)
-        self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesAuto,lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
-        self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.avgFailedTimesCrossedDefensesAuto, lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
-        self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele,lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
-	self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.avgFailedTimesCrossedDefensesTele, lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
-        self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.sdSuccessfulDefenseCrossesAuto, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
-        self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.sdFailedDefenseCrossesAuto, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
-        self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
-        self.defenseValuesForAverageTeam(self.averageTeam, lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesAuto,lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesAuto, lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele,lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.avgFailedTimesCrossedDefensesTele, lambda x: np.mean(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesAuto, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesAuto, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdSuccessfulDefenseCrossesTele, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
+        self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
         a.numScaleAndChallengePoints = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
         a.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
 
@@ -882,18 +861,18 @@ class Calculator(object):
             t.sdHighShotsAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numHighShotsMadeAuto)  # Checked
             t.sdLowShotsAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numLowShotsMadeAuto)  # Checked
             t.sdBallsKnockedOffMidlineAuto = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.numBallsKnockedOffMidlineAuto)  # Checked\
-            t.avgSuccessfulTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
-            t.avgSuccessfulTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
-            t.avgFailedTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
-            t.avgFailedTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
-            t.avgTimeForDefenseCrossAuto = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
-            t.avgTimeForDefenseCrossTele = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
-            t.sdSuccessfulDefenseCrossesAuto = self.getStdNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
-            t.sdSuccessfulDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
-            t.sdFailedDefenseCrossesAuto = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
-            t.sdFailedDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
-            t.crossingsSuccessRateForDefenseAuto = utils.dictQuotient(t.avgSuccessfulTimesCrossedDefensesAuto, utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto, t.avgFailedTimesCrossedDefensesAuto))
-            t.crossingsSuccessRateForDefenseTele = utils.dictQuotient(t.avgSuccessfulTimesCrossedDefensesTele, utils.dictSum(t.avgSuccessfulTimesCrossedDefensesTele, t.avgFailedTimesCrossedDefensesTele))
+            # t.avgSuccessfulTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
+            # t.avgSuccessfulTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
+            # t.avgFailedTimesCrossedDefensesAuto = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
+            # t.avgFailedTimesCrossedDefensesTele = self.getAverageNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
+            # t.avgTimeForDefenseCrossAuto = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
+            # t.avgTimeForDefenseCrossTele = self.getAverageTimeDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
+            # t.sdSuccessfulDefenseCrossesAuto = self.getStdNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesAuto)
+            # t.sdSuccessfulDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesSuccessfulCrossedDefensesTele)
+            # t.sdFailedDefenseCrossesAuto = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesAuto)
+            # t.sdFailedDefenseCrossesTele = self.getStdNumberDefenseValues(team, lambda timd: timd.timesFailedCrossedDefensesTele)
+            # t.crossingsSuccessRateForDefenseAuto = utils.dictQuotient(t.avgSuccessfulTimesCrossedDefensesAuto, utils.dictSum(t.avgSuccessfulTimesCrossedDefensesAuto, t.avgFailedTimesCrossedDefensesAuto))
+            # t.crossingsSuccessRateForDefenseTele = utils.dictQuotient(t.avgSuccessfulTimesCrossedDefensesTele, utils.dictSum(t.avgSuccessfulTimesCrossedDefensesTele, t.avgFailedTimesCrossedDefensesTele))
             # t.predictedSuccessfulCrossingsForDefenseTele = 
 
             # #Tele
@@ -949,19 +928,26 @@ class Calculator(object):
             
             t.slowedPercentage = utils.dictQuotient(t.avgNumTimesSlowed, sumCategoryADataPointDict)
             t.unaffectedPercentage = utils.dictQuotient(t.avgNumTimesUnaffected, sumCategoryADataPointDict)
-           # self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
-            #    lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
-           # self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto, 
-           #     lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
-           # self.setDefenseValuesForTeam(team, t.avgFailedTimesCrossedDefensesTele, lambda tm: tm.timesFailedCrossedDefensesTele, 
-            #    lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
-           # self.setDefenseValuesForTeam(team, t.avgFailedTimesCrossedDefensesAuto, lambda tm: tm.timesFailedCrossedDefensesAuto, 
-           #     lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
-           # self.setDefenseValuesForTeam(team, t.avgTimeForDefenseCrossTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
-           #      lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: np.mean(y) if y != None else 0)
-           # self.setDefenseValuesForTeam(team, t.avgTimeForDefenseCrossAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto, 
-            #     lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: np.mean(y) if y != None else 0)
-           #I WILL ADD standard dev later. PLEASE PUSH THIS CODE
+            self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
+                lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto, 
+                lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgFailedTimesCrossedDefensesTele, lambda tm: tm.timesFailedCrossedDefensesTele, 
+                lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgFailedTimesCrossedDefensesAuto, lambda tm: tm.timesFailedCrossedDefensesAuto, 
+                lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.avgTimeForDefenseCrossTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
+                lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: np.mean(y) if y != None and len(y) > 0 else 0)
+            self.setDefenseValuesForTeam(team, t.avgTimeForDefenseCrossAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto, 
+                lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: np.mean(y) if y != None and len(y) > 0 else 0)
+            self.setDefenseValuesForTeam(team, t.sdSuccessfulDefenseCrossesAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto,
+                lambda x: utils.rms(x) if x != None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.sdSuccessfulDefenseCrossesTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele,
+                lambda x: utils.rms(x) if x != None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.sdFailedDefenseCrossesAuto, lambda tm: tm.timesFailedCrossedDefensesAuto,
+                lambda x: utils.rms(x) if x != None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
+            self.setDefenseValuesForTeam(team, t.sdFailedDefenseCrossesTele, lambda tm: tm.timesFailedCrossedDefensesTele,
+                lambda x: utils.rms(x) if x != None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
             print "Completed first calcs for " + str(team.number)
 
     def numCrossingsForTIMD(self, timd, dataDict):

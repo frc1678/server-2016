@@ -11,7 +11,7 @@ import unicodedata
 import time
 import DataValidator
 import CSVExporter
-import pdb
+import utils
 import scoutPerformance
 
 shouldCacheJSONCopies = False
@@ -36,7 +36,6 @@ shouldCacheSecsCounter = 0
 cycle = 1
 
 numHoursBetweenCaches = 1.0/360.0
-print "s" + 2
 
 while(cycle <= 1):
 	print("\nCalcs Cycle " + str(cycle) + "...")
@@ -50,14 +49,16 @@ while(cycle <= 1):
 	comp.updateTIMDsFromFirebase()
 	calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
-	if len(calculator.getCompletedTIMDsInCompetition) == len(comp.timds): break 
 	cycle += 1
 
-elimsAlliances = []
-for i in range(8):
-	a, b, c = raw_input("Input team numbers for alliance " + str(i + 1)).split()
-	elimsAlliances.append([a,b,c])
+elimsAlliances, i = {}, 1
+while i <= 8:
+	a,b,c = raw_input("Input team numbers for alliance " + str(i) + ": ").split()
+	if all(x in map(lambda x: x.number, comp.teams) for x in [int(a), int(b), int(c)]): 
+		elimsAlliances[i] = [int(a),int(b),int(c)]
+		i += 1
 
+FBC.addElimsAlliances(elimsAlliances)
 
 
 # # DEBUG
