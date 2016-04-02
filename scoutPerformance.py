@@ -1,6 +1,8 @@
 import Math
 import DataModel
 import utils
+import numpy as np
+import prepFirebaseForCompetition
 
 # Scout Performance Analysis
 class ScoutPerformance(object):
@@ -9,8 +11,13 @@ class ScoutPerformance(object):
 		super(ScoutPerformance, self).__init__()
 		self.comp = comp
 		self.calculator = Math.Calculator(comp)
-		
+		self.correctionalMatches = {}
 
+	def makeTBAMatches(self):
+		func = lambda m: utils.setDictionaryValue(self.correctionalMatches, m.number, 
+			prepFirebaseForCompetition.makeSingleMatchRequest(m.number))
+		map(func, self.calculator.getCompletedMatchesInCompetition())
+		
 	def scoutedScoreForMatchNum(self, match, allianceIsRed):
 		matchNum = match.number
 		allTIMDs = self.calculator.getTIMDsForMatchNumber(matchNum)
@@ -49,14 +56,17 @@ class ScoutPerformance(object):
 		return autoPts + teleShotPts + teleDefenseCrossPts + scalePts + challengePts
 
 	def analyzeScouts(self):
+		scoutScoresByMatch = {}
 		scoutScores = {} # Lower is better
-
-		for m in self.comp.matches:
+		self.makeTBAMatches()
+		TBAMatches = self.correctionalMatches
+		for m in self.calculator.getCompletedMatchesInCompetition():
 			redScoutedScore = self.scoutedScoreForMatchNum(m, True)
 			blueScoutedScore = self.scoutedScoreForMatchNum(m, False)
-
-			redScoreDifference = abs(redScoutedScore - m.redScore)
-			blueScoreDifference = abs(blueScoutedScore - m.blueScore)
+			penaltyFreeRedScore = abs(m.redScore - TBAMatches[m.number]["score_breakdown"]["red"]["foulPoints"])
+			penaltyFreeBlueScore = abs(m.blueScore - TBAMatches[m.number]["score_breakdown"]["blue"]["foulPoints"])
+			redScoreDifference = abs(redScoutedScore - penaltyFreeRedScore)
+			blueScoreDifference = abs(blueScoutedScore - penaltyFreeBlueScore)
 
 			allTIMDs = self.calculator.getTIMDsForMatchNumber(m.number)
 			redAllianceNumbers = self.calculator.getAllianceForMatch(m, True)
@@ -66,16 +76,13 @@ class ScoutPerformance(object):
 
 			for timd in allTIMDs:
 				si = timd.scoutName
-				if not si in scoutScores.keys(): scoutScores[si] = 0
-				if timd in redAllianceTIMDs: 
-					scoutScores[si] += redScoreDifference 
-				else: 
-					scoutScores[si] += blueScoreDifference 
+				if not si in scoutScoresByMatch.keys(): scoutScoresByMatch[si] = []
+				scoutScoresByMatch[si].append(redScoreDifference if timd in redAllianceTIMDs else blueScoreDifference)
+		f = lambda s: utils.setDictionaryValue(scoutScores, s, np.mean(scoutScoresByMatch[s]))
 
+		map(f, scoutScoresByMatch)
 		print scoutScores
 		return scoutScores
-
-
 '''SAC
 
 Kyle: 569,

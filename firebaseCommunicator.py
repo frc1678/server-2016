@@ -6,11 +6,13 @@ import unicodedata
 from os import listdir
 import pdb
 import math
+import datetime
 
 # (superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
 # (superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
 #(superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
-(superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
+(superSecret, url) = ('IMXOxXD3FjOOUoMGJlkAK5pAtn89mGIWAEnaKJhP', 'https://1678-strat-dev-2016.firebaseio.com/')
+# (superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
 
@@ -50,25 +52,23 @@ class FirebaseCommunicator(object):
 		result = firebase.put(FBLocation, str(timd.teamNumber) + "Q" + str(timd.matchNumber), timdDict)
 
 	def addCalculatedTeamDataToFirebase(self, team):
+		print "Writing team " + str(team.number) + " to Firebase..."
 		calculatedTeamDataDict = utils.makeDictFromCalculatedTeamData(team.calculatedData)
 		FBLocation = "/Teams/" + str(team.number) 
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
 
 	def addCalculatedTIMDataToFirebase(self, timd):
+		print "Writing team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber) + " to Firebase..."
 		calculatedTIMDataDict = utils.makeDictFromCalculatedTIMData(timd.calculatedData)
-		# if timd.matchNumber==18 and timd.teamNumber==2640: pdb.set_trace()
 		FBLocation = "/TeamInMatchDatas/" + str(timd.teamNumber) + "Q" + str(timd.matchNumber)
 		result = firebase.put(FBLocation, 'calculatedData', calculatedTIMDataDict)
 
 	def addCalculatedMatchDataToFirebase(self, match):
-		# print "calc D"
-		# print match.calculatedData.predictedRedScore
+		print "Writing match " + str(match.number) + " to Firebase..."
 		calculatedMatchDataDict = utils.makeDictFromCalculatedMatchData(match.calculatedData)
 		'''for (key, value) in calculatedMatchDataDict:
 			if math.isnan(value):
 				d[key] = None'''
-		utils.jprint(calculatedMatchDataDict)
-		#pdb.set_trace()
 		FBLocation = "/Matches/" + str(match.number)
 		result = firebase.put(FBLocation, 'calculatedData', calculatedMatchDataDict)
 
@@ -157,7 +157,8 @@ class FirebaseCommunicator(object):
 	def cacheFirebase(self):
 		numFiles = len(listdir("CachedFirebases"))
 		data = json.dumps(firebase.get("/", None))
-		with open("./CachedFirebases/" + str(numFiles) + '.json', 'w') as f:
+		now = str(datetime.datetime.now())
+		with open("./CachedFirebases/" + now + '.json', 'w') as f:
 			f.write(data)
 			f.close()
 

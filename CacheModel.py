@@ -18,3 +18,5 @@ class CachedCompetitionData(object):
 		self.ballControlZScores = {-1 : 0}
 		self.defenseZScores = {-1 : 0}
 		self.drivingAbilityZScores = {-1 : 0}
+		self.predictedSeedings = []
+		self.actualSeedings = []

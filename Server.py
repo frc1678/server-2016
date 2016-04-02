@@ -42,7 +42,7 @@ shouldEmail = False
 numHoursBetweenCaches = 1.0/360.0
 emailer = CrashReporter.EmailThread()
 
-while(cycle <= 1):
+while(True):
 	print("\nCalcs Cycle " + str(cycle) + "...")
 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
 		shouldCacheSecsCounter = 0
@@ -63,16 +63,14 @@ while(cycle <= 1):
 	time.sleep(secsBetweenCalc)
 	cycle += 1
 
-pdb.set_trace()
+# elimsAlliances, i = {}, 1
+# while i <= 8:
+# 	a,b,c = raw_input("Input team numbers for alliance " + str(i) + ": ").split()
+# 	if all(x in map(lambda x: x.number, comp.teams) for x in [int(a), int(b), int(c)]): 
+# 		elimsAlliances[i] = [int(a),int(b),int(c)]
+# 		i += 1
 
-elimsAlliances, i = {}, 1
-while i <= 8:
-	a,b,c = raw_input("Input team numbers for alliance " + str(i) + ": ").split()
-	if all(x in map(lambda x: x.number, comp.teams) for x in [int(a), int(b), int(c)]): 
-		elimsAlliances[i] = [int(a),int(b),int(c)]
-		i += 1
-
-FBC.addElimsAlliances(elimsAlliances)
+# FBC.addElimsAlliances(elimsAlliances)
 
 
 # # DEBUG

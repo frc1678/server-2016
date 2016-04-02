@@ -28,6 +28,10 @@ def getEventTeamsRequestKey(competition, year):
 def makeEventTeamsRequest(competition, year):
 	return makeRequest(makeYearEventKeyRequestURL(year, competition, 'teams'))
 
+def makeSingleMatchRequest(matchNum, event=eventCode, year=year):
+	url = basicURL + 'match/' + str(year) + event + '_' + 'qm' + str(matchNum) + '?' + headerKey + '=' + headerValue
+	return utils.readJSONFromString(makeRequest(url))
+
 def makeFakeDatabase(eventCode=eventCode, year=year):
 	FBC = firebaseCommunicator.FirebaseCommunicator(competition)
 	FBC.JSONteams = utils.readJSONFromString(makeEventTeamsRequest(eventCode, year))
@@ -39,4 +43,4 @@ def makeFakeDatabase(eventCode=eventCode, year=year):
 	FBC.addTIMDsToFirebase(competition.matches) #You need to create the matches and teams before you call this
 
 
-makeFakeDatabase()
+# makeFakeDatabase()

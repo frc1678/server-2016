@@ -45,7 +45,6 @@ def dictQuotient(dict1, dict2):
 	return dictOperation(dict1, dict2, lambda x, y: float(x) / float(y) if float(y) != 0.0 else None, 1.0)
 
 def dictPercentage(dict1, dict2):
-	print dictSum(dict1, dict2)
 	return dictQuotient(dict1, dictSum(dict1, dict2))
 
 def dictDivideConstant(dict, constant):
