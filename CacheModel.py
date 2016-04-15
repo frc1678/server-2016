@@ -10,7 +10,6 @@ class CachedCompetitionData(object):
 	def __init__(self):
 		super(CachedCompetitionData, self).__init__()
 		self.defenseSightings = None
-		self.citrusDPRs = {}
 		self.teamsWithMatchesCompleted = []
 		self.speedZScores = {-1 : 0}
 		self.torqueZScores = {-1 : 0}
@@ -20,3 +19,5 @@ class CachedCompetitionData(object):
 		self.drivingAbilityZScores = {-1 : 0}
 		self.predictedSeedings = []
 		self.actualSeedings = []
+		self.SARs = []
+		self.TBAMatches = {}

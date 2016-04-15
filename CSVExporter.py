@@ -43,7 +43,7 @@ def TSVExportCVR(comp):
 
 def TSVExportMini(comp):
 	s = ""
-	MiniKeys = ["numAutoPoints", "actualSeed",	"siegeConsistency",	"disfunctionalPercentage", "avgDrivingAbility"]
+	MiniKeys = ["numAutoPoints", "actualSeed",	"siegeConsistency",	"disfunctionalPercentage", "avgDrivingAbility", "defensesCrossableAuto", "avgGroundIntakes", "pitNumberOfWheels"]
 	firstTeam = True
 	with open('./dataExportMini.tsv', 'w') as file:
 		for team in comp.teams:
@@ -56,7 +56,10 @@ def TSVExportMini(comp):
 				s += "\n"
 			s += str(team.number) + "	"
 			for key in MiniKeys:
-				s += str(cd[key]) + "	"
+				if key == 'pitNumberOfWheels':
+					s += str(team.pitNumberOfWheels)
+				else:
+					s += str(cd[key]) + "	"
 			s += "\n"
 		file.write(s)
 		file.close()

@@ -57,6 +57,7 @@ class CalculatedTeamData(object):
 		self.challengePercentage = None
 		self.breachPercentage = None
 		self.teleopShotAbility = None
+		self.defensesCrossableAuto = None
 		self.beachedPercentage = {
 			'pc' : None,
 			'cdf' : None
@@ -183,6 +184,8 @@ class CalculatedTeamData(object):
 		self.siegeConsistency = None
 		self.siegeAbility = None
 		self.autoAbility = None
+		self.autoAbilityExcludeD = None
+		self.autoAbilityExcludeLB = None
 		self.predictedNumRPs = None
 		self.actualNumRPs = None
 		self.numAutoPoints = None

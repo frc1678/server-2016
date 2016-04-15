@@ -1,50 +1,65 @@
-number	numAutoPoints	actualSeed	siegeConsistency	disfunctionalPercentage	avgDrivingAbility	
-1323	None	None	None	None	None	
-3925	None	None	None	None	None	
-3495	None	None	None	None	None	
-701	None	None	None	None	None	
-5499	None	None	None	None	None	
-5137	None	None	None	None	None	
-5136	None	None	None	None	None	
-5496	None	None	None	None	None	
-5134	None	None	None	None	None	
-3045	None	None	None	None	None	
-3303	None	None	None	None	None	
-254	None	None	None	None	None	
-5458	None	None	None	None	None	
-1422	None	None	None	None	None	
-973	None	None	None	None	None	
-972	None	None	None	None	None	
-1967	None	None	None	None	None	
-3970	None	None	None	None	None	
-1678	None	None	None	None	None	
-2073	None	None	None	None	None	
-8	None	None	None	None	None	
-812	None	None	None	None	None	
-1671	None	None	None	None	None	
-3859	None	None	None	None	None	
-751	None	None	None	None	None	
-585	None	None	None	None	None	
-5852	None	None	None	None	None	
-2813	None	None	None	None	None	
-4255	None	None	None	None	None	
-2761	None	None	None	None	None	
-2643	None	None	None	None	None	
-670	None	None	None	None	None	
-2135	None	None	None	None	None	
-5677	None	None	None	None	None	
-4543	None	None	None	None	None	
-5104	None	None	None	None	None	
-4711	None	None	None	None	None	
-4171	None	None	None	None	None	
-3482	None	None	None	None	None	
-3501	None	None	None	None	None	
-4135	None	None	None	None	None	
-3189	None	None	None	None	None	
-6059	None	None	None	None	None	
-4990	None	None	None	None	None	
-649	None	None	None	None	None	
-5817	None	None	None	None	None	
-1458	None	None	None	None	None	
-1662	None	None	None	None	None	
-4973	None	None	None	None	None	
+number	numAutoPoints	actualSeed	siegeConsistency	disfunctionalPercentage	avgDrivingAbility	defensesCrossableAuto	avgGroundIntakes	pitNumberOfWheels	
+604	0.5	45	0.875	0.125	1.70910229452	rt, rw	0.0	8
+5171	0.5	28	0.125	0.125	0.397727188636	mt, rt, rw, lb	0.75	6
+199	0.25	46	0.375	0.25	0.943259926658	rw	0.125	6
+668	0.25	61	0.875	0.0	2.22994761785	lb	2.75	6
+766	0.5	29	0.5	0.375	0.897882864618	mt, lb	0.875	8
+192	3.75	18	0.5	0.0	2.14751543026	cdf, lb	5.0	8
+115	0.5	35	0.375	0.125	1.57868327665	rw, lb	2.125	6
+114	1.25	13	0.625	0.125	1.92664285503	pc, lb	3.25	6
+4765	0.5	54	0.5	0.25	0.434260205941	cdf, mt, rw, rp	0.125	0
+253	0.5	63	0.25	0.25	0.458997172603	rp	0.5	4
+5655	0.0	62	0.125	0.625	0.8375		0.125	6
+256	0.0	9	0.5	0.5	0.865147224538	rw, rp	0.125	0
+3303	0.0	19	0.5	0.25	2.33702523868	mt, lb, rp	2.625	4
+254	8.88888888889	1	0.888888888889	0.0	2.92190050481	lb	8.44444444444	8
+5728	0.25	60	0.25	0.0	1.09672178229	rt, rw	1.0	6
+2135	0.0	55	0.75	0.375	1.19577308696	mt, rt, rw, lb, rp	1.125	6
+972	0.25	26	0.375	0.0	1.82639375435	mt, rt, rw, rp	1.25	6
+971	12.5	3	0.75	0.0	2.97736936176	rw, lb	7.125	3000
+2489	1.0	6	0.75	0.0	1.36363933487	rw, sp	1.25	6
+1967	0.25	30	0.75	0.125	1.23797730834	rt, rw	0.5	10
+5700	0.75	10	0.625	0.125	0.961612560372	mt, rt, lb	0.125	6
+4904	0.0	7	0.444444444444	0.111111111111	1.50354142476	mt, rw, rp	1.44444444444	6
+3256	0.25	36	0.5	0.25	1.37214699055	lb	3.5	8
+5924	0.25	8	0.875	0.125	1.65369650252	rw, lb	1.5	6
+6039	0.5	11	0.625	0.0	0.90732501155	mt, rt, lb, rp	0.125	0
+2035	0.75	31	0.875	0.0	1.50919372372	lb	2.0	6
+5940	0.0	14	0.875	0.0	2.19875154461	mt, rw, lb, rp	4.5	None
+1678	3.75	2	0.75	0.0	2.21714792511	rt, rw, lb	5.875	0
+368	0.0	4	0.875	0.0	1.37162400072	mt, rt, rw, rp	4.25	6
+5905	1.0	56	0.5	0.125	1.50536852895	mt, rw, rp	1.375	6
+2367	1.0	20	0.75	0.125	1.20576350835	rw	1.125	6
+8	0.0	15	0.625	0.0	0.531550159045	lb	0.625	6
+751	0.75	32	0.875	0.0	1.90801160398	rt, rw	1.5	6
+3482	0.0	40	0.625	0.125	1.33081771141	mt, rw, lb, rp	2.625	6
+2813	1.375	41	0.375	0.125	1.90459166901	rw	1.375	6
+581	0.75	47	0.5	0.125	1.57617551983	rt, lb	0.0	4
+4255	1.125	16	0.75	0.125	0.932862375913	rt	0.125	10
+1351	1.0	21	0.375	0.125	1.08918242951	pc, cdf, rt, lb	1.5	6
+2643	0.857142857143	22	0.571428571429	0.142857142857	0.785506448694	rt	0.142857142857	0
+670	0.571428571429	57	0.857142857143	0.0	1.47945247457	mt, rt, lb, rp	1.28571428571	4
+2854	0.5	48	0.25	0.5	1.57895255488	mt, rt, lb	0.0	0
+5027	0.0	49	0.75	0.125	1.4261026353	rw, lb, rp	0.5	6
+5026	1.25	37	0.625	0.0	1.59227259054	lb	0.75	6
+5737	0.5	64	0.625	0.125	1.00565359745	mt, rw, lb	0.875	0
+5677	0.5	23	0.75	0.125	1.6522559886	rt, rw, rp	2.5	6
+1868	0.25	24	0.625	0.125	1.12719415313	mt, rw, lb, rp	1.125	8
+100	0.5	33	0.625	0.375	0.875674831156	rt, rw, lb	0.375	4
+4186	1.25	27	0.75	0.25	0.968566052111	rt, rw	0.5	6
+5104	0.25	42	0.75	0.0	1.54509164721	mt, rw, lb	1.625	4
+1280	0.0	5	0.75	0.125	1.64809481516	mt, lb, rp	2.25	0
+1700	0.5	38	0.5	0.125	-0.00939955206174	lb, rp	1.0	8
+846	0.75	50	0.875	0.125	2.02476661685	lb	2.25	10
+5089	0.666666666667	25	0.777777777778	0.111111111111	1.45946732022	mt, rt, rw	2.55555555556	6
+852	0.25	12	0.75	0.125	1.39528669465	mt, rt, rw, lb, rp	2.375	0
+841	1.5	51	0.875	0.125	1.77934277895	rw	1.625	8
+4643	0.75	58	0.75	0.125	0.58948773418		0.125	8
+4159	0.25	59	0.5	0.0	1.48869297121	rw	0.875	10
+6036	0.5	52	1.0	0.0	1.88013418714	cdf, rw, lb	2.375	10
+2473	1.5	39	0.5	0.125	0.899888845987	lb	1.25	6
+6059	0.0	53	0.5	0.5	1.63055777229	mt, rw, lb, sp	0.0	6
+4990	0.25	43	0.5	0.5	0.976370514071	rt	0.0	6
+649	1.5	17	0.75	0.0	1.29411203034	rt, lb	3.5	10
+1662	0.25	34	1.0	0.0	1.60328406415	rp, db	2.125	0
+4171	0.0	44	0.75	0.125	1.2939320425	mt, lb, rp	0.0	0

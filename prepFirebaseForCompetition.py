@@ -8,7 +8,7 @@ import time
 basicURL = "http://www.thebluealliance.com/api/v2/"
 headerKey = "X-TBA-App-Id"
 headerValue = "blm:serverProof1678:004" # set to "<your initials>:TBA_communicator:0"
-eventCode = 'cada'
+eventCode = 'casj'
 year = 2016
 
 competition = DataModel.Competition()
@@ -28,6 +28,9 @@ def getEventTeamsRequestKey(competition, year):
 def makeEventTeamsRequest(competition, year):
 	return makeRequest(makeYearEventKeyRequestURL(year, competition, 'teams'))
 
+def makeEventRankingsRequest(competition, year):
+	makeRequest(makeYearEventKeyRequestURL(year, competition, 'rankings'))
+
 def makeSingleMatchRequest(matchNum, event=eventCode, year=year):
 	url = basicURL + 'match/' + str(year) + event + '_' + 'qm' + str(matchNum) + '?' + headerKey + '=' + headerValue
 	return utils.readJSONFromString(makeRequest(url))
@@ -43,4 +46,3 @@ def makeFakeDatabase(eventCode=eventCode, year=year):
 	FBC.addTIMDsToFirebase(competition.matches) #You need to create the matches and teams before you call this
 
 
-# makeFakeDatabase()

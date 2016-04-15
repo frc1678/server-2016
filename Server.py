@@ -26,8 +26,6 @@ comp.updateTIMDsFromFirebase()
 CSVExporter.TSVExportSAC(comp)
 CSVExporter.TSVExportAll(comp)
 CSVExporter.TSVExportMini(comp)
-SPA = scoutPerformance.ScoutPerformance(comp)
-SPA.analyzeScouts()
 dv = DataValidator.DataValidator(comp)
 
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)

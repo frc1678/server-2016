@@ -8,12 +8,12 @@ import pdb
 import math
 import datetime
 
-# (superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
+(superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
 # (superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
 #(superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
-(superSecret, url) = ('IMXOxXD3FjOOUoMGJlkAK5pAtn89mGIWAEnaKJhP', 'https://1678-strat-dev-2016.firebaseio.com/')
+# (superSecret, url) = ('IMXOxXD3FjOOUoMGJlkAK5pAtn89mGIWAEnaKJhP', 'https://1678-strat-dev-2016.firebaseio.com/')
 # (superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
-
+# 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
 
 firebase = fb.FirebaseApplication(url, auth)
@@ -28,7 +28,6 @@ class FirebaseCommunicator(object):
 
 	def updateFirebaseWithTeam(self, team):
 		teamDict = utils.makeDictFromTeam(team)
-		#teamDict['name'] = unicodedata.normalize('NFKD', teamDict['name']).encode('ascii','ignore') # For some strange reason the names of the teams are all in unicode strings
 		FBLocation = "/Teams"
 		result = firebase.put(FBLocation, team.number, teamDict)
 
@@ -149,9 +148,10 @@ class FirebaseCommunicator(object):
 		firebase.put(FBLocation, 'Matches', [])
 		firebase.put(FBLocation, 'TeamInMatchDatas', [])
 
-	def addElimsAlliances(self, alliancesDict):
+	def addScoutScoresToFirebase(self, scoutScores):
+		print "Writing Scout Scores to Firebase"
 		FBLocation = "/"
-		firebase.put(FBLocation, 'Elimination Alliances', alliancesDict)
+		result = firebase.put(FBLocation, 'Scout Scores', scoutScores)
 
 
 	def cacheFirebase(self):

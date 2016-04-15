@@ -27,10 +27,10 @@ class FirstTIMDProcess(multiprocessing.Process):
                     self.timd.calculatedData): self.timd.calculatedData = DataModel.CalculatedTeamInMatchData()
             c = self.timd.calculatedData
             c.teleopShotAbility = self.calculator.getTIMDTeleopShotAbility(self.timd)
-            c.highShotAccuracyTele = self.calculator.getTIMDHighShotAccuracyTele(self.timd)  # Checked
-            c.highShotAccuracyAuto = self.calculator.getTIMDHighShotAccuracyAuto(self.timd)  # Checked
-            c.lowShotAccuracyTele = self.calculator.getTIMDLowShotAccuracyTele(self.timd)  # Checked
-            c.lowShotAccuracyAuto = self.calculator.getTIMDLowShotAccuracyAuto(self.timd)  # Checked
+            c.highShotAccuracyTele = self.calculator.TIMDShotAccuracy(self.timd.numHighShotsMadeTele, self.timd.numHighShotsMissedTele)  # Checked
+            c.highShotAccuracyAuto = self.calculator.TIMDShotAccuracy(self.timd.numHighShotsMadeAuto, self.timd.numHighShotsMissedAuto)  # Checked
+            c.lowShotAccuracyTele = self.calculator.TIMDShotAccuracy(self.timd.numLowShotsMadeTele, self.timd.numLowShotsMissedTele)  # Checked
+            c.lowShotAccuracyAuto = self.calculator.TIMDShotAccuracy(self.timd.numLowShotsMadeAuto, self.timd.numLowShotsMissedAuto)  # Checked
             c.siegeAbility = self.calculator.singleSiegeAbility(self.timd)
             c.autoAbility = self.calculator.autoAbility(self.timd)
             c.siegeConsistency = utils.convertFirebaseBoolean(self.timd.didChallengeTele) or utils.convertFirebaseBoolean(self.timd.didScaleTele)
