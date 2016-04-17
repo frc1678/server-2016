@@ -11,7 +11,7 @@ import CacheModel as cache
 import DataModel
 import utils
 import time
-from prepFirebaseForCompetition import makeSingleMatchRequest
+import TBACommunicator
 
 import multiprocessing
 import copy
@@ -26,6 +26,7 @@ class Calculator(object):
         warnings.simplefilter('error', RuntimeWarning)
 
         self.comp = competition
+        self.TBAC = TBACommunicator.TBACommunicator()
         self.categories = ['a', 'b', 'c', 'd', 'e']
         self.ourTeamNum = 1678
         self.monteCarloIterations = 100
@@ -215,15 +216,14 @@ class Calculator(object):
         return utils.sumStdDevs([5 * team.calculatedData.sdHighShotsTele, 10 * team.calculatedData.sdHighShotsAuto, 5 * team.calculatedData.sdLowShotsAuto, 2 * team.calculatedData.sdLowShotsTele])
 
     def twoBallAutoTIMDsForTeam(self, team):
-        return filter(lambda timd: timd.calculatedData.highShotsAttemptedTele > 2, self.getCompletedTIMDsForTeam(team))
+        return filter(lambda tm: tm.numHighShotsMadeAuto + tm.numHighShotsMissedAuto > 2, self.getCompletedTIMDsForTeam(team))
 
     def twoBallAutoTriedPercentage(self, team):
         return len(self.twoBallAutoTIMDsForTeam(team)) / len(self.getCompletedTIMDsForTeam(team)) 
 
     def twoBallAutoAccuracy(self, team):
         timds = self.twoBallAutoTIMDsForTeam(team)
-        if len(timds) > 0:
-            return np.mean([timd.calculatedData.highShotAccuracyAuto for timd in timds])
+        return np.mean([timd.calculatedData.highShotAccuracyAuto for timd in timds]) if len(timds) > 0 else None
 
     def stdDevTeleopShotAbility(self, team):
         return utils.sumStdDevs(5 * team.calculatedData.sdHighShotsTele, 2 * team.calculatedData.sdLowShotsTele)
@@ -695,14 +695,11 @@ class Calculator(object):
         teams = self.teamsWithMatchesCompleted()
         return sorted(teams, key=lambda t: (retrievalFunctions[0](t), retrievalFunctions[1](t), retrievalFunctions[2](t)), reverse=True)  
 
+    def getTeamSeed(self, team):
+        return int(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][0])
 
+    
     #SCOUT ANALYSIS
-
-    def makeTBAMatches(self):
-        correctionalMatches = {}
-        func = lambda m: utils.setDictionaryValue(correctionalMatches, m.number, makeSingleMatchRequest(m.number))
-        map(func, self.getCompletedMatchesInCompetition())
-        return correctionalMatches
 
     def scoutedScoreForMatchNum(self, match, allianceIsRed):
         matchNum = match.number
@@ -804,7 +801,7 @@ class Calculator(object):
         return scoutScores
 
     def rankScouts(self):
-        return sorted(self.scoutErrorOPR(), key=lambda x: x['score'], reverse=True)
+        return sorted(self.scoutAccRank(), key=lambda x: x['score'], reverse=True)
     
     
     #CACHING
@@ -826,8 +823,8 @@ class Calculator(object):
     def cacheSecondTeamData(self):
         map(lambda (func, dictionary): self.rValuesForAverageFunctionForDict(func, dictionary), self.rScoreParams())
         map(self.doSecondCachingForTeam, self.comp.teams)
-        self.cachedComp.actualSeedings = self.teamsSortedByRetrievalFunctions(self.getSeedingFunctions())
-        self.cachedComp.predictedSeedings = self.teamsSortedByRetrievalFunctions(self.getPredictedSeedingFunctions())
+        self.cachedComp.actualSeedings = self.TBAC.makeEventRankingsRequest()
+        self.cachedComp.predictedSeedings = self.teamsSortedByRetrievalFunctions(self.getPredictedSeedingFunctions()) 
         self.doSecondCachingForTeam(self.averageTeam)
 
     def doCachingForTeam(self, team):
@@ -1043,11 +1040,10 @@ class Calculator(object):
 
     def doSecondCalculationsForTeam(self, team):
         if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
-            print "Beginning second calcs for team " + str(team.number)
             t = team.calculatedData
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
             t.actualNumRPs = self.getSumForDataFunctionForTeam(team, lambda timd: timd.calculatedData.numRPs)
-            t.actualSeed = self.cachedComp.actualSeedings.index(team) + 1
+            t.actualSeed = self.getTeamSeed(team)
             t.predictedSeed = self.cachedComp.predictedSeedings.index(team) + 1
             t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]
@@ -1119,7 +1115,6 @@ class Calculator(object):
             self.doBetweenFirstAndSecondCalculationsForTeams()
             self.doMatchesCalculations()
             self.doSecondTeamCalculations()
-
             map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())
             map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())
             map(FBC.addCalculatedMatchDataToFirebase, self.getCompletedMatchesInCompetition())

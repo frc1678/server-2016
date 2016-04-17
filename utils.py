@@ -162,14 +162,9 @@ def makeDictFromTIMD(timd):
 	return d
 
 
-def makeDictFromCalculatedTeamData(calculatedData):
+def makeDictFromCalculatedData(calculatedData):
 	return calculatedData.__dict__
 
-def makeDictFromCalculatedMatchData(calculatedData):
-	return calculatedData.__dict__
-
-def makeDictFromCalculatedTIMData(calculatedData):
-	return calculatedData.__dict__
 
 def makeTIMDsFromDicts(timds):
 	t = []

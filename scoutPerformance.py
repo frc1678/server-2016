@@ -2,7 +2,6 @@ import Math
 import DataModel
 import utils
 import numpy as np
-import prepFirebaseForCompetition
 import CacheModel as cache
 import pdb
 
