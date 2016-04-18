@@ -1,6 +1,6 @@
 import DataModel
 import firebaseCommunicator
-import TBACommunicator 
+import TBACommunicator
 import utils
 import time
 

@@ -1,6 +1,8 @@
 import math
 from operator import attrgetter
+import re
 import pdb
+import time
 
 import numpy as np
 import scipy as sp
@@ -42,6 +44,7 @@ class Calculator(object):
         self.averageTeam = DataModel.Team()
         self.averageTeam.number = -1
         self.averageTeam.name = 'Average Team'
+        self.surrogateTIMDs = []
         self.cachedComp = cache.CachedCompetitionData()
         self.cachedTeamDatas[self.averageTeam.number] = cache.CachedTeamData(**{'teamNumber': self.averageTeam.number})
         [utils.setDictionaryValue(self.cachedTeamDatas, team.number,
@@ -58,7 +61,7 @@ class Calculator(object):
         return [match for match in self.comp.matches if self.teamInMatch(team, match)]
 
     def getCompletedMatchesForTeam(self, team):
-        return filter(self.matchIsCompleted, self.getMatchesForTeam(team))
+        return filter(lambda m: self.matchIsCompleted(m) and not self.isSurrogate(team, m), self.getMatchesForTeam(team))
 
     def teamsWithMatchesCompleted(self):
         return self.cachedComp.teamsWithMatchesCompleted
@@ -80,10 +83,7 @@ class Calculator(object):
         return [match for match in self.comp.matches if match.number == matchNumber][0]
 
     def teamsInMatch(self, match):
-        teamNumbersInMatch = []
-        teamNumbersInMatch.extend(match.redAllianceTeamNumbers)
-        teamNumbersInMatch.extend(match.blueAllianceTeamNumbers)
-        return [self.getTeamForNumber(teamNumber) for teamNumber in teamNumbersInMatch]
+        return match.redAllianceTeamNumbers + match.blueAllianceTeamNumbers
 
     def teamInMatch(self, team, match):
         return team in self.teamsInMatch(match)
@@ -96,7 +96,7 @@ class Calculator(object):
 
     def teamsAreOnSameAllianceInMatch(self, team1, team2, match):
         alliances = [match.redAllianceTeamNumbers, match.blueAllianceTeamNumbers]
-        return sum([True for alliance in alliances if team1.number in alliance and team2.number in alliance]) == 1 
+        return len(filter(lambda a: team1.number in a and team2.number in a, alliances)) == 1 
 
     def teamsForTeamNumbersOnAlliance(self, alliance):
         return map(self.getTeamForNumber, alliance)
@@ -151,13 +151,17 @@ class Calculator(object):
         return calculatedData.drivingAbility != None 
 
     def timdIsCompleted(self, timd):
-        return timd.rankTorque != None and timd.numHighShotsMadeTele != None
+        return timd.rankTorque != None and timd.numHighShotsMadeTele != None 
 
     def matchHasValuesSet(self, match):
         return match.redScore != None and match.blueScore != None
   
     def retrieveCompletedTIMDsForTeam(self, team):
         return self.getCompletedTIMDsForTeamNumber(team.number)
+
+    def isSurrogate(self, team, match):
+        timd = self.getTIMDForTeamNumberAndMatchNumber(team.number, match.number)
+        return timd in self.surrogateTIMDs
 
 
     #Calculated Team Data
@@ -196,8 +200,7 @@ class Calculator(object):
         if x != None and mu != None and sigma != None: return 1.0 - stats.norm.cdf(x, mu, sigma)
 
     def welchsTest(self, mean1, mean2, std1, std2, sampleSize1, sampleSize2):
-        if std1 == 0.0 or std2 == 0.0 or sampleSize1 <= 0 or sampleSize2 <= 0:
-            return float(mean1 > mean2)
+        if std1 == 0.0 or std2 == 0.0 or sampleSize1 <= 0 or sampleSize2 <= 0: return float(mean1 > mean2)
         numerator = mean1 - mean2
         denominator = ((std1 ** 2) / sampleSize1 + (std2 ** 2) / sampleSize2) ** 0.5
         return numerator / denominator
@@ -216,10 +219,10 @@ class Calculator(object):
         return utils.sumStdDevs([5 * team.calculatedData.sdHighShotsTele, 10 * team.calculatedData.sdHighShotsAuto, 5 * team.calculatedData.sdLowShotsAuto, 2 * team.calculatedData.sdLowShotsTele])
 
     def twoBallAutoTIMDsForTeam(self, team):
-        return filter(lambda tm: tm.numHighShotsMadeAuto + tm.numHighShotsMissedAuto > 2, self.getCompletedTIMDsForTeam(team))
+        return filter(lambda tm: tm.numHighShotsMadeAuto + tm.numHighShotsMissedAuto >= 2, self.getCompletedTIMDsForTeam(team))
 
     def twoBallAutoTriedPercentage(self, team):
-        return len(self.twoBallAutoTIMDsForTeam(team)) / len(self.getCompletedTIMDsForTeam(team)) 
+        return float(len(self.twoBallAutoTIMDsForTeam(team))) / len(self.getCompletedTIMDsForTeam(team))
 
     def twoBallAutoAccuracy(self, team):
         timds = self.twoBallAutoTIMDsForTeam(team)
@@ -284,6 +287,9 @@ class Calculator(object):
         value = self.monteCarloForMeanForStDevForValueFunction(mean, stdDev, lambda crossings: 5 * min(crossings, 2))
         return value
 
+    def timdHasDefenseExclusion(self, timd, exclusions):
+        return timd if len(filter(lambda x: x in timd.timesSuccessfulCrossedDefensesAuto, exclusions)) == 0 else None 
+    
     def defenseFacedForTIMD(self, timd, defenseKey):
         return defenseKey in self.defensesFacedInTIMD(timd)
 
@@ -325,6 +331,9 @@ class Calculator(object):
         defenseAlpha = cachedData.alphas[defenseKey]
         sumDefenseAlphas = sum(map(lambda dKey: cachedData.alphas[dKey], self.defenseList))
         return defenseAlpha / sumDefenseAlphas if sumDefenseAlphas > 0 else None
+
+    def totalCrossesInAutoForTIMD(self, timd):
+        return sum([len(value) for value in timd.timesSuccessfulCrossedDefensesAuto.values() if value != None])
 
     def predictedCrosses(self, team, defenseKey):
         competitionDefenseSightings = self.numTimesCompetitionFacedDefense(defenseKey)
@@ -411,7 +420,6 @@ class Calculator(object):
 
     def defensesCrossedInAutoByTeam(self, team):
         func = lambda d: team.calculatedData.avgSuccessfulTimesCrossedDefensesAuto[d]
-        print [dKey for dKey in self.defenseList if func(dKey) != None and func(dKey) > 0]
         return ', '.join([dKey for dKey in self.defenseList if func(dKey) != None and func(dKey) > 0])
 
     def standardDeviationForTeamForCategory(self, team, category):
@@ -466,9 +474,6 @@ class Calculator(object):
                 defensesCrossed += len(crossesDict[category] if crossesDict[category] != None else [])
         defensePoints = 10 if defensesCrossed >= 1 else 0
         return (10 * timd.numHighShotsMadeAuto + 5 * timd.numLowShotsMadeAuto + 2 * int(utils.convertFirebaseBoolean(timd.didReachAuto)) + defensePoints)
-
-    def timdHasDefenseExclusion(self, timd, exclusions):
-        return timd if len(filter(lambda x: x in timd.timesSuccessfulCrossedDefensesAuto, exclusions)) == 0 else None 
 
     def rValuesForAverageFunctionForDict(self, averageFunction, d):
         impossible = True
@@ -628,7 +633,7 @@ class Calculator(object):
         return predictedRPs + self.actualNumberOfRPs(team)
 
     def actualNumberOfRPs(self, team):
-        return sum([self.RPsGainedFromMatchForTeam(team, m) for m in self.getCompletedMatchesForTeam(team)])
+        return self.getSumForDataFunctionForTeam(team, lambda tm: tm.calculatedData.numRPs)   
 
     def scoreRPsGainedFromMatchWithScores(self, score, opposingScore):
         if score > opposingScore: return 2
@@ -697,6 +702,9 @@ class Calculator(object):
 
     def getTeamSeed(self, team):
         return int(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][0])
+
+    def getTeamRPsFromTBA(self, team):
+        return int(float(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][2]))
 
     
     #SCOUT ANALYSIS
@@ -821,8 +829,10 @@ class Calculator(object):
             (lambda t: t.calculatedData.avgDrivingAbility, self.cachedComp.drivingAbilityZScores)]
 
     def cacheSecondTeamData(self):
+        print "ABOUT TO CACHE SEEDING"
         map(lambda (func, dictionary): self.rValuesForAverageFunctionForDict(func, dictionary), self.rScoreParams())
         map(self.doSecondCachingForTeam, self.comp.teams)
+        time.sleep(10)
         self.cachedComp.actualSeedings = self.TBAC.makeEventRankingsRequest()
         self.cachedComp.predictedSeedings = self.teamsSortedByRetrievalFunctions(self.getPredictedSeedingFunctions()) 
         self.doSecondCachingForTeam(self.averageTeam)
@@ -1007,6 +1017,7 @@ class Calculator(object):
             
             t.slowedPercentage = utils.dictQuotient(t.avgNumTimesSlowed, sumCategoryADataPointDict)
             t.unaffectedPercentage = utils.dictQuotient(t.avgNumTimesUnaffected, sumCategoryADataPointDict)
+            t.avgNumTimesCrossedDefensesAuto = self.getAverageForDataFunctionForTeam(team, lambda tm: tm.calculatedData.totalNumTimesCrossedDefensesAuto)
             self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
                 lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
             self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesAuto, lambda tm: tm.timesSuccessfulCrossedDefensesAuto, 
@@ -1042,7 +1053,7 @@ class Calculator(object):
         if not len(self.getCompletedTIMDsForTeam(team)) <= 0:
             t = team.calculatedData
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
-            t.actualNumRPs = self.getSumForDataFunctionForTeam(team, lambda timd: timd.calculatedData.numRPs)
+            t.actualNumRPs = self.getTeamRPsFromTBA(team)
             t.actualSeed = self.getTeamSeed(team)
             t.predictedSeed = self.cachedComp.predictedSeedings.index(team) + 1
             t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
@@ -1125,6 +1136,15 @@ class Calculator(object):
 
         else:
             print "No Data"
+
+    def adjustSchedule(self):
+        surrogateTIMDs = []
+        a = ""
+        while True:
+            a = raw_input("Enter surrogate team number and match number (e.g. 254Q23): ")
+            if a == "f": break
+            surrogateTIMDs.append(self.getTIMDForTeamNumberAndMatchNumber(int(re.split('Q', a)[0]), int(re.split('Q', a)[1])))
+        self.surrogateTIMDs = surrogateTIMDs
 
    
 

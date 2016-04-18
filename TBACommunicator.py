@@ -1,6 +1,7 @@
 import urllib3
 import utils
 import Math
+import requests
 
 class TBACommunicator(object):
 	"""docstring for TBACommunicator"""
@@ -28,7 +29,8 @@ class TBACommunicator(object):
 		return self.makeRequest(self.makeYearEventKeyRequestURL('teams'))
 
 	def makeEventRankingsRequest(self):
-		return utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('rankings')))[1:]
+		try: return utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('rankings')))[1:]
+		except requests.exceptions.ConnectionError: pass
 
 	def makeSingleMatchRequest(self, matchNum):
 		url = self.basicURL + "/match" + self.eventCodeYear + "_qm" + matchNum + + '?' + self.headerKey + '=' + self.headerValue
@@ -38,11 +40,11 @@ class TBACommunicator(object):
 		return utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('matches')))
 
 	def TBAIsBehind(self, matches):
-		TBAMatches = len(filter(lambda m: m["comp_level"] == 'qm' and m['score_breakdown'] != None, self.makeEventMatchesRequest()))
-		return abs(len(matches) - TBAMatches) >= 3
+		TBACompletedMatches = len(filter(lambda m: m["comp_level"] == 'qm' and m['score_breakdown'] != None, self.makeEventMatchesRequest()))
+		return abs(len(matches) - TBACompletedMatches) >= 3
 
 	def makeTBAMatches(self, matches):
-		matches = {}
-	   	func = lambda m: utils.setDictionaryValue(correctionalMatches, m.number, self.makeSingleMatchRequest(m.number))
+		TBAMatches = {}
+	   	func = lambda m: utils.setDictionaryValue(TBAMatches, m.number, self.makeSingleMatchRequest(m.number))
 	   	map(func, matches)
-	   	return matches
+	   	return TBAMatches
