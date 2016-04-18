@@ -3,6 +3,7 @@ import utils
 import json
 from firebase import firebase as fb
 import unicodedata
+import requests
 from os import listdir
 import pdb
 import math
@@ -12,8 +13,8 @@ import datetime
 # (superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
 #(superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
 # (superSecret, url) = ('IMXOxXD3FjOOUoMGJlkAK5pAtn89mGIWAEnaKJhP', 'https://1678-strat-dev-2016.firebaseio.com/')
-# (superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
-(superSecret, url) = ('lGufYCifprPw8p1fiVOs7rqYV3fswHHr9YLwiUWh', 'https://1678-extreme-testing.firebaseio.com/') 
+(superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
+# (superSecret, url) = ('lGufYCifprPw8p1fiVOs7rqYV3fswHHr9YLwiUWh', 'https://1678-extreme-testing.firebaseio.com/') 
 
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
 
@@ -49,68 +50,44 @@ class FirebaseCommunicator(object):
 		print "Writing team " + str(team.number) + " to Firebase..."
 		calculatedTeamDataDict = utils.makeDictFromCalculatedData(team.calculatedData)
 		FBLocation = "/Teams/" + str(team.number) 
-		result = firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
+		try: firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
+		except requests.exceptions.RequestException as e: pass
 
 	def addCalculatedTIMDataToFirebase(self, timd):
 		print "Writing team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber) + " to Firebase..."
 		calculatedTIMDataDict = utils.makeDictFromCalculatedData(timd.calculatedData)
 		FBLocation = "/TeamInMatchDatas/" + str(timd.teamNumber) + "Q" + str(timd.matchNumber)
-		result = firebase.put(FBLocation, 'calculatedData', calculatedTIMDataDict)
-
+		try: firebase.put(FBLocation, 'calculatedData', calculatedTIMDataDict)
+		except requests.exceptions.RequestException as e: pass
+	
 	def addCalculatedMatchDataToFirebase(self, match):
 		print "Writing match " + str(match.number) + " to Firebase..."
 		calculatedMatchDataDict = utils.makeDictFromCalculatedData(match.calculatedData)
 		FBLocation = "/Matches/" + str(match.number)
-		result = firebase.put(FBLocation, 'calculatedData', calculatedMatchDataDict)
+		try: firebase.put(FBLocation, 'calculatedData', calculatedMatchDataDict)
+		except requests.exceptions.RequestException as e: pass
 
 	def addTeamsToFirebase(self): 
 		print "\nDoing Teams..."
-		for team in self.JSONteams:
-			print str(team["team_number"]) + ",", # This is weird syntax, I'm aware. The comma on the end tells it not to print a new line, but to do a space instead
-			t = DataModel.Team()
-			t.number = team["team_number"]
-			t.name = team["nickname"]
-			t.teamInMatchDatas = []
-			self.updateFirebaseWithTeam(t)
+		map(lambda t: self.updateFirebaseWithTeam(utils.setDataForTeam(t)), self.JSONteams)
 		
 	def addMatchesToFirebase(self):
 		print "\nDoing Matches..."
-		for match in self.JSONmatches:
-			#if match["match_number"] == 14: #DEBUG
-			#	break
-			if match["comp_level"] != "qm":
-				continue # goes to next loop iteration
-			m = DataModel.Match()
-			alliancesDict = match["alliances"]
-			m.number = match["match_number"]
-			print str(m.number) + ",",
-			m.blueScore = alliancesDict["blue"]["score"]
-			m.redScore = alliancesDict["red"]["score"]
-			m.blueAllianceTeamNumbers = alliancesDict["blue"]["teams"]
-			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
-			m.TIMDs = []
-			self.updateFirebaseWithMatch(m)
+		matches = filter(lambda m: m["comp_level"] == 'qm', self.JSONmatches)
+		map(lambda m: self.updateFirebaseWithMatch(utils.setDataForMatch(m, False)), matches)
 
 	def addScorelessMatchesToFirebase(self):
 		print "\nDoing Matches..."
-		for match in self.JSONmatches:
-			if match["comp_level"] != "qm":
-				continue 
-			m = DataModel.Match()
-			alliancesDict = match["alliances"]
-			m.number = match["match_number"]
-			print str(m.number) + ",",
-			m.blueScore = None
-			m.redScore = None
-			m.blueAllianceTeamNumbers = alliancesDict["blue"]["teams"]
-			m.redAllianceTeamNumbers = alliancesDict["red"]["teams"]
-			m.TIMDs = []
-			self.updateFirebaseWithMatch(m)
+		matches = filter(lambda m: m["comp_level"] == 'qm', self.JSONmatches)
+		map(lambda m: self.updateFirebaseWithMatch(utils.setDataForMatch(m, True)), matches)
+		
 
-	def addTIMDsToFirebase(self, matches):
-		print "\nDoing TIMDs..."
+	def addTIMDsToFirebase(self, matches): #addTIMD function get all team numbers in a given match and updates firebase with the 
+		print "\nDoing TIMDs..."																				#corresponding TIMD
 		timdFunc = lambda t, m: self.updateFirebaseWithTIMD(utils.makeTIMDFromTeamNumberAndMatchNumber(t, m.number))
-		map(lambda m: map(lambda t: timdFunc(t, m.number), m.redAllianceTeamNumbers.extend(m.blueAllianceTeamNumbers)), matches)
+		addTIMD = lambda m: map(lambda t: timdFunc(t, m), m.redAllianceTeamNumbers + m.blueAllianceTeamNumbers)
+		map(addTIMD, matches)
+
 
 	def addCompInfoToFirebase(self): #Doing these keys manually so less clicking in firebase is better and because just easier
 		FBLocation = "/"
@@ -124,12 +101,6 @@ class FirebaseCommunicator(object):
 		print "\nWARNING: Wiping Firebase..."
 		FBLocation = "/"
 		firebase.delete(FBLocation, None)
-
-	def addScoutScoresToFirebase(self, scoutScores):
-		print "Writing Scout Scores to Firebase"
-		FBLocation = "/"
-		result = firebase.put(FBLocation, 'Scout Scores', scoutScores)
-
 
 	def cacheFirebase(self):
 		data = json.dumps(firebase.get("/", None))

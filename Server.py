@@ -31,7 +31,7 @@ dv = DataValidator.DataValidator(comp)
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 #FBC.wipeDatabase()
 calculator = Math.Calculator(comp)
-
+calculator.adjustSchedule()
 secsBetweenCalc = 0
 shouldCacheSecsCounter = 0
 cycle = 1

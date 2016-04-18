@@ -193,7 +193,22 @@ def makeArrayOfTeamNumAndMatchNum(teamNum):
 	timds = []
 	for timd in self.comp.TIMDs:
 		if timd.teamNumber == teamNum:
-			teamNumAndMatchNum = teamNum + "Q" + str(timd.matchNumber)			
+			teamNumAndMatchNum = teamNum + "Q" + str(timd.matchNumber)	
+
+def setDataForMatch(match, scoreless):
+	m = DataModel.Match()
+	f = lambda key: [match["alliances"]["red"][key], match["alliances"]["blue"][key]]
+	m.number, m.redAllianceTeamNumbers, m.blueAllianceTeamNumbers = int(match["match_number"]), f("teams")[0], f("teams")[1]
+	m.redScore, m.blueScore, m.TIMDs = None if scoreless else f("score")[0], None if scoreless else f("score")[1], []
+	print str(m.number) + "," ,
+	return m
+
+def setDataForTeam(team):
+	t = DataModel.Team()
+	t.number, t.name, t.teamInMatchDatas = team["team_number"], team["nickname"], []
+	print str(t.number) + "," ,
+	return t
+
 
 def printWarningForSeconds(numSeconds):
 		print str(numSeconds) + ' SECONDS UNTIL FIREBASE WIPES'

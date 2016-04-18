@@ -1,6 +1,6 @@
 import firebaseCommunicator
 import utils
-# Classes That Reflect Firebase Data Structure
+#Classes That Reflect Firebase Data Structure
 
 class Competition(object):
 	"""docstring for Competition"""
@@ -58,6 +58,7 @@ class CalculatedTeamData(object):
 		self.breachPercentage = None
 		self.teleopShotAbility = None
 		self.defensesCrossableAuto = None
+		self.avgNumTimesCrossedDefensesAuto = None
 		self.beachedPercentage = {
 			'pc' : None,
 			'cdf' : None
@@ -409,24 +410,26 @@ class CalculatedTeamInMatchData(object):
 	"""docstring for CalculatedTeamInMatchData"""
 	def __init__(self, **args):
 		super(CalculatedTeamInMatchData, self).__init__()
-		self.highShotAccuracyAuto = None #
-		self.lowShotAccuracyAuto = None #
-		self.highShotAccuracyTele = None #
-		self.lowShotAccuracyTele = None #
+		self.highShotAccuracyAuto = None 
+		self.lowShotAccuracyAuto = None 
+		self.highShotAccuracyTele = None 
+		self.lowShotAccuracyTele = None 
 		self.highShotsAttemptedTele = None
 		self.lowShotsAttemptedTele = None
 		self.teleopShotAbility = None
-		self.siegeAbility = None#
+		self.siegeAbility = None
 		self.autoAbility = None
-		self.siegeConsistency = None#
-		self.numRPs = None#
-		self.drivingAbility = None#
-		self.numAutoPoints = None#
-		self.numScaleAndChallengePoints = None#
+		self.siegeConsistency = None
+		self.numRPs = None
+		self.drivingAbility = None
+		self.numAutoPoints = None
+		self.numScaleAndChallengePoints = None
 		self.numBallsIntakedOffMidlineAuto = None
 		self.beachedPercentage = None
 		self.slowedPercentage = None 
-		self.unaffectedPercentage = None 
+		self.unaffectedPercentage = None
+		self.totalNumTimesCrossedDefensesAuto = None
+		self.wasDisfunctional = None 
 		self.numTimesSuccesfulCrossedDefensesTele = {
 			'pc' : None,
 			'cdf' : None,
