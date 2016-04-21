@@ -23,7 +23,6 @@ comp = DataModel.Competition()
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()
 
-CSVExporter.TSVExportCMP(comp)
 
 dv = DataValidator.DataValidator(comp)
 
@@ -41,6 +40,8 @@ emailer = CrashReporter.EmailThread()
 
 while(True):
 	print("\nCalcs Cycle " + str(cycle) + "...")
+	CSVExporter.TSVExportCMP(comp)
+
 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
 		shouldCacheSecsCounter = 0
 	if(shouldCacheSecsCounter == 0):
