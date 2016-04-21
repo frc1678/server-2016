@@ -271,6 +271,7 @@ class Team(object):
 		self.pitNotes = None
 		self.pitOrganization = None
 		self.pitNumberOfWheels = None
+		self.pitProgrammingLanguage = None
 		self.__dict__.update(args)
 
 
