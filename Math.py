@@ -595,7 +595,7 @@ class Calculator(object):
     def captureChanceForAlliance(self, alliance):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
         siegeChance = np.prod([t.calculatedData.siegeConsistency for t in alliance])
-        return siegeChance * self.probabilityDensity(8.0, self.numShotsForAlliance(alliance), self.stdDevNumShotsForAlliance(alliance))
+        return siegeChance * self.probabilityDensity(10.0, self.numShotsForAlliance(alliance), self.stdDevNumShotsForAlliance(alliance))
 
     def captureChanceForAllianceNumbers(self, allianceNumbers):
         return self.captureChanceForAlliance(self.teamsForTeamNumbersOnAlliance(allianceNumbers))
