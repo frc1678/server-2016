@@ -1,6 +1,5 @@
 import urllib3
 import utils
-import Math
 import requests
 
 class TBACommunicator(object):
@@ -30,7 +29,7 @@ class TBACommunicator(object):
 
 	def makeEventRankingsRequest(self):
 		try: return utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('rankings')))[1:]
-		except requests.exceptions.ConnectionError: pass
+		except: pass
 
 	def makeSingleMatchRequest(self, matchNum):
 		url = self.basicURL + "/match" + self.eventCodeYear + "_qm" + matchNum + + '?' + self.headerKey + '=' + self.headerValue

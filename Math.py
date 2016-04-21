@@ -83,7 +83,7 @@ class Calculator(object):
         return [match for match in self.comp.matches if match.number == matchNumber][0]
 
     def teamsInMatch(self, match):
-        return match.redAllianceTeamNumbers + match.blueAllianceTeamNumbers
+        return map(self.getTeamForNumber, match.redAllianceTeamNumbers + match.blueAllianceTeamNumbers)
 
     def teamInMatch(self, team, match):
         return team in self.teamsInMatch(match)
@@ -829,10 +829,8 @@ class Calculator(object):
             (lambda t: t.calculatedData.avgDrivingAbility, self.cachedComp.drivingAbilityZScores)]
 
     def cacheSecondTeamData(self):
-        print "ABOUT TO CACHE SEEDING"
         map(lambda (func, dictionary): self.rValuesForAverageFunctionForDict(func, dictionary), self.rScoreParams())
         map(self.doSecondCachingForTeam, self.comp.teams)
-        time.sleep(10)
         self.cachedComp.actualSeedings = self.TBAC.makeEventRankingsRequest()
         self.cachedComp.predictedSeedings = self.teamsSortedByRetrievalFunctions(self.getPredictedSeedingFunctions()) 
         self.doSecondCachingForTeam(self.averageTeam)
@@ -1142,7 +1140,7 @@ class Calculator(object):
         a = ""
         while True:
             a = raw_input("Enter surrogate team number and match number (e.g. 254Q23): ")
-            if a == "f": break
+            if a == "f" or a == "": break
             surrogateTIMDs.append(self.getTIMDForTeamNumberAndMatchNumber(int(re.split('Q', a)[0]), int(re.split('Q', a)[1])))
         self.surrogateTIMDs = surrogateTIMDs
 
