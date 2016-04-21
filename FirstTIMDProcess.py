@@ -39,7 +39,7 @@ class FirstTIMDProcess(multiprocessing.Process):
             c.numScaleAndChallengePoints = c.siegeAbility  # they are the same
             c.highShotsAttemptedTele = self.timd.numHighShotsMadeTele + self.timd.numHighShotsMissedTele
             c.lowShotsAttemptedTele = self.timd.numLowShotsMadeTele + self.timd.numLowShotsMissedTele
-            c.numBallsIntakedOffMidlineAuto = float(0.0)
+            c.numBallsIntakedOffMidlineAuto = len(self.timd.ballsIntakedAuto) if self.timd.ballsIntakedAuto != None else 0
             c.numTimesSuccesfulCrossedDefensesAuto = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
             c.numTimesFailedCrossedDefensesAuto = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesAuto)
             c.numTimesSuccesfulCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)

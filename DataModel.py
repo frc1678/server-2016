@@ -58,6 +58,7 @@ class CalculatedTeamData(object):
 		self.breachPercentage = None
 		self.teleopShotAbility = None
 		self.defensesCrossableAuto = None
+		seelf.defensesCrossableTele = None
 		self.avgNumTimesCrossedDefensesAuto = None
 		self.beachedPercentage = {
 			'pc' : None,
@@ -337,7 +338,7 @@ class TeamInMatchData(object):
 
 
 		#Auto
-		self.ballsIntakedAuto = []
+		self.ballsIntakedAuto = None
 		self.numBallsKnockedOffMidlineAuto = None
 
 		self.timesSuccessfulCrossedDefensesAuto = {
