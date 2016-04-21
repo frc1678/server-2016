@@ -58,7 +58,7 @@ class CalculatedTeamData(object):
 		self.breachPercentage = None
 		self.teleopShotAbility = None
 		self.defensesCrossableAuto = None
-		seelf.defensesCrossableTele = None
+		self.defensesCrossableTele = None
 		self.avgNumTimesCrossedDefensesAuto = None
 		self.beachedPercentage = {
 			'pc' : None,
