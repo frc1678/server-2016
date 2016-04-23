@@ -858,7 +858,8 @@ class Calculator(object):
             lambda t: t.calculatedData.disabledPercentage)
         a.incapacitatedPercentage = self.getAverageOfDataFunctionAcrossCompetition( 
             lambda t: t.calculatedData.incapacitatedPercentage)
-        a.disfunctionalPercentage = a.disabledPercentage + a.incapacitatedPercentage
+        # a.disfunctionalPercentage = a.disabledPercentage + a.incapacitatedPercentage
+        a.disfunctionalPercentage = 0.5
 
         #Auto
         a.autoAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.autoAbility)
