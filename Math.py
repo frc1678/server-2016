@@ -19,6 +19,7 @@ import multiprocessing
 import copy
 import warnings
 from FirstTIMDProcess import FirstTIMDProcess
+from FirebaseWriterProcess import FirebaseWriteObjectProcess
 
 class Calculator(object):
     """docstring for Calculator"""
@@ -704,15 +705,11 @@ class Calculator(object):
         return sorted(teams, key=lambda t: (retrievalFunctions[0](t), retrievalFunctions[1](t), retrievalFunctions[2](t)), reverse=True)  
 
     def getTeamSeed(self, team):
-        f = filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)       
-        return team.calculatedData.actualSeed if len(f) == 0 else int(f[0][0])
+        return int(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][0])       
 
     def getTeamRPsFromTBA(self, team):
-        filteredSeedings = filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)
-        if len(filteredSeedings) == 0:
-            print str(team.number) + " has no TBA seeding."
-            return team.calculatedData.actualSeed
-        return int(float(filteredSeedings[0][2])) # Because filteredSeedings[0][2] is a string of a float
+        return int(float(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][2]))       
+
 
     
     #SCOUT ANALYSIS
@@ -1132,11 +1129,16 @@ class Calculator(object):
             self.cacheSecondTeamData()
             self.doBetweenFirstAndSecondCalculationsForTeams()
             self.doMatchesCalculations()
-            self.doSecondTeamCalculations()
-            map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())
-            map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())
-            map(FBC.addCalculatedMatchDataToFirebase, self.getCompletedMatchesInCompetition())
-
+            # self.doSecondTeamCalculations()
+            # map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())                            # If multiprocesses
+            # map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())                        # fail, uncomment
+            # map(FBC.addCalculatedMatchDataToFirebase, self.getCompletedMatchesInCompetition())                    # these lines
+           
+            objects = self.teamsWithMatchesCompleted() + self.getCompletedTIMDsInCompetition() + self.comp.matches  # In case of 
+            for ob in objects:                                                                                      # failure, comment
+                process = FirebaseWriteObjectProcess(ob, FBC)                                                       # out these four 
+                process.start()                                                                                     # lines
+            
             endTime = time.time()
 
             self.writeCalculationDiagnostic(endTime - startTime)
