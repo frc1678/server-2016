@@ -10,11 +10,11 @@ import math
 import datetime
 
 
-(superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
+#(superSecret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
 #(superSecret, url) = ('j1r2wo3RUPMeUZosxwvVSFEFVcrXuuMAGjk6uPOc', 'https://1678-dev-2016.firebaseio.com/')
 # (superSecret, url) = ('hL8fStivTbHUXM8A0KXBYPg2cMsl80EcD7vgwJ1u', 'https://1678-dev2-2016.firebaseio.com/')
 #(superSecret, url) = ('AEduO6VFlZKD4v10eW81u9j3ZNopr5h2R32SPpeq', 'https://1678-dev3-2016.firebaseio.com/')
-# (superSecret, url) = ('IMXOxXD3FjOOUoMGJlkAK5pAtn89mGIWAEnaKJhP', 'https://1678-strat-dev-2016.firebaseio.com/')
+(superSecret, url) = ('IMXOxXD3FjOOUoMGJlkAK5pAtn89mGIWAEnaKJhP', 'https://1678-strat-dev-2016.firebaseio.com/')
 # (superSecret, url) = ('lGufYCifprPw8p1fiVOs7rqYV3fswHHr9YLwiUWh', 'https://1678-extreme-testing.firebaseio.com/') 
 
 
@@ -95,7 +95,7 @@ class FirebaseCommunicator(object):
 		FBLocation = "/"
 		result = firebase.put(FBLocation, 'code', self.competition.code)
 		result = firebase.put(FBLocation, 'averageScore', self.competition.averageScore)
-		
+		result = firebase.put(FBLocation, 'currentMatchNum', self.competition.currentMatchNum)
 		self.competition.averageScore = None
 
 	def wipeDatabase(self):
@@ -110,6 +110,12 @@ class FirebaseCommunicator(object):
 		with open("./CachedFirebases/" + now + '.json', 'w') as f:
 			f.write(data)
 			f.close()
+
+	def updateCurrentMatchNum(self):
+		for m in sorted(self.competition.matches, key=lambda match: match.number, reverse=True):
+			if m.redScore == None and m.blueScore == None:
+				return m.number
+		return 0
 
 
 def getPythonObjectForFirebaseDataAtLocation(location):

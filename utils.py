@@ -15,7 +15,7 @@ for fake database creation purposes it is not worth it'''
 # 	retrievalFunction(object) = value
 
 def sumStdDevs(stdDevs):
-	return sum(map(lambda x: x ** 2, stdDevs)) ** 0.5
+	return sum(map(lambda x: x ** 2 , filter(lambda s: s != None, stdDevs))) ** 0.5
 
 def convertFirebaseBoolean(fbBool):
 	return True if fbBool == 'true' else False

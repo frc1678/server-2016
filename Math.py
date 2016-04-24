@@ -29,6 +29,7 @@ class Calculator(object):
 
         self.comp = competition
         self.TBAC = TBACommunicator.TBACommunicator()
+        self.TBAC.eventCode = self.comp.code
         self.categories = ['a', 'b', 'c', 'd', 'e']
         self.ourTeamNum = 1678
         self.monteCarloIterations = 100
@@ -52,7 +53,10 @@ class Calculator(object):
 
     # Team utility functions
     def getTeamForNumber(self, teamNumber):
-        return [team for team in self.comp.teams if team.number == teamNumber][0]
+        try: return [team for team in self.comp.teams if team.number == teamNumber][0]
+        except: 
+            print str(teamNumber) + " doesn't exist."
+            return None
 
     def teamsWithCalculatedData(self):
         return filter(lambda t: self.teamCalculatedDataHasValues(t.calculatedData), self.comp.teams)
@@ -357,7 +361,8 @@ class Calculator(object):
         return np.mean(times) if len(times) > 0 else None
 
     def predictedCrossingsForDefenseCategory(self, team, category):
-        return np.mean([team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None]) # TODO: Update with actual correct key
+        l = [team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] for dKey in self.defenseDictionary[category] if self.teamFacedDefense(team, dKey) and team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[dKey] != None]
+        return np.mean(l) if len(l) > 0 else 0
 
     def predictedCrossingsForDefense(self, team, defenseKey):
         return team.calculatedData.predictedSuccessfulCrossingsForDefenseTele[defenseKey]
@@ -458,7 +463,7 @@ class Calculator(object):
         }
 
 
-    #OVERALL DATA
+    # OVERALL DATA
     def autoAbility(self, timd):
         if timd == None: return
         defensesCrossed = 0
@@ -471,6 +476,8 @@ class Calculator(object):
     def rValuesForAverageFunctionForDict(self, averageFunction, d):
         impossible = True
         values = map(averageFunction, self.teamsWithMatchesCompleted())
+        if len(values) == 0:
+            return None
         initialValue = values[0]
         for value in values[1:]:
             if value != initialValue: impossible = False
@@ -587,7 +594,10 @@ class Calculator(object):
 
     def captureChanceForAlliance(self, alliance):
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
-        siegeChance = np.prod([t.calculatedData.siegeConsistency for t in alliance])
+        siegeConsistencies = filter(lambda sc: sc != None, [t.calculatedData.siegeConsistency for t in alliance])
+        if len(siegeConsistencies) == None:
+            return self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeConsistency)
+        siegeChance = np.prod(siegeConsistencies)
         return siegeChance * self.probabilityDensity(10.0, self.numShotsForAlliance(alliance), self.stdDevNumShotsForAlliance(alliance))
 
     def captureChanceForAllianceNumbers(self, allianceNumbers):
@@ -694,10 +704,15 @@ class Calculator(object):
         return sorted(teams, key=lambda t: (retrievalFunctions[0](t), retrievalFunctions[1](t), retrievalFunctions[2](t)), reverse=True)  
 
     def getTeamSeed(self, team):
-        return int(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][0])
+        f = filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)       
+        return team.calculatedData.actualSeed if len(f) == 0 else int(f[0][0])
 
     def getTeamRPsFromTBA(self, team):
-        return int(float(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][2]))
+        filteredSeedings = filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)
+        if len(filteredSeedings) == 0:
+            print str(team.number) + " has no TBA seeding."
+            return team.calculatedData.actualSeed
+        return int(float(filteredSeedings[0][2])) # Because filteredSeedings[0][2] is a string of a float
 
     
     #SCOUT ANALYSIS
@@ -858,7 +873,7 @@ class Calculator(object):
             lambda t: t.calculatedData.disabledPercentage)
         a.incapacitatedPercentage = self.getAverageOfDataFunctionAcrossCompetition( 
             lambda t: t.calculatedData.incapacitatedPercentage)
-        a.disfunctionalPercentage = a.disabledPercentage + a.incapacitatedPercentage
+        a.disfunctionalPercentage = None if None in (a.disabledPercentage, a.incapacitatedPercentage) else a.disabledPercentage + a.incapacitatedPercentage
 
         #Auto
         a.autoAbility = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.autoAbility)

@@ -12,6 +12,7 @@ class Competition(object):
 		self.TIMDs = []
 		self.predictedSeeding = []
 		self.actualSeeding = []
+		self.currentMatchNum = 0
 	
 	def updateTeamsAndMatchesFromFirebase(self):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
