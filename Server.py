@@ -41,6 +41,8 @@ shouldEmail = False
 numHoursBetweenCaches = 1.0/360.0
 emailer = CrashReporter.EmailThread()
 
+scoutCalculator = scoutPerformance.ScoutPerformance(comp, calculator)
+
 while(True):
 	print("\nCalcs Cycle " + str(cycle) + "...")
 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
@@ -49,6 +51,7 @@ while(True):
 		FBC.cacheFirebase()
 	shouldCacheSecsCounter += secsBetweenCalc
 	dv.validateFirebase()
+	scoutCalculator.analyzeScouts()
 	comp.updateTeamsAndMatchesFromFirebase()
 	comp.updateTIMDsFromFirebase()
 	if shouldEmail:

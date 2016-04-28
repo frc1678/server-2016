@@ -38,7 +38,7 @@ class TBACommunicator(object):
 		except: pass
 
 	def makeSingleMatchRequest(self, matchNum):
-		url = self.basicURL + "/match" + self.eventCodeYear + "_qm" + matchNum + + '?' + self.headerKey + '=' + self.headerValue
+		url = self.basicURL + "match/" + str(self.eventCodeYear) + "_qm" + str(matchNum) + '?' + self.headerKey + '=' + self.headerValue
 		return utils.readJSONFromString(self.makeRequest(url))
 
 	def makeEventMatchesRequest(self):

@@ -109,13 +109,7 @@ class FirebaseCommunicator(object):
 			f.write(data)
 			f.close()
 
-	def updateCurrentMatchNum(self):
-		for m in sorted(self.competition.matches, key=lambda match: match.number, reverse=True):
-			print m.number
-			if m.redScore == None and m.blueScore == None:
-				return m.number
-		return 0
-
+	
 
 def getPythonObjectForFirebaseDataAtLocation(location):
 	# The location will be a key path, like '/' for the root (entire) object.

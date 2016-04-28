@@ -217,6 +217,10 @@ class Calculator(object):
     
     #SHOTS DATA
     def TIMDShotAccuracy(self, made, missed):
+<<<<<<< HEAD
+=======
+        print (float(made / float(made + missed)), made + missed)
+>>>>>>> e9a22aff2751b94dd1c8e95d161fe8aba01b52e8
         return float(made / float(made + missed)) if made + missed != 0 else None
 
     def totalSDShotPointsForTeam(self, team):
@@ -914,7 +918,7 @@ class Calculator(object):
         self.defenseValuesForAverageTeam(lambda t: t.calculatedData.sdFailedDefenseCrossesTele, lambda x: utils.rms(x) if x != None and len(x) != 0 else 0)
         a.numScaleAndChallengePoints = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
         a.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
-
+        print a
     def getSecondCalculationsForAverageTeam(self):
         a = self.averageTeam.calculatedData
 
@@ -1163,7 +1167,11 @@ class Calculator(object):
             print m.number
             if m.redScore == None and m.blueScore == None:
                 self.comp.currentMatchNum = m.number
+<<<<<<< HEAD
+                return
+=======
 		return m.number
+>>>>>>> 94119a4021e2ad6b1b57bab71c166009925f546a
         return 0
 
 
