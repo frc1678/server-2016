@@ -498,7 +498,7 @@ class Calculator(object):
         crossingTimeWeight = -0.2
         meanDefenseCrossingTimeForTeam = self.meanDefenseCrossingTimeForTeam(team)
         meanDefenseCrossingTimeForCompetition = self.meanDefenseCrossingTimeForCompetition()
-        crossProp = (meanDefenseCrossingTimeForTeam / meanDefenseCrossingTimeForCompetition) if meanDefenseCrossingTimeForCompetition > 0 else 0
+        crossProp = ((meanDefenseCrossingTimeForTeam or 0) / meanDefenseCrossingTimeForCompetition) if meanDefenseCrossingTimeForCompetition > 0 else 0
         if meanDefenseCrossingTimeForTeam == None: return 0
         elif meanDefenseCrossingTimeForCompetition == None: return None
         defenseCrossTime = crossingTimeWeight * crossProp * 2
@@ -697,7 +697,7 @@ class Calculator(object):
         breachRPs = self.getBreachChanceForMatchForAllianceIsRed(match, allianceIsRed)
         captureRPs = self.getCaptureChanceForMatchForAllianceIsRed(match, allianceIsRed)
         scoreRPs = 2 * (self.getWinChanceForMatchForAllianceIsRed(match, allianceIsRed) or 0)
-        RPs = breachRPs + captureRPs + scoreRPs 
+        RPs = breachRPs or 0 + captureRPs or 0 + scoreRPs or 0 
         return RPs if not math.isnan(RPs) else None
 
     def teamsSortedByRetrievalFunctions(self, retrievalFunctions):
@@ -1129,15 +1129,16 @@ class Calculator(object):
             self.cacheSecondTeamData()
             self.doBetweenFirstAndSecondCalculationsForTeams()
             self.doMatchesCalculations()
-            # self.doSecondTeamCalculations()
-            # map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())                            # If multiprocesses
-            # map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())                        # fail, uncomment
-            # map(FBC.addCalculatedMatchDataToFirebase, self.getCompletedMatchesInCompetition())                    # these lines
-           
-            objects = self.teamsWithMatchesCompleted() + self.getCompletedTIMDsInCompetition() + self.comp.matches  # In case of 
-            for ob in objects:                                                                                      # failure, comment
-                process = FirebaseWriteObjectProcess(ob, FBC)                                                       # out these four 
-                process.start()                                                                                     # lines
+            self.doSecondTeamCalculations()
+            map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())                            # If multiprocesses
+            map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())                        # fail, uncomment
+            map(FBC.addCalculatedMatchDataToFirebase, self.getCompletedMatchesInCompetition())                    # these lines
+            self.updateCurrentMatchNum()
+            FBC.addCompInfoToFirebase()
+            #objects = self.teamsWithMatchesCompleted() + self.getCompletedTIMDsInCompetition() + self.comp.matches  # In case of 
+            #for ob in objects:                                                                                      # failure, comment
+            #    process = FirebaseWriteObjectProcess(ob, FBC)                                                       # out these four 
+            #    process.start()                                                                                     # lines
             
             endTime = time.time()
 
@@ -1156,7 +1157,11 @@ class Calculator(object):
         self.surrogateTIMDs = surrogateTIMDs
 
    
-
+    def updateCurrentMatchNum(self):
+        for m in sorted(self.comp.matches, key=lambda match: match.number, reverse=True):
+            if m.redScore == None and m.blueScore == None:
+                return m.number
+        return 0
 
 
         
