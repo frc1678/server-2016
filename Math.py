@@ -530,6 +530,7 @@ class Calculator(object):
         return self.stdDevPredictedScoreForAlliance(self.teamsForTeamNumbersOnAlliance(allianceNumbers))
 
     def predictedScoreForAlliance(self, alliance):
+   
         alliance = map(self.replaceWithAverageIfNecessary, alliance)
         allianceTeleopShotPoints = sum(
             [t.calculatedData.teleopShotAbility for t in alliance if t.calculatedData.teleopShotAbility])
@@ -1134,7 +1135,7 @@ class Calculator(object):
             FBC.addCompInfoToFirebase()
             map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())                            # If multiprocesses
             map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())                        # fail, uncomment
-            map(FBC.addCalculatedMatchDataToFirebase, self.getCompletedMatchesInCompetition())                    # these lines
+            map(FBC.addCalculatedMatchDataToFirebase, self.comp.matches)                    # these lines
             
             #objects = self.teamsWithMatchesCompleted() + self.getCompletedTIMDsInCompetition() + self.comp.matches  # In case of 
             #for ob in objects:                                                                                      # failure, comment
