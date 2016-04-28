@@ -1164,7 +1164,11 @@ class Calculator(object):
             print m.number
             if m.redScore == None and m.blueScore == None:
                 self.comp.currentMatchNum = m.number
+<<<<<<< HEAD
                 return
+=======
+		return m.number
+>>>>>>> 94119a4021e2ad6b1b57bab71c166009925f546a
         return 0
 
 
