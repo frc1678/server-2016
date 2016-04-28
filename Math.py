@@ -217,7 +217,7 @@ class Calculator(object):
     
     #SHOTS DATA
     def TIMDShotAccuracy(self, made, missed):
-        return float(made / (made + missed)) if made + missed != 0 else None
+        return float(made / float(made + missed)) if made + missed != 0 else None
 
     def totalSDShotPointsForTeam(self, team):
         return utils.sumStdDevs([5 * team.calculatedData.sdHighShotsTele, 10 * team.calculatedData.sdHighShotsAuto, 5 * team.calculatedData.sdLowShotsAuto, 2 * team.calculatedData.sdLowShotsTele])
