@@ -1130,11 +1130,12 @@ class Calculator(object):
             self.doBetweenFirstAndSecondCalculationsForTeams()
             self.doMatchesCalculations()
             self.doSecondTeamCalculations()
+            self.updateCurrentMatchNum()
+            FBC.addCompInfoToFirebase()
             map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())                            # If multiprocesses
             map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())                        # fail, uncomment
             map(FBC.addCalculatedMatchDataToFirebase, self.getCompletedMatchesInCompetition())                    # these lines
-            self.updateCurrentMatchNum()
-            FBC.addCompInfoToFirebase()
+            
             #objects = self.teamsWithMatchesCompleted() + self.getCompletedTIMDsInCompetition() + self.comp.matches  # In case of 
             #for ob in objects:                                                                                      # failure, comment
             #    process = FirebaseWriteObjectProcess(ob, FBC)                                                       # out these four 
@@ -1158,9 +1159,10 @@ class Calculator(object):
 
    
     def updateCurrentMatchNum(self):
-        for m in sorted(self.comp.matches, key=lambda match: match.number, reverse=True):
+        for m in sorted(self.comp.matches, key=lambda match: match.number, reverse=False):
+            print m.number
             if m.redScore == None and m.blueScore == None:
-                return m.number
+                self.comp.currentMatchNum = m.number
         return 0
 
 
