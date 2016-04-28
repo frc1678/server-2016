@@ -20,7 +20,7 @@ import CrashReporter
 shouldCacheJSONCopies = False
 
 comp = DataModel.Competition()
-comp.code = 'casj'
+comp.code = 'hop'
 print "Competition Code: " + comp.code 
 comp.updateTeamsAndMatchesFromFirebase()
 comp.updateTIMDsFromFirebase()

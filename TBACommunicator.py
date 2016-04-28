@@ -25,6 +25,7 @@ class TBACommunicator(object):
 		return "event/{fullCode}/teams".format(fullCode = self.eventCodeYears)
 
 	def makeEventTeamsRequest(self):
+		return self.makeRequest(self.makeYearEventKeyRequestURL('teams'))
 		return utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('teams')))
 
 	def makeTeamMediaRequest(self, key, year):
