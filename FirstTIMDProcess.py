@@ -27,7 +27,10 @@ class FirstTIMDProcess(multiprocessing.Process):
                     self.timd.calculatedData): self.timd.calculatedData = DataModel.CalculatedTeamInMatchData()
             c = self.timd.calculatedData
             c.teleopShotAbility = self.calculator.getTIMDTeleopShotAbility(self.timd)
+            print (self.timd.teamNumber, self.timd.numHighShotsMadeTele, self.timd.numHighShotsMissedTele)
             c.highShotAccuracyTele = self.calculator.TIMDShotAccuracy(self.timd.numHighShotsMadeTele, self.timd.numHighShotsMissedTele)  # Checked
+            print (self.timd.teamNumber, self.timd.numHighShotsMadeTele, self.timd.numHighShotsMissedTele, c.highShotAccuracyTele)
+
             c.highShotAccuracyAuto = self.calculator.TIMDShotAccuracy(self.timd.numHighShotsMadeAuto, self.timd.numHighShotsMissedAuto)  # Checked
             c.lowShotAccuracyTele = self.calculator.TIMDShotAccuracy(self.timd.numLowShotsMadeTele, self.timd.numLowShotsMissedTele)  # Checked
             c.lowShotAccuracyAuto = self.calculator.TIMDShotAccuracy(self.timd.numLowShotsMadeAuto, self.timd.numLowShotsMissedAuto)  # Checked
