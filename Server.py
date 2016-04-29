@@ -58,7 +58,7 @@ while(True):
 		FBC.cacheFirebase()
 	shouldCacheSecsCounter += secsBetweenCalc
 	dv.validateFirebase()
-	# scoutCalculator.analyzeScouts()
+	#scoutCalculator.analyzeScouts()
 	comp.updateTeamsAndMatchesFromFirebase()
 	comp.updateTIMDsFromFirebase()
 	checkForMissingData()

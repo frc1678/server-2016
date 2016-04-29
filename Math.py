@@ -53,10 +53,10 @@ class Calculator(object):
                                   cache.CachedTeamData(**{'teamNumber': team.number})) for team in self.comp.teams]
 
     def getMissingDataString(self):
-        self.comp.currentMatchNum = 55
+        #self.comp.currentMatchNum = 80
         print "CURRENT MATCH NUM = " + str(self.comp.currentMatchNum)
         playedTIMDs = [timd for timd in self.comp.TIMDs if timd.matchNumber < self.comp.currentMatchNum]
-        print map(lambda timd: (timd.numHighShotsMadeTele, timd.teamNumber, timd.matchNumber), playedTIMDs)
+        #print map(lambda timd: (timd.numHighShotsMadeTele, timd.teamNumber, timd.matchNumber), playedTIMDs)
         incompletePlayedSuperTIMDs = [timd for timd in playedTIMDs if timd.rankTorque == None]
         incompletePlayedScoutTIMDs = filter(lambda timd: timd.numHighShotsMadeTele == None, playedTIMDs)
         incompletePlayedSuperTIMDStrings = ['Scout: ' + str(timd.teamNumber) + 'Q' + str(timd.matchNumber) for timd in incompletePlayedSuperTIMDs]
@@ -1145,14 +1145,14 @@ class Calculator(object):
             self.doSecondTeamCalculations()
             self.updateCurrentMatchNum()
             FBC.addCompInfoToFirebase()
-            map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())                            # If multiprocesses
-            map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())                        # fail, uncomment
-            map(FBC.addCalculatedMatchDataToFirebase, self.comp.matches)                    # these lines
+            #map(FBC.addCalculatedTeamDataToFirebase, self.teamsWithMatchesCompleted())                            # If multiprocesses
+            #map(FBC.addCalculatedTIMDataToFirebase, self.getCompletedTIMDsInCompetition())                        # fail, uncomment
+            #map(FBC.addCalculatedMatchDataToFirebase, self.comp.matches)                    # these lines
             
-            #objects = self.teamsWithMatchesCompleted() + self.getCompletedTIMDsInCompetition() + self.comp.matches  # In case of 
-            #for ob in objects:                                                                                      # failure, comment
-            #    process = FirebaseWriteObjectProcess(ob, FBC)                                                       # out these four 
-            #    process.start()                                                                                     # lines
+            objects = self.teamsWithMatchesCompleted() + self.getCompletedTIMDsInCompetition() + self.comp.matches  # In case of 
+            for ob in objects:                                                                                      # failure, comment
+                process = FirebaseWriteObjectProcess(ob, FBC)                                                       # out these four 
+                process.start()                                                                                     # lines
             
             endTime = time.time()
 

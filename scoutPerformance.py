@@ -13,6 +13,27 @@ class ScoutPerformance(object):
 		self.calculator = calculator
 		self.correctionalMatches = {}
 		self.TBAC = TBACommunicator.TBACommunicator()
+		self.scoutAccRank()
+
+	def getCompletedTIMDsForScout(self, scout):
+		return filter(lambda tm: tm.scoutName == scout, self.getCompletedTIMDsInCompetition())
+
+	def getCompletedMatchesForScout(self, scout):
+		return filter(self.calculator.matchIsCompleted, map(lambda x: self.calculator.getMatchForNumber(x.matchNumber), self.calculator.getCompletedTIMDsForScout(scout)))
+
+	def scoutScoutedMatch(self, name, match):
+		return len(filter(lambda x: x.scoutName == name, self.calculator.getTIMDsForMatchNumber(match.number))) == 1
+
+	def scoutsOnSameAllianceInMatch(self, scout1, scout2, match):
+		if not all([self.scoutScoutedMatch(scout1, match), self.scoutScoutedMatch(scout2, match)]): return False
+		timds = [self.calculator.getTIMDForScoutNameAndMatch(scout1, match), self.calculator.getTIMDForScoutNameAndMatch(scout2, match)]
+		alliances = [match.blueAllianceTeamNumbers, match.redAllianceTeamNumbers]
+		return sum([timd.teamNumber in a for a in alliances for timd in timds]) == 2
+
+	def getTIMDForScoutNameAndMatch(self, name, match):
+		return filter(lambda x: x.scoutName == name and x.matchNumber == match.number, self.calculator.getCompletedTIMDsForScout(name))[0]
+
+
 	def makeTBAMatches(self):
 		func = lambda m: utils.setDictionaryValue(self.correctionalMatches, m.number, 
 			self.TBAC.makeSingleMatchRequest(m.number))
@@ -54,6 +75,27 @@ class ScoutPerformance(object):
 		challengePts = 5 * sum([utils.convertFirebaseBoolean(timd.didChallengeTele) for timd in allianceTIMDs])
 
 		return autoPts + teleShotPts + teleDefenseCrossPts + scalePts + challengePts
+
+	def scoutAccRank(self):
+	        print "Analyzing Scouts..."
+	        scoutScores = []
+	        scoutErrByMatch = self.analyzeScouts()
+	        scoutList = scoutErrByMatch.keys()
+	        timesTogetherFunc = lambda s, s1: len(filter(lambda m: self.scoutsOnSameAllianceInMatch(s, s1, m), 
+	            self.getCompletedMatchesForScout(s)))
+	        getTeamRowFunc = lambda s: map(lambda s1: timesTogetherFunc(s, s1), scoutList)
+	        matrixOfScoutMatchesTogether = np.matrix(map(getTeamRowFunc, scoutList))
+	        if np.linalg.det(matrixOfScoutMatchesTogether) == 0: 
+	            print "Cannot invert matrix"
+	            return
+	        else: inverseMatrixOfScoutMatchesTogether = np.linalg.inv(matrixOfScoutMatchesTogether)
+	        errorList = map(lambda s: scoutErrByMatch[s], scoutList)
+	        errorMatrix = np.matrix(errorList).reshape(len(errorList), 1)
+	        scoutErrorOPRs = np.dot(inverseMatrixOfScoutMatchesTogether, errorMatrix)
+	        for c in scoutList: 
+	            scoutScores.append({'name' : c, 'score' : scoutErrorOPRs.item(scoutList.index(c), 0)})
+	        print scoutScores
+	        return scoutScores
 
 	def analyzeScouts(self):
 		scoutScoresByMatch = {}
