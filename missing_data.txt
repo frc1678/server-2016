@@ -1,0 +1,1 @@
+['Scout: 2046Q27', 'Super: 5166Q51', 'Super: 1712Q47', 'Super: 2733Q31', 'Super: 1323Q31', 'Super: 686Q26', 'Super: 2046Q27', 'Super: 971Q31', 'Super: 1559Q19', 'Super: 869Q46', 'Super: 3646Q19', 'Super: 5847Q30', 'Super: 5899Q19', 'Super: 231Q17', 'Super: 5996Q30']

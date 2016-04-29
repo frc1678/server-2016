@@ -54,10 +54,11 @@ class Calculator(object):
 
     def getMissingDataString(self):
         self.comp.currentMatchNum = 55
-        print self.comp.currentMatchNum
+        print "CURRENT MATCH NUM = " + str(self.comp.currentMatchNum)
         playedTIMDs = [timd for timd in self.comp.TIMDs if timd.matchNumber < self.comp.currentMatchNum]
+        print map(lambda timd: (timd.numHighShotsMadeTele, timd.teamNumber, timd.matchNumber), playedTIMDs)
         incompletePlayedSuperTIMDs = [timd for timd in playedTIMDs if timd.rankTorque == None]
-        incompletePlayedScoutTIMDs = [timd for timd in playedTIMDs if timd.numHighShotsMadeTele == None]
+        incompletePlayedScoutTIMDs = filter(lambda timd: timd.numHighShotsMadeTele == None, playedTIMDs)
         incompletePlayedSuperTIMDStrings = ['Scout: ' + str(timd.teamNumber) + 'Q' + str(timd.matchNumber) for timd in incompletePlayedSuperTIMDs]
         incompletePlayedScoutTIMDStrings = ['Super: ' + str(timd.teamNumber) + 'Q' + str(timd.matchNumber) for timd in incompletePlayedScoutTIMDs]
         incompletePlayedSuperTIMDStrings.extend(incompletePlayedScoutTIMDStrings)

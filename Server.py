@@ -47,9 +47,8 @@ def checkForMissingData():
 	with open('missing_data.txt', 'w') as missingDataFile:
 		missingDatas = calculator.getMissingDataString()
 		print missingDatas
-		print 1 + 'a'
-		for missingData in missingDatas:
-			missingDataFile.write(missingData + '\n')
+		#print 1 + 'a'
+		missingDataFile.write(str(missingDatas))
 
 while(True):
 	print("\nCalcs Cycle " + str(cycle) + "...")
