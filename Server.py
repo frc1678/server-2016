@@ -43,6 +43,14 @@ emailer = CrashReporter.EmailThread()
 
 scoutCalculator = scoutPerformance.ScoutPerformance(comp, calculator)
 
+def checkForMissingData():
+	with open('missing_data.txt', 'w') as missingDataFile:
+		missingDatas = calculator.getMissingDataString()
+		print missingDatas
+		print 1 + 'a'
+		for missingData in missingDatas:
+			missingDataFile.write(missingData + '\n')
+
 while(True):
 	print("\nCalcs Cycle " + str(cycle) + "...")
 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
@@ -51,9 +59,10 @@ while(True):
 		FBC.cacheFirebase()
 	shouldCacheSecsCounter += secsBetweenCalc
 	dv.validateFirebase()
-	scoutCalculator.analyzeScouts()
+	# scoutCalculator.analyzeScouts()
 	comp.updateTeamsAndMatchesFromFirebase()
 	comp.updateTIMDsFromFirebase()
+	checkForMissingData()
 	if shouldEmail:
 		try:
 			calculator.doCalculations(FBC)
@@ -65,6 +74,9 @@ while(True):
 	time.sleep(secsBetweenCalc)
 	cycle += 1
 
+
+
+		# missingDataFile.write(calculator.getMissingDataString())
 # elimsAlliances, i = {}, 1
 # while i <= 8:
 # 	a,b,c = raw_input("Input team numbers for alliance " + str(i) + ": ").split()

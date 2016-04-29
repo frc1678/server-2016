@@ -52,6 +52,17 @@ class Calculator(object):
         [utils.setDictionaryValue(self.cachedTeamDatas, team.number,
                                   cache.CachedTeamData(**{'teamNumber': team.number})) for team in self.comp.teams]
 
+    def getMissingDataString(self):
+        self.comp.currentMatchNum = 55
+        print self.comp.currentMatchNum
+        playedTIMDs = [timd for timd in self.comp.TIMDs if timd.matchNumber < self.comp.currentMatchNum]
+        incompletePlayedSuperTIMDs = [timd for timd in playedTIMDs if timd.rankTorque == None]
+        incompletePlayedScoutTIMDs = [timd for timd in playedTIMDs if timd.numHighShotsMadeTele == None]
+        incompletePlayedSuperTIMDStrings = ['Scout: ' + str(timd.teamNumber) + 'Q' + str(timd.matchNumber) for timd in incompletePlayedSuperTIMDs]
+        incompletePlayedScoutTIMDStrings = ['Super: ' + str(timd.teamNumber) + 'Q' + str(timd.matchNumber) for timd in incompletePlayedScoutTIMDs]
+        incompletePlayedSuperTIMDStrings.extend(incompletePlayedScoutTIMDStrings)
+        return incompletePlayedSuperTIMDStrings
+
     # Team utility functions
     def getTeamForNumber(self, teamNumber):
         try: return [team for team in self.comp.teams if team.number == teamNumber][0]
