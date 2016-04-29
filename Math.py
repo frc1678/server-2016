@@ -656,7 +656,7 @@ class Calculator(object):
 
     def getAutoPointsForMatchForAllianceIsRed(self, match, allianceIsRed):
         timds = self.getCompletedTIMDsForMatchForAllianceIsRed(match, allianceIsRed)
-        return sum(map(lambda tm: tm.calculatedData.autoAbility, timds))
+        return sum(map(lambda tm: tm.calculatedData.autoAbility or 0, timds))
 
     def getAutoPointsForTeamAllianceInMatch(self, team, match):
         return self.getAutoPointsForMatchForAllianceIsRed(match, self.getTeamAllianceIsRedInMatch(team, match))
