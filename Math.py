@@ -483,7 +483,7 @@ class Calculator(object):
         crossesDict = timd.timesSuccessfulCrossedDefensesAuto
         crossesDict = crossesDict.values() if crossesDict != None else ValueError("noCrossesDict")
         defCross = sum([len(d) for d in crossesDict if d != None])
-        defensePoints = 10 if defensesCrossed >= 1 else 0
+        defensePoints = 10 if defCross >= 1 else 0
         return ((10 * timd.numHighShotsMadeAuto) + (5 * timd.numLowShotsMadeAuto) + (2 * int(utils.convertFirebaseBoolean(timd.didReachAuto))) + (defensePoints))
 
     def rValuesForAverageFunctionForDict(self, averageFunction, d):
