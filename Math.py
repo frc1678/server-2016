@@ -100,7 +100,8 @@ class Calculator(object):
         return [match for match in self.comp.matches if match.number == matchNumber][0]
 
     def teamsInMatch(self, match):
-        return map(self.getTeamForNumber, match.redAllianceTeamNumbers + match.blueAllianceTeamNumbers)
+        return match.redTeams + match.blueTeams
+        # return map(self.getTeamForNumber, match.redAllianceTeamNumbers + match.blueAllianceTeamNumbers)
 
     def teamInMatch(self, team, match):
         return team in self.teamsInMatch(match)
