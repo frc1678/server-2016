@@ -17,10 +17,16 @@ class DataValidator(object):
 			'e' : {'lb' : -1}
 		}
 		self.valueNotUploaded = [-1, -1.0, "-1", ['-1'], self.defensesDict, False, {}, ['lb', '', '', '', ''], {1678: -1}, {"not0": "-1"}, None]
+		self.exceptedKeys = ['name', 'number', 'calculatedData', 'teamInMatchDatas', 'matches', 'pit']
 
 	def validateFirebase(self):
 		print("Teams Validation Problems: " + str(self.validateTeams(self.competition.teams, True)))
 		print("Matches Validation Problems: " + str(self.validateMatches(self.competition.matches)))
+
+	def someValuesNotUploaded(team):
+		items = utils.makeDictFromTeam(team).items()
+		uploaded = lambda k, v: (v not in self.valueNotUploaded and key not in self.exceptedKeys)
+		return filter(lambda k,v: not uploaded(k,v), items) if sum(map(uploaded, items)) < len(items) else []
 
 	def validateTeams(self, teams, shouldValidateCalculatedTeamData):
 		problems = []
@@ -42,18 +48,9 @@ class DataValidator(object):
 						 	timdProblems = self.validateTeamInMatchData(utils.makeDictFromTIMD(TIMD))
 						 	if timdProblems != []:
 						 		problems.append(timdProblems)
-
-				if (value in self.valueNotUploaded) and ("pit" not in key and "Url" not in key) and key != "name" and key != "number" and key != "teamInMatchDatas" and key != "calculatedData" and key != 'matches':
-					thereHasBeenunuploaded1 = True
-					unuploaded = key
-				elif (value not in self.valueNotUploaded) and key != 'name' and key != 'number' and ('pit' not in key) and key != "teamInMatchDatas" and key != "calculatedData" and key != 'matches':
-					thereHasBeenuploaded = True  
-					uploaded = key
-				if thereHasBeenunuploaded1 and thereHasBeenuploaded:
-					problems.append(str(team.number) + ": Has an unuploaded in " + unuploaded + " and a uploaded in " + uploaded + ".")
-					break
+				if self.someValuesNotUploaded(team) != []: 
+					problems.append(problem)		
 		return problems
-
 
 	def validateCalculatedTeamData(self, CTD, teamNumber):
 		problems = []
@@ -91,6 +88,8 @@ class DataValidator(object):
 				problems.append(str(TIMD["teamNumber"]) + ": Has an unuploaded in one TEAM IN MATCH DATA value, but not in another.")
 				break
 		return problems
+
+
 
 
 

@@ -14,8 +14,9 @@ import DataValidator
 import CSVExporter
 import utils
 import pdb
-import scoutPerformance
+# import scoutPerformance
 import CrashReporter
+import numpy as np
 
 shouldCacheJSONCopies = False
 
@@ -41,37 +42,39 @@ shouldEmail = False
 numHoursBetweenCaches = 1.0/360.0
 emailer = CrashReporter.EmailThread()
 
-scoutCalculator = scoutPerformance.ScoutPerformance(comp, calculator)
+# scoutCalculator = scoutPerformance.ScoutPerformance(comp, calculator)
 
-def checkForMissingData():
-	with open('missing_data.txt', 'w') as missingDataFile:
-		missingDatas = calculator.getMissingDataString()
-		print missingDatas
-		#print 1 + 'a'
-		missingDataFile.write(str(missingDatas))
 
-while(True):
-	print("\nCalcs Cycle " + str(cycle) + "...")
-	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
-		shouldCacheSecsCounter = 0
-	if(shouldCacheSecsCounter == 0):
-		FBC.cacheFirebase()
-	shouldCacheSecsCounter += secsBetweenCalc
-	dv.validateFirebase()
-	#scoutCalculator.analyzeScouts()
-	comp.updateTeamsAndMatchesFromFirebase()
-	comp.updateTIMDsFromFirebase()
-	checkForMissingData()
-	if shouldEmail:
-		try:
-			calculator.doCalculations(FBC)
-		except:
-			emailer.reportServerCrash(traceback.format_exc())
-			sys.exit(0)
-	else: 
-		calculator.doCalculations(FBC)
-	time.sleep(secsBetweenCalc)
-	cycle += 1
+
+# def checkForMissingData():
+# 	with open('missing_data.txt', 'w') as missingDataFile:
+# 		missingDatas = calculator.getMissingDataString()
+# 		print missingDatas
+# 		#print 1 + 'a'
+# 		missingDataFile.write(str(missingDatas))
+
+# while(True):
+# 	print("\nCalcs Cycle " + str(cycle) + "...")
+# 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
+# 		shouldCacheSecsCounter = 0
+# 	if(shouldCacheSecsCounter == 0):
+# 		FBC.cacheFirebase()
+# 	shouldCacheSecsCounter += secsBetweenCalc
+# 	dv.validateFirebase()
+# 	#scoutCalculator.analyzeScouts()
+# 	comp.updateTeamsAndMatchesFromFirebase()
+# 	comp.updateTIMDsFromFirebase()
+# 	checkForMissingData()
+# 	if shouldEmail:
+# 		try:
+# 			calculator.doCalculations(FBC)
+# 		except:
+# 			emailer.reportServerCrash(traceback.format_exc())
+# 			sys.exit(0)
+# 	else: 
+# 		calculator.doCalculations(FBC)
+# 	time.sleep(secsBetweenCalc)
+# 	cycle += 1
 
 
 

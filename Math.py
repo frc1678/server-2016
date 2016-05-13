@@ -53,10 +53,8 @@ class Calculator(object):
                                   cache.CachedTeamData(**{'teamNumber': team.number})) for team in self.comp.teams]
 
     def getMissingDataString(self):
-        #self.comp.currentMatchNum = 80
         print "CURRENT MATCH NUM = " + str(self.comp.currentMatchNum)
         playedTIMDs = [timd for timd in self.comp.TIMDs if timd.matchNumber < self.comp.currentMatchNum]
-        #print map(lambda timd: (timd.numHighShotsMadeTele, timd.teamNumber, timd.matchNumber), playedTIMDs)
         incompletePlayedSuperTIMDs = [timd for timd in playedTIMDs if timd.rankTorque == None]
         incompletePlayedScoutTIMDs = filter(lambda timd: timd.numHighShotsMadeTele == None, playedTIMDs)
         incompletePlayedSuperTIMDStrings = ['Scout: ' + str(timd.teamNumber) + 'Q' + str(timd.matchNumber) for timd in incompletePlayedSuperTIMDs]
@@ -74,17 +72,14 @@ class Calculator(object):
     def teamsWithCalculatedData(self):
         return filter(lambda t: self.teamCalculatedDataHasValues(t.calculatedData), self.comp.teams)
 
-    def getMatchesForTeam(self, team):
-        return [match for match in self.comp.matches if self.teamInMatch(team, match)]
-
     def getCompletedMatchesForTeam(self, team):
-        return filter(lambda m: self.matchIsCompleted(m) and not self.isSurrogate(team, m), self.getMatchesForTeam(team))
+        return filter(self.matchIsCompleted, team.matches)
 
     def teamsWithMatchesCompleted(self):
         return self.cachedComp.teamsWithMatchesCompleted
 
     def findTeamsWithMatchesCompleted(self):
-        return [team for team in self.comp.teams if len(self.getCompletedTIMDsForTeam(team)) > 0]
+        return filter(lambda x: len(self.getCompletedMatchesForTeam(team)) > 0, self.comp.teams)
 
     def teamsWhoHaveFacedDefense(self, defenseKey):
         return filter(lambda t: self.teamFacedDefense(t, defenseKey), self.comp.teams)
@@ -101,27 +96,24 @@ class Calculator(object):
 
     def teamsInMatch(self, match):
         return match.redTeams + match.blueTeams
-        # return map(self.getTeamForNumber, match.redAllianceTeamNumbers + match.blueAllianceTeamNumbers)
 
     def teamInMatch(self, team, match):
-        return team in self.teamsInMatch(match)
+        return match in team.matches
 
     def matchIsCompleted(self, match):
-        return len(self.getCompletedTIMDsForMatchNumber(match.number)) == 6 and self.matchHasValuesSet(match)   
+        return len(self.getCompletedTIMDsForMatch(match)) == 6 and self.matchHasValuesSet(match)   
 
     def getCompletedMatchesInCompetition(self):
         return filter(self.matchIsCompleted, self.comp.matches)
 
     def teamsAreOnSameAllianceInMatch(self, team1, team2, match):
-        alliances = [match.redAllianceTeamNumbers, match.blueAllianceTeamNumbers]
-        return len(filter(lambda a: team1.number in a and team2.number in a, alliances)) == 1 
+        return team2 in self.getAllianceForTeamInMatch(team1, match)
 
     def teamsForTeamNumbersOnAlliance(self, alliance):
         return map(self.getTeamForNumber, alliance)
 
     def getAllianceForMatch(self, match, allianceIsRed):
-        return self.teamsForTeamNumbersOnAlliance(
-            match.redAllianceTeamNumbers if allianceIsRed else match.blueAllianceTeamNumbers)
+        return match.redTeams if allianceIsRed else match.blueTeams
 
     def getAllianceForTeamInMatch(self, team, match):
         return self.getAllianceForMatch(match, self.getTeamAllianceIsRedInMatch(team, match))
@@ -131,36 +123,29 @@ class Calculator(object):
             match.blueScore, match.blueAllianceDidBreach, match.blueAllianceDidCapture)
 
     def getTeamAllianceIsRedInMatch(self, team, match):
-        if team.number == -1: return True
-        if team.number in match.redAllianceTeamNumbers: return True
-        elif team.number in match.blueAllianceTeamNumbers: return False
-        else: raise ValueError('Team ' + str(team.number) + ' is not in match ' + str(match.number))
+        if team.number == -1 or team in match.redTeams: return True
+        if team in match.blueTeams: return False
+        else: raise ValueError(str(team.number) not in "Q" + str(match.number))
 
-    # TIMD utility functions
-    def getTIMDsForTeamNumber(self, teamNumber):
-        if teamNumber == -1:
-            return self.comp.TIMDs
-        return [timd for timd in self.comp.TIMDs if timd.teamNumber == teamNumber]
-
-    def getCompletedTIMDsForTeamNumber(self, teamNumber):
-        return filter(self.timdIsCompleted, self.getTIMDsForTeamNumber(teamNumber))
-
-    def getCompletedTIMDsForMatchForAllianceIsRed(self, match, allianceIsRed):
-        return map(lambda t: self.getTIMDForTeamNumberAndMatchNumber(t.number, match.number), 
-            self.getAllianceForMatch(match, allianceIsRed))
+    # TIMD utility function
 
     def getCompletedTIMDsForTeam(self, team):
-        cachedData = self.cachedTeamDatas[team.number]
-        return cachedData.completedTIMDs
+        return filter(self.timdIsCompleted, team.timds)
 
-    def getTIMDsForMatchNumber(self, matchNumber):
-        return [timd for timd in self.comp.TIMDs if timd.matchNumber == matchNumber]
+    def getTIMDsForMatchForAllianceIsRed(self, match, allianceIsRed):
+        return filter(lambda t: t.team in match.redTeams, match.timds) if allianceIsRed else filter(lambda t: t.team in match.blueTeams, match.timds) 
 
-    def getCompletedTIMDsForMatchNumber(self, matchNumber):
-        return filter(self.timdIsCompleted, self.getTIMDsForMatchNumber(matchNumber))
+    def getCompletedTIMDsForMatchForAllianceIsRed(self, match, allianceIsRed):
+        return filter(self.timdIsCompleted, self.getTIMDsForMatchForAllianceIsRed(match, allianceIsRed))
 
-    def getTIMDForTeamNumberAndMatchNumber(self, teamNumber, matchNumber):
-        return [timd for timd in self.getTIMDsForTeamNumber(teamNumber) if timd.matchNumber == matchNumber][0]
+    def getCompletedTIMDsForTeam(self, team):
+        return filter(self.timdIsCompleted, team.timds)
+
+    def getCompletedTIMDsForMatch(self, match):
+        return filter(self.timdIsCompleted, match.timds)
+
+    def getTIMDForTeamAndMatch(self, team, match):
+        return filter(lambda t: t.team == team and t.match == match, self.comp.TIMDs)
 
     def getCompletedTIMDsInCompetition(self):
         return filter(self.timdIsCompleted, self.comp.TIMDs)
@@ -227,8 +212,7 @@ class Calculator(object):
         values = [dataFunction(timd) for timd in timds]
         return np.mean(values) if len(values) > 0 else None
 
-    
-    #SHOTS DATA
+     #SHOTS DATA
     def TIMDShotAccuracy(self, made, missed):
         return float(made / float(made + missed)) if made + missed != 0 else None
 
@@ -724,113 +708,6 @@ class Calculator(object):
     def getTeamRPsFromTBA(self, team):
         return int(float(filter(lambda x: int(x[1]) == team.number, self.cachedComp.actualSeedings)[0][2]))       
 
-
-    
-    #SCOUT ANALYSIS
-
-    def scoutedScoreForMatchNum(self, match, allianceIsRed):
-        matchNum = match.number
-        allTIMDs = self.getTIMDsForMatchNumber(matchNum)
-        allianceNumbers = self.getAllianceForMatch(match, allianceIsRed)
-        allianceNumbers = map(lambda t: t.number, allianceNumbers)
-        allianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in allianceNumbers]
-
-        autoPts = self.getAutoPointsForMatchForAllianceIsRed(match, allianceIsRed)
-
-        teleShotPts = 2 * sum([(timd.numLowShotsMadeTele or 0) for timd in allianceTIMDs]) + 5 * sum([(timd.numHighShotsMadeTele or 0) for timd in allianceTIMDs])
-        
-        for timd in allianceTIMDs:
-            s = timd.timesSuccessfulCrossedDefensesTele
-            for key in self.defenseList:
-                if not key in s:
-                    s[key] = 0
-                elif s[key] == None:
-                    s[key] = 0
-                else:
-                    s[key] = len(s[key])
-        allDefenseCrossings = utils.dictSum(allianceTIMDs[0].timesSuccessfulCrossedDefensesTele, utils.dictSum(allianceTIMDs[1].timesSuccessfulCrossedDefensesTele, allianceTIMDs[2].timesSuccessfulCrossedDefensesTele))
-        
-        temp = {}
-        for defense, crossings in allDefenseCrossings.items():
-            if crossings > 2:
-                temp[defense] = 2
-            else:
-                temp[defense] = crossings
-        allDefenseCrossings = temp
-
-        teleDefenseCrossPts = 5 * sum(allDefenseCrossings.values())
-        
-        scalePts = 15 * sum([utils.convertFirebaseBoolean(timd.didScaleTele) for timd in allianceTIMDs])
-        challengePts = 5 * sum([utils.convertFirebaseBoolean(timd.didChallengeTele) for timd in allianceTIMDs])
-
-        return autoPts + teleShotPts + teleDefenseCrossPts + scalePts + challengePts
-
-    def analyzeScouts(self):
-        scoutScoresByMatch = {}
-        scoutScores = {} # Lower is better
-        TBAMatches = self.cachedComp.TBAMatches
-        for m in self.getCompletedMatchesInCompetition():
-            redScoutedScore = self.scoutedScoreForMatchNum(m, True)
-            blueScoutedScore = self.scoutedScoreForMatchNum(m, False)
-            penaltyFreeRedScore = abs(m.redScore - TBAMatches[m.number]["score_breakdown"]["red"]["foulPoints"])
-            penaltyFreeBlueScore = abs(m.blueScore - TBAMatches[m.number]["score_breakdown"]["blue"]["foulPoints"])
-            redScoreDifference = abs(redScoutedScore - penaltyFreeRedScore)
-            blueScoreDifference = abs(blueScoutedScore - penaltyFreeBlueScore)
-
-            allTIMDs = self.getTIMDsForMatchNumber(m.number)
-            redAllianceNumbers = self.getAllianceForMatch(m, True)
-            redAllianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in redAllianceNumbers]
-            blueAllianceNumbers = self.getAllianceForMatch(m, False)
-            blueAllianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in blueAllianceNumbers]
-
-            for timd in allTIMDs:
-                si = timd.scoutName
-                if not si in scoutScoresByMatch.keys(): scoutScoresByMatch[si] = []
-                scoutScoresByMatch[si].append(redScoreDifference if timd in redAllianceTIMDs else blueScoreDifference)
-        return scoutScoresByMatch 
-
-    def getCompletedTIMDsForScout(self, scout):
-        return filter(lambda tm: tm.scoutName == scout, self.getCompletedTIMDsInCompetition())
-
-    def getCompletedMatchesForScout(self, scout):
-        return filter(self.matchIsCompleted, map(lambda x: self.getMatchForNumber(x.matchNumber), self.getCompletedTIMDsForScout(scout)))
-
-    def scoutScoutedMatch(self, name, match):
-        return len(filter(lambda x: x.scoutName == name, self.getTIMDsForMatchNumber(match.number))) == 1
-
-    def scoutsOnSameAllianceInMatch(self, scout1, scout2, match):
-        if not all([self.scoutScoutedMatch(scout1, match), self.scoutScoutedMatch(scout2, match)]): return False
-        timds = [self.getTIMDForScoutNameAndMatch(scout1, match), self.getTIMDForScoutNameAndMatch(scout2, match)]
-        alliances = [match.blueAllianceTeamNumbers, match.redAllianceTeamNumbers]
-        return sum([timd.teamNumber in a for a in alliances for timd in timds]) == 2
-
-    def getTIMDForScoutNameAndMatch(self, name, match):
-        return filter(lambda x: x.scoutName == name and x.matchNumber == match.number, self.getCompletedTIMDsForScout(name))[0]
-
-    def scoutAccRank(self):
-        print "Analyzing Scouts..."
-        scoutScores = []
-        scoutErrByMatch = self.analyzeScouts()
-        scoutList = scoutErrByMatch.keys()
-        timesTogetherFunc = lambda s, s1: len(filter(lambda m: self.scoutsOnSameAllianceInMatch(s, s1, m), 
-            self.getCompletedMatchesForScout(s)))
-        getTeamRowFunc = lambda s: map(lambda s1: timesTogetherFunc(s, s1), scoutList)
-        matrixOfScoutMatchesTogether = np.matrix(map(getTeamRowFunc, scoutList))
-        if np.linalg.det(matrixOfScoutMatchesTogether) == 0: 
-            print "Cannot invert matrix"
-            return
-        else: inverseMatrixOfScoutMatchesTogether = np.linalg.inv(matrixOfScoutMatchesTogether)
-        errorList = map(lambda s: sum(scoutErrByMatch[s]), scoutList)
-        errorMatrix = np.matrix(errorList).reshape(len(errorList), 1)
-        scoutErrorOPRs = np.dot(inverseMatrixOfScoutMatchesTogether, errorMatrix)
-        for c in scoutList: 
-            scoutScores.append({'name' : c, 'score' : scoutErrorOPRs.item(scoutList.index(c), 0)})
-        return scoutScores
-
-    def rankScouts(self):
-        return sorted(self.scoutAccRank(), key=lambda x: x['score'], reverse=True)
-    
-    
     #CACHING
 
     def cacheFirstTeamData(self):

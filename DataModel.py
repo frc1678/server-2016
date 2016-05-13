@@ -29,6 +29,9 @@ class Competition(object):
 			match.timds = [timd for timd in self.TIMDs if timd.matchNumber == match.number]
 		for team in self.teams:
 			team.timds = [timd for timd in self.TIMDs if timd.teamNumber == team.number]
+		for timd in self.TIMDs:
+			timd.match = filter(lambda m: m.number == timd.matchNumber, self.matches)[0]
+			timd.team = filter(lambda t: t.number == timd.teamNumber, self.teams)[0]
 
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
@@ -337,6 +340,8 @@ class TeamInMatchData(object):
 		self.calculatedData = CalculatedTeamInMatchData()
 		self.teamNumber = None
 		self.matchNumber = None
+		self.team = None
+		self.match = None
 		self.scoutName = None
 
 		self.didGetIncapacitated = None

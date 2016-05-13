@@ -15,12 +15,14 @@ competition.eventCode = TBAC.eventCode
 
 def makeFakeDatabase():
 	FBC = firebaseCommunicator.FirebaseCommunicator(competition)
-	FBC.JSONteams = utils.readJSONFromString(TBAC.makeEventTeamsRequest())
-	FBC.JSONmatches = utils.readJSONFromString(TBAC.makeRequest(TBAC.makeYearEventKeyRequestURL('matches')))
+	FBC.JSONteams = TBAC.makeEventTeamsRequest()
+	FBC.JSONmatches = TBAC.makeRequest(TBAC.makeYearEventKeyRequestURL('matches'))
+	print FBC.JSONteams
+	print FBC.JSONmatches
 	FBC.wipeDatabase()
 	FBC.addTeamsToFirebase()
 	FBC.addScorelessMatchesToFirebase()
 	competition.updateTeamsAndMatchesFromFirebase()
 	FBC.addTIMDsToFirebase(competition.matches) #You need to create the matches and teams before you call this
 
-#makeFakeDatabase()
+makeFakeDatabase()

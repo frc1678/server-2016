@@ -59,9 +59,6 @@ def stdDictSum(dict1, dict2):
 def setDictionaryValue(dict, key, value):
 	dict[key] = value
 
-def jprint(JSON):
-	print(json.dumps(JSON, sort_keys=True, indent=4))
-
 def makeASCIIFromJSON(input):
     if isinstance(input, dict):
         return { makeASCIIFromJSON(key) : makeASCIIFromJSON(value) for key, value in input.iteritems() }
@@ -72,16 +69,8 @@ def makeASCIIFromJSON(input):
     else:
         return input
 
-
 def readJSONFromString(string):
 	return makeASCIIFromJSON(json.load(StringIO(string)))
-
-
-def readJSONFileToObj(fileName):
-	fileInput = open(fileName, 'r')
-	pythonObj = json.load(fileInput)
-	return pythonObj
-
 
 def makeMatchFromDict(d):
 	match = DataModel.Match(**d) #I have no idea why this works
@@ -89,16 +78,11 @@ def makeMatchFromDict(d):
 		match.calculatedData = DataModel.CalculatedMatchData(**d['calculatedData'])
 	return match
 
-
 def makeTeamFromDict(d):
 	team = DataModel.Team(**d) #I have no idea why this works
 	if 'calculatedData' in d.keys():
 		team.calculatedData = DataModel.CalculatedTeamData(**d['calculatedData'])
-		d = DataModel.Team(**d)
-		d.calculatedData = DataModel.CalculatedTeamData(**d.calculatedData)
-	# print("tn: " + str(team.number) + str(d['number']))
 	return team
-
 
 def makeTIMDFromDict(d):
 	timd = DataModel.TeamInMatchData(**d) #I have no idea why this works
@@ -106,34 +90,15 @@ def makeTIMDFromDict(d):
 		timd.calculatedData = DataModel.CalculatedTeamInMatchData(**d['calculatedData'])
 	return timd
 
-
 def makeTeamsFromDicts(dicts):
-	teams = []
-	for key in dicts.keys():
-		teams.append(makeTeamFromDict(dicts[key]))
-	return teams
-
+	return map(lambda v: makeTeamFromDict(v), dicts.values())
 
 def makeMatchesFromDicts(dicts):
-	matches = []
-	for match in dicts:
-		if match == None:
-			continue
-		matches.append(makeMatchFromDict(match))
-	return matches
+	return [makeMatchFromDict(m) for m in dicts if m != None]
 
-'''
-def makeDictFromTeamOld(t):
-	d = t.__dict__
-	if not isinstance(t.calculatedData, dict):
-		d["calculatedData"] = t.calculatedData.__dict__
-	return d
-'''
 def makeDictFromObject(o):
 	if isinstance(o, dict): 
-		for k, v in o.iteritems():
-			if v.__class__ in [DataModel.CalculatedTeamData, DataModel.CalculatedMatchData, DataModel.CalculatedTeamInMatchData]:
-				o[k] = v.__dict__
+		[utils.setDictionaryValue(o,k,v) for k,v in o.iteritems() if v.__class__ in [DataModel.CalculatedTeamData, DataModel.CalculatedMatchData, DataModel.CalculatedTeamInMatchData]]
 		return o
 	return dict((key, value) for key, value in o.__dict__.iteritems() if not callable(value) and not key.startswith('__'))
 
@@ -144,13 +109,7 @@ def makeDictFromTeam(t):
 	d = makeDictFromObject(t)
 	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
 	return d
-'''
-def makeDictFromMatchOld(t):
- 	d = t.__dict__
- 	if not isinstance(t.calculatedData, dict):
- 		d["calculatedData"] = t.calculatedData.__dict__
- 	return d
- '''
+
 def makeDictFromMatch(t):
 	d = makeDictFromObject(t)
 	d['calculatedData'] = makeDictFromObject(d['calculatedData'])
@@ -161,39 +120,21 @@ def makeDictFromTIMD(timd):
 	d["calculatedData"] = makeDictFromObject(d['calculatedData'])
 	return d
 
-
 def makeDictFromCalculatedData(calculatedData):
 	return calculatedData.__dict__
 
-
 def makeTIMDsFromDicts(timds):
-	t = []
-	for key in timds.keys():
-		if key == None:
-			continue
-		t.append(makeTIMDFromDict(timds[key]))
-	return t
-
+	return [makeTIMDFromDict(timd) for timd in timds if timd != None]
 
 def makeTeamObjectWithNumberAndName(number, name):
 	team = Team()
-	team.name = name
-	team.number = number
+	team.name, team.number = name, number
 	return team
-
 
 def makeTIMDFromTeamNumberAndMatchNumber(teamNumber, matchNumber):
 	timd = DataModel.TeamInMatchData()
-	timd.teamNumber = teamNumber
-	timd.matchNumber = matchNumber
+	timd.teamNumber, timd.matchNumber = teamNumber, matchNumber
 	return timd
-
-
-def makeArrayOfTeamNumAndMatchNum(teamNum):
-	timds = []
-	for timd in self.comp.TIMDs:
-		if timd.teamNumber == teamNum:
-			teamNumAndMatchNum = teamNum + "Q" + str(timd.matchNumber)	
 
 def setDataForMatch(match, scoreless):
 	m = DataModel.Match()
@@ -209,9 +150,8 @@ def setDataForTeam(team):
 	print str(t.number) + "," ,
 	return t
 
-
 def printWarningForSeconds(numSeconds):
-		print str(numSeconds) + ' SECONDS UNTIL FIREBASE WIPES'
-		time.sleep(1)
+	print str(numSeconds) + ' SECONDS UNTIL FIREBASE WIPES'
+	time.sleep(1)
 
 
