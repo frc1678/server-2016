@@ -24,6 +24,7 @@ class Competition(object):
 			team.matches = [m for m in self.matches if team.number in m.redAllianceTeamNumbers + m.blueAllianceTeamNumbers]
 
 	def updateTIMDsFromFirebase(self):
+		print type(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas/1678Q5"))
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
 		for match in self.matches:
 			match.timds = [timd for timd in self.TIMDs if timd.matchNumber == match.number]

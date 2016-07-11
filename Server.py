@@ -33,7 +33,7 @@ dv = DataValidator.DataValidator(comp)
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
 #FBC.wipeDatabase()
 calculator = Math.Calculator(comp)
-calculator.adjustSchedule()
+# calculator.adjustSchedule()
 secsBetweenCalc = 0
 shouldCacheSecsCounter = 0
 cycle = 1
@@ -53,28 +53,28 @@ emailer = CrashReporter.EmailThread()
 # 		#print 1 + 'a'
 # 		missingDataFile.write(str(missingDatas))
 
-# while(True):
-# 	print("\nCalcs Cycle " + str(cycle) + "...")
-# 	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
-# 		shouldCacheSecsCounter = 0
-# 	if(shouldCacheSecsCounter == 0):
-# 		FBC.cacheFirebase()
-# 	shouldCacheSecsCounter += secsBetweenCalc
-# 	dv.validateFirebase()
-# 	#scoutCalculator.analyzeScouts()
-# 	comp.updateTeamsAndMatchesFromFirebase()
-# 	comp.updateTIMDsFromFirebase()
-# 	checkForMissingData()
-# 	if shouldEmail:
-# 		try:
-# 			calculator.doCalculations(FBC)
-# 		except:
-# 			emailer.reportServerCrash(traceback.format_exc())
-# 			sys.exit(0)
-# 	else: 
-# 		calculator.doCalculations(FBC)
-# 	time.sleep(secsBetweenCalc)
-# 	cycle += 1
+while(True):
+	print("\nCalcs Cycle " + str(cycle) + "...")
+	if((shouldCacheSecsCounter / (numHoursBetweenCaches * 3600)) == 1):
+		shouldCacheSecsCounter = 0
+	if(shouldCacheSecsCounter == 0):
+		FBC.cacheFirebase()
+	shouldCacheSecsCounter += secsBetweenCalc
+	# dv.validateFirebase()
+	#scoutCalculator.analyzeScouts()
+	comp.updateTeamsAndMatchesFromFirebase()
+	comp.updateTIMDsFromFirebase()
+	# checkForMissingData()
+	if shouldEmail:
+		try:
+			calculator.doCalculations(FBC)
+		except:
+			emailer.reportServerCrash(traceback.format_exc())
+			sys.exit(0)
+	else: 
+		calculator.doCalculations(FBC)
+	time.sleep(secsBetweenCalc)
+	cycle += 1
 
 
 

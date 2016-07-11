@@ -124,7 +124,7 @@ def makeDictFromCalculatedData(calculatedData):
 	return calculatedData.__dict__
 
 def makeTIMDsFromDicts(timds):
-	return [makeTIMDFromDict(timd) for timd in timds if timd != None]
+	return [makeTIMDFromDict(timd) for timd in timds.values() if timd != None]
 
 def makeTeamObjectWithNumberAndName(number, name):
 	team = Team()
