@@ -12,18 +12,19 @@ class FirstTIMDProcess(multiprocessing.Process):
         warnings.simplefilter('error', RuntimeWarning)
 
     def run(self):
-        if (not self.calculator.timdIsCompleted(self.timd)):
+        if (not self.calculator.su.timdIsCompleted(self.timd)):
             print "TIMD is not complete for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
             self.calculatedTIMDsList.append(self.timd)
         else:
             print "Beginning first calculations for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
-            team = self.calculator.getTeamForNumber(self.timd.teamNumber)
-            match = self.calculator.getMatchForNumber(self.timd.matchNumber)
+            team = self.calculator.su.getTeamForNumber(self.timd.teamNumber)
+            
+            match = self.calculator.su.getMatchForNumber(self.timd.matchNumber)
 
-            self.calculator.matches = filter(lambda m: not self.calculator.teamInMatch(team, m) == (self.timd.matchNumber != m.number), self.calculator.comp.matches)
+            self.calculator.matches = filter(lambda m: not self.calculator.su.teamInMatch(team, m) == (self.timd.matchNumber != m.number), self.calculator.comp.matches)
             self.calculator.TIMDs = filter(lambda t: t.matchNumber in [m.number for m in self.calculator.matches], self.calculator.comp.TIMDs)
 
-            if not self.calculator.TIMCalculatedDataHasValues(
+            if not self.calculator.su.TIMCalculatedDataHasValues(
                     self.timd.calculatedData): self.timd.calculatedData = DataModel.CalculatedTeamInMatchData()
             c = self.timd.calculatedData
             c.teleopShotAbility = self.calculator.getTIMDTeleopShotAbility(self.timd)

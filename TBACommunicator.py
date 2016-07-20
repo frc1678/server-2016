@@ -1,48 +1,42 @@
-import urllib3
-import utils
 import requests
+import json
+import utils
 
 class TBACommunicator(object):
 	"""docstring for TBACommunicator"""
 	def __init__(self):
 		super(TBACommunicator, self).__init__()
-		self.eventCode = 'hop'
+		self.code = 'hop'
 		self.year = 2016
-		self.eventCodeYear = str(self.year) + self.eventCode
+		self.key = str(self.year) + self.code
 		self.basicURL = "http://www.thebluealliance.com/api/v2/"
 		self.headerKey = "X-TBA-App-Id"
 		self.headerValue = "blm:server1678:004"
-		
-	def makeYearEventKeyRequestURL(self, key):
-		return self.basicURL + 'event/' + self.eventCodeYear + '/' + key + '?' + self.headerKey + '=' + self.headerValue
 
 	def makeRequest(self, url):
-		http = urllib3.PoolManager()
-		r = http.request('GET', url)
-		return r.data
+		return utils.makeASCIIFromJSON(requests.get(url, headers={self.headerKey: self.headerValue}).json())
 
-	def getEventTeamsRequestKey(self):
-		return "event/{fullCode}/teams".format(fullCode = self.eventCodeYears)
+	def makeEventKeyRequestURL(self, key):
+		return self.basicURL + 'event/' + self.key + '/' + key
 
 	def makeEventTeamsRequest(self):
-		return self.makeRequest(self.makeYearEventKeyRequestURL('teams'))
-		return utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('teams')))
+		return self.makeRequest(self.makeEventKeyRequestURL('teams'))
 
-	def makeTeamMediaRequest(self, key, year):
-		return utils.readJSONFromString(self.makeRequest(self.basicURL + "team/" + key + "/" + str(year) + "/media" + '?' + self.headerKey + '=' + self.headerValue))
+	def makeTeamMediaRequest(self, teamKey):
+		return self.makeRequest(self.basicURL+'team/'+teamKey+"/"+str(self.year)+'/media')
 
 	def makeEventRankingsRequest(self):
-		try: 
-			requestResult = utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('rankings')))[1:]
-			return requestResult
-		except: pass
-
-	def makeSingleMatchRequest(self, matchNum):
-		url = self.basicURL + "match/" + str(self.eventCodeYear) + "_qm" + str(matchNum) + '?' + self.headerKey + '=' + self.headerValue
-		return utils.readJSONFromString(self.makeRequest(url))
+		return self.makeRequest(self.makeEventKeyRequestURL('rankings'))[1:]
 
 	def makeEventMatchesRequest(self):
-		return utils.readJSONFromString(self.makeRequest(self.makeYearEventKeyRequestURL('matches')))
+		return self.makeRequest(self.makeEventKeyRequestURL('matches'))
+	
+	def makeTeamMediaRequest(self, key, year):
+		return utils.readJSONFromString(self.makeRequest(self.basicURL + "team/" + key + "/" + str(year) + "/media" + '?' + self.headerKey + '=' + self.headerValue))
+	
+	def makeSingleMatchRequest(self, matchNum):
+		url = self.basicURL + "match/" + str(self.eventCodeYear) + "_qm" + str(matchNum)
+		return utils.readJSONFromString(self.makeRequest(url))
 
 	def TBAIsBehind(self, matches):
 		TBACompletedMatches = len(filter(lambda m: m["comp_level"] == 'qm' and m['score_breakdown'] != None, self.makeEventMatchesRequest()))

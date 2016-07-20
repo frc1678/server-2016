@@ -112,14 +112,7 @@ class FirebaseCommunicator(object):
 	
 
 def getPythonObjectForFirebaseDataAtLocation(location):
-	# The location will be a key path, like '/' for the root (entire) object.
-	result = firebase.get(location, None)
-	print type(result)
-	'''
-	Supposedly you can add other request parameters
-	But it was throwing errors when I tried it, soo...
-	But they will be JSON formatted get request parameters. :)
-	'''
-	return utils.readJSONFromString(json.dumps(result))
+	return utils.makeASCIIFromJSON((firebase.get(location, None)))
+
 
 

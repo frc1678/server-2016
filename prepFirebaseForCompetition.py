@@ -9,19 +9,17 @@ import time
 
 TBAC = TBACommunicator.TBACommunicator()
 competition = DataModel.Competition()
-competition.eventCode = TBAC.eventCode
+competition.eventCode = TBAC.code
 
 
 
 def makeFakeDatabase():
 	FBC = firebaseCommunicator.FirebaseCommunicator(competition)
 	FBC.JSONteams = TBAC.makeEventTeamsRequest()
-	FBC.JSONmatches = TBAC.makeRequest(TBAC.makeYearEventKeyRequestURL('matches'))
-	print FBC.JSONteams
-	print FBC.JSONmatches
+	FBC.JSONmatches = TBAC.makeEventMatchesRequest()
 	FBC.wipeDatabase()
 	FBC.addTeamsToFirebase()
-	FBC.addScorelessMatchesToFirebase()
+	FBC.addMatchesToFirebase()
 	competition.updateTeamsAndMatchesFromFirebase()
 	FBC.addTIMDsToFirebase(competition.matches) #You need to create the matches and teams before you call this
 

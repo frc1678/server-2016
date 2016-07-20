@@ -2,7 +2,6 @@ import utils
 import numpy as np
 import CacheModel as cache
 import pdb
-import prepFirebaseForCompetition
 import TBACommunicator
 # Scout Performance Analysis
 class ScoutPerformance(object):
@@ -32,12 +31,6 @@ class ScoutPerformance(object):
 
 	def getTIMDForScoutNameAndMatch(self, name, match):
 		return filter(lambda x: x.scoutName == name and x.matchNumber == match.number, self.calculator.getCompletedTIMDsForScout(name))[0]
-
-
-	def makeTBAMatches(self):
-		func = lambda m: utils.setDictionaryValue(self.correctionalMatches, m.number, 
-			self.TBAC.makeSingleMatchRequest(m.number))
-		map(func, self.calculator.getCompletedMatchesInCompetition())
 		
 	def scoutedScoreForMatchNum(self, match, allianceIsRed):
 		matchNum = match.number
@@ -77,31 +70,29 @@ class ScoutPerformance(object):
 		return autoPts + teleShotPts + teleDefenseCrossPts + scalePts + challengePts
 
 	def scoutAccRank(self):
-	        print "Analyzing Scouts..."
-	        scoutScores = []
-	        scoutErrByMatch = self.analyzeScouts()
-	        scoutList = scoutErrByMatch.keys()
-	        timesTogetherFunc = lambda s, s1: len(filter(lambda m: self.scoutsOnSameAllianceInMatch(s, s1, m), 
-	            self.getCompletedMatchesForScout(s)))
-	        getTeamRowFunc = lambda s: map(lambda s1: timesTogetherFunc(s, s1), scoutList)
-	        matrixOfScoutMatchesTogether = np.matrix(map(getTeamRowFunc, scoutList))
-	        if np.linalg.det(matrixOfScoutMatchesTogether) == 0: 
-	            print "Cannot invert matrix"
-	            return
-	        else: inverseMatrixOfScoutMatchesTogether = np.linalg.inv(matrixOfScoutMatchesTogether)
-	        errorList = map(lambda s: scoutErrByMatch[s], scoutList)
-	        errorMatrix = np.matrix(errorList).reshape(len(errorList), 1)
-	        scoutErrorOPRs = np.dot(inverseMatrixOfScoutMatchesTogether, errorMatrix)
-	        for c in scoutList: 
-	            scoutScores.append({'name' : c, 'score' : scoutErrorOPRs.item(scoutList.index(c), 0)})
-	        print scoutScores
-	        return scoutScores
+		print "Analyzing Scouts..."
+		scoutScores = []
+		scoutErrByMatch = self.analyzeScouts()
+		scoutList = scoutErrByMatch.keys()
+		timesTogetherFunc = lambda s, s1: len(filter(lambda m: self.scoutsOnSameAllianceInMatch(s, s1, m), 
+			self.getCompletedMatchesForScout(s)))
+		getTeamRowFunc = lambda s: map(lambda s1: timesTogetherFunc(s, s1), scoutList)
+		matrixOfScoutMatchesTogether = np.matrix(map(getTeamRowFunc, scoutList))
+		if np.linalg.det(matrixOfScoutMatchesTogether) == 0: 
+			print "Cannot invert matrix"
+			return
+		else: inverseMatrixOfScoutMatchesTogether = np.linalg.inv(matrixOfScoutMatchesTogether)
+		errorList = map(lambda s: scoutErrByMatch[s], scoutList)
+		errorMatrix = np.matrix(errorList).reshape(len(errorList), 1)
+		scoutErrorOPRs = np.dot(inverseMatrixOfScoutMatchesTogether, errorMatrix)
+		for c in scoutList: 
+			scoutScores.append({'name' : c, 'score' : scoutErrorOPRs.item(scoutList.index(c), 0)})
+		return scoutScores
 
 	def analyzeScouts(self):
 		scoutScoresByMatch = {}
 		scoutScores = {} # Lower is better
-		self.makeTBAMatches()
-		TBAMatches = self.correctionalMatches
+		TBAMatches = self.TBAC.makeTBAMatches()
 		for m in self.calculator.getCompletedMatchesInCompetition():
 			redScoutedScore = self.scoutedScoreForMatchNum(m, True)
 			blueScoutedScore = self.scoutedScoreForMatchNum(m, False)
@@ -123,6 +114,5 @@ class ScoutPerformance(object):
 		f = lambda s: utils.setDictionaryValue(scoutScores, s, np.mean(scoutScoresByMatch[s]))
 
 		map(f, scoutScoresByMatch)
-		print scoutScores
 		return scoutScores
 
