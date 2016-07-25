@@ -698,7 +698,7 @@ class Calculator(object):
         a.numScaleAndChallengePoints = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
         a.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
 
-    def getSecondCalculationsForAverageTeam(self):
+    def getThirdCalculationsForAverageTeam(self):
         a = self.averageTeam.calculatedData
 
         a.RScoreTorque = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreTorque)
@@ -826,16 +826,16 @@ class Calculator(object):
                 lambda x: utils.rms(x) if x != None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
             print "Completed first calcs for " + str(team.number)
                 
-    def doBetweenFirstAndSecondCalculationsForTeams(self):
-        map(self.doBetweenFirstAndSecondCalculationsForTeam, self.comp.teams)
-        self.doBetweenFirstAndSecondCalculationsForTeam(self.averageTeam)
+    def doThirdCalculationsForTeams(self):
+        map(self.doThirdCalculationsForTeam, self.comp.teams)
+        self.doThirdCalculationsForTeam(self.averageTeam)
 
-    def doBetweenFirstAndSecondCalculationsForTeam(self, team):
+    def doSecondCalculationsForTeam(self, team):
         if not len(self.su.getCompletedTIMDsForTeam(team)) <= 0:
             func = lambda dKey: utils.setDictionaryValue(team.calculatedData.predictedSuccessfulCrossingsForDefenseTele, dKey, self.predictedCrosses(team, dKey))
             map(func, self.defenseList)            
 
-    def doSecondCalculationsForTeam(self, team):
+    def doThirdCalculationsForTeam(self, team):
         if not len(self.su.getCompletedTIMDsForTeam(team)) <= 0:
             t = team.calculatedData
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
@@ -908,9 +908,9 @@ class Calculator(object):
             self.cacheFirstTeamData()
             self.doFirstTeamCalculations()
             self.cacheSecondTeamData()
-            self.doBetweenFirstAndSecondCalculationsForTeams()
+            self.doSecondCalculationsForTeams()
             self.doMatchesCalculations()
-            self.doSecondTeamCalculations()
+            self.doThirdTeamCalculations()
             self.updateCurrentMatchNum()
             map(lambda o: FirebaseWriteObjectProcess(o, FBC).start(), self.cachedComp.teamsWithMatchesCompleted + self.su.getCompletedTIMDsInCompetition() + self.comp.matches)
             
