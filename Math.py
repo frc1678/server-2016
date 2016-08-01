@@ -833,11 +833,12 @@ class Calculator(object):
             map(func, self.defenseList)            
 
     def doThirdCalculationsForTeam(self, team):
-        if not len(self.su.getCompletedTIMDsForTeam(team)) <= 0:
+        if not len(self.su.getCompletedMatchesForTeam(team)) <= 0:
             t = team.calculatedData
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
             t.actualNumRPs = self.getTeamRPsFromTBA(team)
             t.actualSeed = self.getTeamSeed(team)
+            if team.number == 5098: pdb.set_trace()
             t.predictedSeed = self.cachedComp.predictedSeedings.index(team) + 1
             t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]

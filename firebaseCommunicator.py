@@ -30,11 +30,13 @@ class FirebaseCommunicator(object):
 		self.competition = competition
 
 	def updateFirebaseWithTeam(self, team):
+		print str(team.number) + ",",
 		teamDict = utils.makeDictFromTeam(team)
 		FBLocation = "/Teams"
 		result = firebase.put(FBLocation, team.number, teamDict)
 
 	def updateFirebaseWithMatch(self, match):
+		print str(match.number) + ",",
 		matchDict = utils.makeDictFromMatch(match)
 		FBLocation = "/Matches"
 		matchDict["blueAllianceTeamNumbers"] = map(lambda n: int(n.replace('frc', '')), matchDict["blueAllianceTeamNumbers"])
@@ -75,7 +77,7 @@ class FirebaseCommunicator(object):
 	def addMatchesToFirebase(self):
 		print "\nDoing Matches..."
 		matches = filter(lambda m: m["comp_level"] == 'qm', self.JSONmatches)
-		map(lambda m: self.updateFirebaseWithMatch(utils.setDataForMatch(m, False)), matches)
+		map(lambda m: self.updateFirebaseWithMatch(utils.setDataForMatch(m)), matches)
 
 	def addScorelessMatchesToFirebase(self):
 		print "\nDoing Matches..."

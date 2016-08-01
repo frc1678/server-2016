@@ -31,9 +31,7 @@ CSVExporter.TSVExportCMP(comp)
 dv = DataValidator.DataValidator(comp)
 
 FBC = firebaseCommunicator.FirebaseCommunicator(comp)
-#FBC.wipeDatabase()
 calculator = Math.Calculator(comp)
-# calculator.adjustSchedule()
 secsBetweenCalc = 0
 shouldCacheSecsCounter = 0
 cycle = 1
@@ -50,7 +48,6 @@ def checkForMissingData():
 	with open('missing_data.txt', 'w') as missingDataFile:
 		missingDatas = calculator.getMissingDataString()
 		print missingDatas
-		#print 1 + 'a'
 		missingDataFile.write(str(missingDatas))
 
 while(True):

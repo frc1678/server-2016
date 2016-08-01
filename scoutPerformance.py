@@ -104,7 +104,7 @@ class ScoutPerformance(Process):
 		matrixOfScoutMatchesTogether = np.matrix(map(getTeamRowFunc, scoutList))
 		if np.linalg.det(matrixOfScoutMatchesTogether) == 0: 
 			print "Cannot invert matrix"
-			return
+			return []
 		else: inverseMatrixOfScoutMatchesTogether = np.linalg.inv(matrixOfScoutMatchesTogether)
 		errorList = map(lambda s: sum(scoutErrByMatch[s]), scoutList)
 		errorMatrix = np.matrix(errorList).reshape(len(errorList), 1)
@@ -114,6 +114,5 @@ class ScoutPerformance(Process):
 		return scoutScores
 
 	def run(self):
-		print sorted(self.scoutAccRank(), key=lambda x: x['score'], reverse=True)
 		return sorted(self.scoutAccRank(), key=lambda x: x['score'], reverse=True)
 
