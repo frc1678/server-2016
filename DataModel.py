@@ -17,21 +17,21 @@ class Competition(object):
 	def updateTeamsAndMatchesFromFirebase(self):
 		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
 		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
-		for match in self.matches:
-			match.redTeams = [t for t in self.teams if t.number in match.redAllianceTeamNumbers]
-			match.blueTeams = [t for t in self.teams if t.number in match.blueAllianceTeamNumbers]
-		for team in self.teams:
-			team.matches = [m for m in self.matches if team.number in m.redAllianceTeamNumbers + m.blueAllianceTeamNumbers]
+		# for match in self.matches:
+		# 	match.redTeams = [t for t in self.teams if t.number in match.redAllianceTeamNumbers]
+		# 	match.blueTeams = [t for t in self.teams if t.number in match.blueAllianceTeamNumbers]
+		# for team in self.teams:
+		# 	team.matches = [m for m in self.matches if team.number in m.redAllianceTeamNumbers + m.blueAllianceTeamNumbers]
 
 	def updateTIMDsFromFirebase(self):
 		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
-		for match in self.matches:
-			match.timds = [timd for timd in self.TIMDs if timd.matchNumber == match.number]
-		for team in self.teams:
-			team.timds = [timd for timd in self.TIMDs if timd.teamNumber == team.number]
-		for timd in self.TIMDs:
-			timd.match = filter(lambda m: m.number == timd.matchNumber, self.matches)[0]
-			timd.team = filter(lambda t: t.number == timd.teamNumber, self.teams)[0]
+		# for match in self.matches:
+		# 	match.timds = [timd for timd in self.TIMDs if timd.matchNumber == match.number]
+		# for team in self.teams:
+		# 	team.timds = [timd for timd in self.TIMDs if timd.teamNumber == team.number]
+		# for timd in self.TIMDs:
+		# 	timd.match = filter(lambda m: m.number == timd.matchNumber, self.matches)[0]
+		# 	timd.team = filter(lambda t: t.number == timd.teamNumber, self.teams)[0]
 
 class CalculatedTeamData(object):
 	"""The calculatedData for an FRC Team object"""
@@ -275,8 +275,8 @@ class Team(object):
 		super(Team, self).__init__()
 		self.name = None
 		self.number = None
-		self.matches = []
-		self.timds = []
+		# self.matches = []
+		# self.timds = []
 		self.calculatedData = CalculatedTeamData()
 		self.selectedImageUrl = None
 		self.otherImageUrls = {
@@ -319,9 +319,9 @@ class Match(object):
 		self.calculatedData = CalculatedMatchData()
 		self.redAllianceTeamNumbers = None
 		self.blueAllianceTeamNumbers = None
-		self.redTeams = []
-		self.blueTeams = []
-		self.timds = []
+		# self.redTeams = []
+		# self.blueTeams = []
+		# self.timds = []
 		self.redScore = None
 		self.blueScore = None
 		self.redDefensePositions = None
@@ -340,8 +340,8 @@ class TeamInMatchData(object):
 		self.calculatedData = CalculatedTeamInMatchData()
 		self.teamNumber = None
 		self.matchNumber = None
-		self.team = None
-		self.match = None
+		# self.team = None
+		# self.match = None
 		self.scoutName = None
 
 		self.didGetIncapacitated = None

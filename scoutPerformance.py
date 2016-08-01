@@ -2,9 +2,11 @@ import utils
 import numpy as np
 import CacheModel as cache
 import pdb
+from multiprocessing import Process
 import TBACommunicator
+
 # Scout Performance Analysis
-class ScoutPerformance(object):
+class ScoutPerformance(Process):
 	"""docstring for ScoutPerformance"""
 	def __init__(self, comp, calculator):
 		super(ScoutPerformance, self).__init__()
@@ -12,30 +14,10 @@ class ScoutPerformance(object):
 		self.calculator = calculator
 		self.correctionalMatches = {}
 		self.TBAC = TBACommunicator.TBACommunicator()
-		self.scoutAccRank()
 
-	def getCompletedTIMDsForScout(self, scout):
-		return filter(lambda tm: tm.scoutName == scout, self.getCompletedTIMDsInCompetition())
-
-	def getCompletedMatchesForScout(self, scout):
-		return filter(self.calculator.matchIsCompleted, map(lambda x: self.calculator.getMatchForNumber(x.matchNumber), self.calculator.getCompletedTIMDsForScout(scout)))
-
-	def scoutScoutedMatch(self, name, match):
-		return len(filter(lambda x: x.scoutName == name, self.calculator.getTIMDsForMatchNumber(match.number))) == 1
-
-	def scoutsOnSameAllianceInMatch(self, scout1, scout2, match):
-		if not all([self.scoutScoutedMatch(scout1, match), self.scoutScoutedMatch(scout2, match)]): return False
-		timds = [self.calculator.getTIMDForScoutNameAndMatch(scout1, match), self.calculator.getTIMDForScoutNameAndMatch(scout2, match)]
-		alliances = [match.blueAllianceTeamNumbers, match.redAllianceTeamNumbers]
-		return sum([timd.teamNumber in a for a in alliances for timd in timds]) == 2
-
-	def getTIMDForScoutNameAndMatch(self, name, match):
-		return filter(lambda x: x.scoutName == name and x.matchNumber == match.number, self.calculator.getCompletedTIMDsForScout(name))[0]
-		
 	def scoutedScoreForMatchNum(self, match, allianceIsRed):
-		matchNum = match.number
-		allTIMDs = self.calculator.getTIMDsForMatchNumber(matchNum)
-		allianceNumbers = self.calculator.getAllianceForMatch(match, allianceIsRed)
+		allTIMDs = self.calculator.su.getTIMDsForMatch(match)
+		allianceNumbers = self.calculator.su.getAllianceForMatch(match, allianceIsRed)
 		allianceNumbers = map(lambda t: t.number, allianceNumbers)
 		allianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in allianceNumbers]
 
@@ -69,6 +51,48 @@ class ScoutPerformance(object):
 
 		return autoPts + teleShotPts + teleDefenseCrossPts + scalePts + challengePts
 
+	def analyzeScouts(self):
+		scoutScoresByMatch = {}
+		scoutScores = {} # Lower is better
+		TBAMatches = self.TBAC.makeEventMatchesRequest()
+		for m in self.calculator.su.getCompletedMatchesInCompetition():
+			redScoutedScore = self.scoutedScoreForMatchNum(m, True)
+			blueScoutedScore = self.scoutedScoreForMatchNum(m, False)
+			penaltyFreeRedScore = abs(m.redScore - TBAMatches[m.number]["score_breakdown"]["red"]["foulPoints"])
+			penaltyFreeBlueScore = abs(m.blueScore - TBAMatches[m.number]["score_breakdown"]["blue"]["foulPoints"])
+			redScoreDifference = abs(redScoutedScore - penaltyFreeRedScore)
+			blueScoreDifference = abs(blueScoutedScore - penaltyFreeBlueScore)
+
+			allTIMDs = self.calculator.su.getTIMDsForMatch(m)
+			redAllianceNumbers = self.calculator.su.getAllianceForMatch(m, True)
+			redAllianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in redAllianceNumbers]
+			blueAllianceNumbers = self.calculator.su.getAllianceForMatch(m, False)
+			blueAllianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in blueAllianceNumbers]
+
+			for timd in allTIMDs:
+				si = timd.scoutName
+				if not si in scoutScoresByMatch.keys(): scoutScoresByMatch[si] = []
+				scoutScoresByMatch[si].append(redScoreDifference if timd in redAllianceTIMDs else blueScoreDifference)
+		return scoutScoresByMatch 
+
+	def getCompletedTIMDsForScout(self, scout):
+		return filter(lambda tm: tm.scoutName == scout, self.calculator.su.getCompletedTIMDsInCompetition())
+
+	def getCompletedMatchesForScout(self, scout):
+		return filter(self.calculator.su.matchIsCompleted, map(lambda x: self.calculator.su.getMatchForNumber(x.matchNumber), self.getCompletedTIMDsForScout(scout)))
+
+	def scoutScoutedMatch(self, name, match):
+		return len(filter(lambda x: x.scoutName == name, self.calculator.su.getTIMDsForMatch(match))) == 1
+
+	def scoutsOnSameAllianceInMatch(self, scout1, scout2, match):
+		if not all([self.scoutScoutedMatch(scout1, match), self.scoutScoutedMatch(scout2, match)]): return False
+		timds = [self.getTIMDForScoutNameAndMatch(scout1, match), self.getTIMDForScoutNameAndMatch(scout2, match)]
+		alliances = [match.blueAllianceTeamNumbers, match.redAllianceTeamNumbers]
+		return sum([timd.teamNumber in a for a in alliances for timd in timds]) == 2
+
+	def getTIMDForScoutNameAndMatch(self, name, match):
+		return filter(lambda x: x.scoutName == name and x.matchNumber == match.number, self.getCompletedTIMDsForScout(name))[0]
+
 	def scoutAccRank(self):
 		print "Analyzing Scouts..."
 		scoutScores = []
@@ -82,37 +106,14 @@ class ScoutPerformance(object):
 			print "Cannot invert matrix"
 			return
 		else: inverseMatrixOfScoutMatchesTogether = np.linalg.inv(matrixOfScoutMatchesTogether)
-		errorList = map(lambda s: scoutErrByMatch[s], scoutList)
+		errorList = map(lambda s: sum(scoutErrByMatch[s]), scoutList)
 		errorMatrix = np.matrix(errorList).reshape(len(errorList), 1)
 		scoutErrorOPRs = np.dot(inverseMatrixOfScoutMatchesTogether, errorMatrix)
 		for c in scoutList: 
 			scoutScores.append({'name' : c, 'score' : scoutErrorOPRs.item(scoutList.index(c), 0)})
 		return scoutScores
 
-	def analyzeScouts(self):
-		scoutScoresByMatch = {}
-		scoutScores = {} # Lower is better
-		TBAMatches = self.TBAC.makeTBAMatches()
-		for m in self.calculator.getCompletedMatchesInCompetition():
-			redScoutedScore = self.scoutedScoreForMatchNum(m, True)
-			blueScoutedScore = self.scoutedScoreForMatchNum(m, False)
-			penaltyFreeRedScore = abs(m.redScore-TBAMatches[m.number]["score_breakdown"]["red"]["foulPoints"])
-			penaltyFreeBlueScore = abs(m.blueScore-TBAMatches[m.number]["score_breakdown"]["blue"]["foulPoints"])
-			redScoreDifference = abs(redScoutedScore-penaltyFreeRedScore)
-			blueScoreDifference = abs(blueScoutedScore-penaltyFreeBlueScore)
-
-			allTIMDs = self.calculator.getTIMDsForMatchNumber(m.number)
-			redAllianceNumbers = self.calculator.getAllianceForMatch(m, True)
-			redAllianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in redAllianceNumbers]
-			blueAllianceNumbers = self.calculator.getAllianceForMatch(m, False)
-			blueAllianceTIMDs = [timd for timd in allTIMDs if timd.teamNumber in blueAllianceNumbers]
-
-			for timd in allTIMDs:
-				si = timd.scoutName
-				if not si in scoutScoresByMatch.keys(): scoutScoresByMatch[si] = []
-				scoutScoresByMatch[si].append(redScoreDifference if timd in redAllianceTIMDs else blueScoreDifference)
-		f = lambda s: utils.setDictionaryValue(scoutScores, s, np.mean(scoutScoresByMatch[s]))
-
-		map(f, scoutScoresByMatch)
-		return scoutScores
+	def run(self):
+		print sorted(self.scoutAccRank(), key=lambda x: x['score'], reverse=True)
+		return sorted(self.scoutAccRank(), key=lambda x: x['score'], reverse=True)
 

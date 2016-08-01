@@ -10,23 +10,23 @@ class DataValidator(object):
 		super(DataValidator, self).__init__()
 		self.competition = competition
 		self.defensesDict = {
-		 	'a' : {'pc' : -1, 'cdf' : -1},
-			'b' : {'mt' : -1, 'rp' : -1},
-			'c' : {'db' : -1, 'sp' : -1},
-			'd' : {'rw' : -1, 'rt' : -1},
-			'e' : {'lb' : -1}
+		 	'a' : {'pc' : None, 'cdf' : None},
+			'b' : {'mt' : None, 'rp' : None},
+			'c' : {'db' : None, 'sp' : None},
+			'd' : {'rw' : None, 'rt' : None},
+			'e' : {'lb' : None}
 		}
 		self.valueNotUploaded = [-1, -1.0, "-1", ['-1'], self.defensesDict, False, {}, ['lb', '', '', '', ''], {1678: -1}, {"not0": "-1"}, None]
-		self.exceptedKeys = ['name', 'number', 'calculatedData', 'teamInMatchDatas', 'matches', 'pit']
+		self.exceptedKeys = ['name', 'number', 'calculatedData', 'teamInMatchDatas', 'matches', 'pit', 'selectedImageUrl']
 
 	def validateFirebase(self):
 		print("Teams Validation Problems: " + str(self.validateTeams(self.competition.teams, True)))
 		print("Matches Validation Problems: " + str(self.validateMatches(self.competition.matches)))
 
-	def someValuesNotUploaded(team):
+	def someValuesNotUploaded(self, team):
 		items = utils.makeDictFromTeam(team).items()
-		uploaded = lambda k, v: (v not in self.valueNotUploaded and key not in self.exceptedKeys)
-		return filter(lambda k,v: not uploaded(k,v), items) if sum(map(uploaded, items)) < len(items) else []
+		notUploaded = lambda k, v: v in self.valueNotUploaded and k not in self.exceptedKeys and 'pit' not in k	
+		return [p for (p,v) in items if notUploaded(p,v)] if sum([not notUploaded(p,v) for (p,v) in items]) < len(items) else []
 
 	def validateTeams(self, teams, shouldValidateCalculatedTeamData):
 		problems = []
@@ -49,7 +49,7 @@ class DataValidator(object):
 						 	if timdProblems != []:
 						 		problems.append(timdProblems)
 				if self.someValuesNotUploaded(team) != []: 
-					problems.append(problem)		
+					problems.append(self.someValuesNotUploaded(team))		
 		return problems
 
 	def validateCalculatedTeamData(self, CTD, teamNumber):
@@ -110,5 +110,3 @@ class DataValidator(object):
 		# 			if timd.rankTorque < 0:
 		# 				problems.append("TIMD: " + str(timd.teamNumber) + "Q" + str(timd.matchNumber) + " should be played but isn't.")
 		return problems
-
-

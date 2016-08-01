@@ -18,7 +18,6 @@ class FirstTIMDProcess(multiprocessing.Process):
         else:
             print "Beginning first calculations for team " + str(self.timd.teamNumber) + " in match " + str(self.timd.matchNumber)
             team = self.calculator.su.getTeamForNumber(self.timd.teamNumber)
-            
             match = self.calculator.su.getMatchForNumber(self.timd.matchNumber)
 
             self.calculator.matches = filter(lambda m: not self.calculator.su.teamInMatch(team, m) == (self.timd.matchNumber != m.number), self.calculator.comp.matches)

@@ -14,7 +14,7 @@ import DataValidator
 import CSVExporter
 import utils
 import pdb
-# import scoutPerformance
+import scoutPerformance
 import CrashReporter
 import numpy as np
 
@@ -42,16 +42,16 @@ shouldEmail = False
 numHoursBetweenCaches = 1.0/360.0
 emailer = CrashReporter.EmailThread()
 
-# scoutCalculator = scoutPerformance.ScoutPerformance(comp, calculator)
+scoutCalculator = scoutPerformance.ScoutPerformance(comp, calculator)
+scoutCalculator.start()
 
 
-
-# def checkForMissingData():
-# 	with open('missing_data.txt', 'w') as missingDataFile:
-# 		missingDatas = calculator.getMissingDataString()
-# 		print missingDatas
-# 		#print 1 + 'a'
-# 		missingDataFile.write(str(missingDatas))
+def checkForMissingData():
+	with open('missing_data.txt', 'w') as missingDataFile:
+		missingDatas = calculator.getMissingDataString()
+		print missingDatas
+		#print 1 + 'a'
+		missingDataFile.write(str(missingDatas))
 
 while(True):
 	print("\nCalcs Cycle " + str(cycle) + "...")
@@ -60,11 +60,11 @@ while(True):
 	if(shouldCacheSecsCounter == 0):
 		FBC.cacheFirebase()
 	shouldCacheSecsCounter += secsBetweenCalc
-	# dv.validateFirebase()
-	#scoutCalculator.analyzeScouts()
+	dv.validateFirebase()
+
 	comp.updateTeamsAndMatchesFromFirebase()
 	comp.updateTIMDsFromFirebase()
-	# checkForMissingData()
+	checkForMissingData()
 	if shouldEmail:
 		try:
 			calculator.doCalculations(FBC)
@@ -75,21 +75,3 @@ while(True):
 		calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
 	cycle += 1
-
-
-
-		# missingDataFile.write(calculator.getMissingDataString())
-# elimsAlliances, i = {}, 1
-# while i <= 8:
-# 	a,b,c = raw_input("Input team numbers for alliance " + str(i) + ": ").split()
-# 	if all(x in map(lambda x: x.number, comp.teams) for x in [int(a), int(b), int(c)]): 
-# 		elimsAlliances[i] = [int(a),int(b),int(c)]
-# 		i += 1
-
-# FBC.addElimsAlliances(elimsAlliances)
-
-
-# # DEBUG
-# teams = []
-# for i in teams:
-# 	updateFirebaseWithTeam(makeTeamObjectWithNumberAndName(i, "none"))

@@ -190,8 +190,8 @@ class Calculator(object):
         return defenseKey in self.defensesFacedInTIMD(timd)
 
     def defensesFacedInTIMD(self, timd):
-        match = timd.match
-        team = timd.team
+        match = self.su.getMatchForNumber(timd.matchNumber)
+        team = self.su.getTeamForNumber(timd.teamNumber)
         return match.redDefensePositions if self.su.getTeamAllianceIsRedInMatch(team, match) else match.blueDefensePositions
 
     def timdsWhereTeamFacedDefense(self, team, defenseKey):
@@ -524,7 +524,7 @@ class Calculator(object):
 
     def predictedNumberOfRPs(self, team):
         predictedRPsFunction = lambda m: self.predictedRPsForAllianceForMatch(self.su.getTeamAllianceIsRedInMatch(team, m), m)
-        predictedRPs = sum([predictedRPsFunction(m) for m in team.matches if not self.su.matchIsCompleted(m) and predictedRPsFunction(m) != None])
+        predictedRPs = sum([predictedRPsFunction(m) for m in self.su.getMatchesForTeam(team) if not self.su.matchIsCompleted(m) and predictedRPsFunction(m) != None])
         return predictedRPs + self.actualNumberOfRPs(team)
 
     def actualNumberOfRPs(self, team):
@@ -571,7 +571,7 @@ class Calculator(object):
         return self.getPredictedAutoPointsForMatchForAllianceIsRed(match, self.su.getTeamAllianceIsRedInMatch(team, match))
 
     def cumulativeSumPredictedAutoPointsForTeam(self, team):
-        return sum([self.getPredictedAutoPointsForTeamAllianceInMatch(team, m) for m in self.su.getCompletedMatchesForTeam(team)])
+        return sum([self.getPredictedAutoPointsForTeamAllianceInMatch(team, m) for m in self.su.getMatchesForTeam(team)])
 
     def getPredictedSiegePointsForMatchForAllianceIsRed(self, match, allianceIsRed):
         return sum([t.calculatedData.siegeAbility for t in self.su.getAllianceForMatch(match, allianceIsRed)])
@@ -580,7 +580,7 @@ class Calculator(object):
         return self.getPredictedSiegePointsForMatchForAllianceIsRed(match, self.su.getTeamAllianceIsRedInMatch(team, match))
 
     def cumulativeSumPredictedSiegePointsForTeam(self, team):
-        return sum([self.getPredictedSiegePointsForTeamAllianceInMatch(team, m) for m in self.su.getCompletedMatchesForTeam(team)])  
+        return sum([self.getPredictedSiegePointsForTeamAllianceInMatch(team, m) for m in self.su.getMatchesForTeam(team)])  
 
     def predictedRPsForAllianceForMatch(self, allianceIsRed, match):
         alliance = self.su.getAllianceForMatch(match, allianceIsRed)
@@ -632,9 +632,6 @@ class Calculator(object):
         cachedData = self.cachedTeamDatas[team.number]
         map(lambda dKey: utils.setDictionaryValue(cachedData.alphas, dKey, self.alphaForTeamForDefense(team, dKey)), self.defenseList)
 
-    def cacheScoutData(self):
-        self.cachedComp.TBAMatches = self.makeTBAMatches()
-        self.cachedComp.SARs = self.scoutAccRank()
 
 
     #CALCULATIONS        
@@ -698,7 +695,7 @@ class Calculator(object):
         a.numScaleAndChallengePoints = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.numScaleAndChallengePoints) # Checked
         a.breachPercentage = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.breachPercentage)
 
-    def getSecondCalculationsForAverageTeam(self):
+    def getThirdCalculationsForAverageTeam(self):
         a = self.averageTeam.calculatedData
 
         a.RScoreTorque = self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.RScoreTorque)
@@ -786,7 +783,7 @@ class Calculator(object):
             t.sdAutoAbility = self.getStandardDeviationForDataFunctionForTeam(team, lambda timd: timd.calculatedData.autoAbility)
             t.numScaleAndChallengePoints = self.numScaleAndChallengePointsForTeam(team)  # Checked
             t.breachPercentage = self.getAverageForDataFunctionForTeam(team, lambda timd: 
-                utils.convertFirebaseBoolean(self.teamDidBreachInMatch(team, timd.match)))
+                utils.convertFirebaseBoolean(self.teamDidBreachInMatch(team, self.su.getMatchForNumber(timd.matchNumber))))
             t.avgHighShotsAttemptedTele = self.getAverageForDataFunctionForTeam(team,
                 lambda timd: timd.calculatedData.highShotsAttemptedTele)
             t.avgLowShotsAttemptedTele = self.getAverageForDataFunctionForTeam(team,
@@ -826,16 +823,16 @@ class Calculator(object):
                 lambda x: utils.rms(x) if x != None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
             print "Completed first calcs for " + str(team.number)
                 
-    def doBetweenFirstAndSecondCalculationsForTeams(self):
-        map(self.doBetweenFirstAndSecondCalculationsForTeam, self.comp.teams)
-        self.doBetweenFirstAndSecondCalculationsForTeam(self.averageTeam)
+    def doThirdTeamCalculations(self):
+        map(self.doThirdCalculationsForTeam, self.comp.teams)
+        self.doThirdCalculationsForTeam(self.averageTeam)
 
-    def doBetweenFirstAndSecondCalculationsForTeam(self, team):
+    def doSecondCalculationsForTeam(self, team):
         if not len(self.su.getCompletedTIMDsForTeam(team)) <= 0:
             func = lambda dKey: utils.setDictionaryValue(team.calculatedData.predictedSuccessfulCrossingsForDefenseTele, dKey, self.predictedCrosses(team, dKey))
             map(func, self.defenseList)            
 
-    def doSecondCalculationsForTeam(self, team):
+    def doThirdCalculationsForTeam(self, team):
         if not len(self.su.getCompletedTIMDsForTeam(team)) <= 0:
             t = team.calculatedData
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
@@ -882,7 +879,7 @@ class Calculator(object):
 
     def doSecondTeamCalculations(self):
         map(self.doSecondCalculationsForTeam, self.comp.teams)
-        self.getSecondCalculationsForAverageTeam()
+        self.doSecondCalculationsForTeam(self.averageTeam)
 
     def doMatchesCalculations(self):
         map(self.doFirstCalculationsForMatch, self.comp.matches)
@@ -908,10 +905,11 @@ class Calculator(object):
             self.cacheFirstTeamData()
             self.doFirstTeamCalculations()
             self.cacheSecondTeamData()
-            self.doBetweenFirstAndSecondCalculationsForTeams()
-            self.doMatchesCalculations()
             self.doSecondTeamCalculations()
+            self.doMatchesCalculations()
+            self.doThirdTeamCalculations()
             self.updateCurrentMatchNum()
+            #WARNING - DO NOT RUN NEXT LINE IF YOU HAVE A WEAK COMPUTER - it will potentially crash the program
             map(lambda o: FirebaseWriteObjectProcess(o, FBC).start(), self.cachedComp.teamsWithMatchesCompleted + self.su.getCompletedTIMDsInCompetition() + self.comp.matches)
             
             endTime = time.time()
@@ -938,6 +936,3 @@ class Calculator(object):
                 self.comp.currentMatchNum = m.number
         return m.number
         return 0
-
-
-        
