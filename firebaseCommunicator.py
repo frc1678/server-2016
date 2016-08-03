@@ -104,11 +104,15 @@ class FirebaseCommunicator(object):
 		firebase.delete(FBLocation, None)
 
 	def cacheFirebase(self):
-		data = json.dumps(firebase.get("/", None))
-		now = str(datetime.datetime.now())
-		with open("./CachedFirebases/" + now + '.json', 'w') as f:
-			f.write(data)
-			f.close()
+		while True:
+			try:
+				data = json.dumps(firebase.get("/", None))
+				now = str(datetime.datetime.now())
+				with open("./CachedFirebases/" + now + '.json', 'w') as f:
+					f.write(data)
+					f.close()
+					break
+			except: pass
 
 	
 

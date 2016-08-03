@@ -3,6 +3,7 @@ class CachedTeamData(object):
 		super(CachedTeamData, self).__init__()
 		self.number = teamNumber
 		self.alphas = {}
+		self.betas = {}
 		self.defensesFaced = []
 		self.completedTIMDs = []
 

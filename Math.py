@@ -220,13 +220,18 @@ class Calculator(object):
         return teamDefenseSightings / teamTotalNumberOfDefenseSightings if teamTotalNumberOfDefenseSightings > 0 else 0
 
     def alphaForTeamForDefense(self, team, defenseKey):
-        return self.competitionProportionForDefense(defenseKey) + self.teamProportionForDefense(team, defenseKey)
+        defenseRetrievalFunction = lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele[defenseKey]
+        teamCrossings = defenseRetrievalFunction(team) if defenseRetrievalFunction(team) != None else 0
+        compCrossings = np.mean([defenseRetrievalFunction(t) for t in self.cachedComp.teamsWithMatchesCompleted if self.teamFacedDefense(t, defenseKey)])
+        return teamCrossings / compCrossings
 
     def betaForTeamForDefense(self, team, defenseKey):
-        cachedData = self.cachedTeamDatas[team.number]
-        defenseAlpha = cachedData.alphas[defenseKey]
-        sumDefenseAlphas = sum(map(lambda dKey: cachedData.alphas[dKey], self.defenseList))
-        return defenseAlpha / sumDefenseAlphas if sumDefenseAlphas > 0 else None
+        if team.number == -1: return 1.0
+        teamDefSightProp = lambda t: float(len(self.timdsWhereTeamFacedDefense(t, defenseKey)))/len(self.su.getCompletedTIMDsForTeam(t))
+        compDefenseSightings = self.numTimesCompetitionFacedDefense(defenseKey)
+        if compDefenseSightings == 0: return
+        compDefenseSightingsProp = np.mean(map(teamDefSightProp, self.cachedComp.teamsWithMatchesCompleted))
+        return teamDefSightProp(team) / compDefenseSightingsProp
 
     def totalCrossesInAutoForTIMD(self, timd):
         return sum([len(value) for value in timd.timesSuccessfulCrossedDefensesAuto.values() if value != None])
@@ -235,6 +240,9 @@ class Calculator(object):
         competitionDefenseSightings = self.numTimesCompetitionFacedDefense(defenseKey)
         if competitionDefenseSightings == 0:
             return None
+        alphaFunction = lambda dKey: self.cachedTeamDatas[team.number].alphas[dKey]
+        betaFunction = lambda dKey: self.cachedTeamDatas[team.number].betas[dKey]
+        thetaNumerator = sum([alphaFunction(dKey) * betaFunction(dKey) for dKey in self.defenseList if self.teamFacedDefense(team, dKey)])
         defenseRetrievalFunction = lambda t: t.calculatedData.avgSuccessfulTimesCrossedDefensesTele[defenseKey]
         averageOfDefenseCrossingsAcrossCompetition = np.mean(
             [defenseRetrievalFunction(t) for t in self.teamsWhoHaveFacedDefense(defenseKey)])
@@ -244,8 +252,7 @@ class Calculator(object):
         teamTotalNumberOfDefenseSightings = 5 * len(self.su.getCompletedTIMDsForTeam(team))
         proportionOfCompetitionDefenseSightings = competitionDefenseSightings / competitionTotalNumberOfDefenseSightings if competitionTotalNumberOfDefenseSightings > 0 else 0
         proportionOfTeamDefenseSightings = teamDefenseSightings / teamTotalNumberOfDefenseSightings if teamTotalNumberOfDefenseSightings > 0 else 0
-        theta = sum([self.betaForTeamForDefense(team, dKey) for dKey in self.defenseList if
-                     self.betaForTeamForDefense(team, dKey) != None])  # TODO: Rename theta something better
+        theta = thetaNumerator / 10        
         return (averageOfDefenseCrossingsAcrossCompetition * theta + teamAverageDefenseCrossings * teamDefenseSightings) / (teamDefenseSightings + 1)
 
     def meanDefenseCrossingTimeForTeam(self, team):
@@ -453,7 +460,7 @@ class Calculator(object):
         return match.calculatedData.sdPredictedRedScore if allianceIsRed else match.calculatedData.sdPredictedBlueScore
 
     def getAvgNumCompletedTIMDsForTeamsOnAlliance(self, alliance):
-        return np.mean(map(lambda t: len(self.su.getCompletedTIMDsForTeam(t)), alliance)) # TODO:WATCHOUT!!!
+        return sum(map(lambda t: len(self.su.getCompletedTIMDsForTeam(t)), alliance)) # TODO:WATCHOUT!!!
 
     def getAvgNumCompletedTIMDsForAlliance(self, alliance):
         return self.getAvgNumCompletedTIMDsForTeamsOnAlliance(alliance)
@@ -488,11 +495,14 @@ class Calculator(object):
         siegeConsistencies = filter(lambda sc: sc != None, [t.calculatedData.siegeConsistency for t in alliance])
         if len(siegeConsistencies) == None:
             return self.getAverageOfDataFunctionAcrossCompetition(lambda t: t.calculatedData.siegeConsistency)
-        siegeChance = np.prod(siegeConsistencies)
+        siegeChance = max(siegeConsistencies)
+        print siegeChance 
+        print self.probabilityDensity(10.0, self.numShotsForAlliance(alliance), self.stdDevNumShotsForAlliance(alliance))
         return siegeChance * self.probabilityDensity(10.0, self.numShotsForAlliance(alliance), self.stdDevNumShotsForAlliance(alliance))
 
    
     def captureChanceForAllianceNumbers(self, allianceNumbers):
+        print "ALLIANCE " + str(allianceNumbers)
         return self.captureChanceForAlliance(self.su.teamsForTeamNumbersOnAlliance(allianceNumbers))
 
     def winChanceForMatchForAllianceIsRed(self, match, allianceIsRed):
@@ -509,8 +519,15 @@ class Calculator(object):
                                        sdOpposingPredictedScore,
                                        sampleSize,
                                        opposingSampleSize)
-        winChance = stats.t.cdf(tscoreRPs, np.mean([sampleSize, opposingSampleSize]))
+        df = self.getDF(sdPredictedScore, opposingPredictedScore, sampleSize, opposingSampleSize)
+        winChance = stats.t.cdf(tscoreRPs, df)
         return winChance if not math.isnan(winChance) else 0
+
+    def getDF(self, s1, s2, n1, n2):
+        numerator = ((s1**4/n1) + (s2**4/n2)) ** 2
+        denominator = (s1**8/((n1**2)*(n1-1))) + (s2**8/((n2**2)*(n2-1)))
+        return numerator / denominator
+
 
 
     # Seeding
@@ -631,6 +648,8 @@ class Calculator(object):
     def doSecondCachingForTeam(self, team):
         cachedData = self.cachedTeamDatas[team.number]
         map(lambda dKey: utils.setDictionaryValue(cachedData.alphas, dKey, self.alphaForTeamForDefense(team, dKey)), self.defenseList)
+        map(lambda dKey: utils.setDictionaryValue(cachedData.betas, dKey, self.betaForTeamForDefense(team, dKey)), self.defenseList)
+
 
 
 
@@ -838,7 +857,6 @@ class Calculator(object):
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
             t.actualNumRPs = self.getTeamRPsFromTBA(team)
             t.actualSeed = self.getTeamSeed(team)
-            if team.number == 5098: pdb.set_trace()
             t.predictedSeed = self.cachedComp.predictedSeedings.index(team) + 1
             t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]
@@ -863,7 +881,7 @@ class Calculator(object):
         match.calculatedData.blueBreachChance = self.breachChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.redBreachChance = self.breachChanceForAllianceNumbers(match.redAllianceTeamNumbers)
         match.calculatedData.blueCaptureChance = self.captureChanceForAllianceNumbers(match.blueAllianceTeamNumbers)
-        match.calculatedData.redCaptureChance = self.captureChanceForAllianceNumbers(match.blueAllianceTeamNumbers)  
+        match.calculatedData.redCaptureChance = self.captureChanceForAllianceNumbers(match.redAllianceTeamNumbers)  
         match.calculatedData.predictedBlueScore = self.predictedScoreForAllianceWithNumbers(match.blueAllianceTeamNumbers)
         match.calculatedData.predictedRedScore = self.predictedScoreForAllianceWithNumbers(match.redAllianceTeamNumbers)
         match.calculatedData.sdPredictedBlueScore = self.stdDevPredictedScoreForAllianceNumbers(match.blueAllianceTeamNumbers)
