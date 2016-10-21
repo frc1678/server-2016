@@ -22,5 +22,6 @@ def makeFakeDatabase():
 	FBC.addMatchesToFirebase()
 	competition.updateTeamsAndMatchesFromFirebase()
 	FBC.addTIMDsToFirebase(competition.matches) #You need to create the matches and teams before you call this
+	competition.updateTIMDsFromFirebase()
 
 makeFakeDatabase()

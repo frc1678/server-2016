@@ -119,5 +119,3 @@ class FirebaseCommunicator(object):
 def getPythonObjectForFirebaseDataAtLocation(location):
 	return utils.makeASCIIFromJSON((firebase.get(location, None)))
 
-
-
