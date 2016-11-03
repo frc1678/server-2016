@@ -2,10 +2,9 @@ import utils
 import numpy as np
 import CacheModel as cache
 import itertools
-import pdb
-from multiprocessing import Process
 import TBACommunicator
-
+import Math
+import random
 
 import pyrebase
 import numpy as np
@@ -33,6 +32,7 @@ class ScoutPrecision(object):
 		super(ScoutPrecision, self).__init__()
 		self.sprs = {}
 		self.cycle = 0
+		self.robotNumToScouts = {}
 		self.TBAC = TBACommunicator.TBACommunicator()
 		self.keysToPointValues = {
 			"numHighShotsMadeAuto" : 10,
@@ -76,6 +76,7 @@ class ScoutPrecision(object):
 
 
 	def calculateScoutPrecisionScores(self, tempTimds):
+		self.cycle += 1
 		consolidationGroups = {}
 		for (temptimdKey, temptimd) in tempTIMDs.items():
 			actualKey = temptimdKey.split("-")[0]
@@ -91,10 +92,64 @@ class ScoutPrecision(object):
 						self.findOddScoutForDataPoint(v, k)
 					if k in self.k:
 						self.getScoutPrecisionForDefenses(v, k)
-		return {k:(v/float(self.cycle)/float(self.getTotalTIMDsForScoutName(k))) for (k,v) in self.sprs.items()}
+		self.sprs = {k:(v/float(self.cycle)/float(self.getTotalTIMDsForScoutName(k))) for (k,v) in self.sprs.items()}
 
 	def rankScouts(self):
 		return sorted(self.sprs.keys(), key=lambda k: self.sprs[k])
-			
+
+	def getScoutFrequencies(self):
+		rankedScouts = self.rankScouts()
+		return {i:rankedScouts.index(i) * (100/(len(rankedScouts) - 1)) + 1 for i in rankedScouts}
+	
+	def organizeLowScouts(self, ls):
+		b = []
+		rankedScouts = self.rankScouts()	
+		for i in range(3):
+			array = []
+			for i in range(len(ls)):
+				ind = random.randint(0, len(ls)-1)
+				array.append(ls[ind])
+				del ls[ind]
+			b.append(array)
+			if len(ls) == 0:
+				break
+		return b
+
+
+
+	def organizeScouts(self, robotNumsForMatch):
+		a = []
+		for k,v in self.getScoutFrequencies().items():
+			a += [k] * v
+		b = {}
+		scoutsInGrouping = []
+		for i in range(3):
+			index = random.randint(0, len(a) - 1)
+			b[robotNumsForMatch[i]] = a[index]
+			a = filter(lambda s: s != a[index], a)				
+			scoutsInGrouping = list(set(a))
+		
+		groupScouts = self.organizeLowScouts(scoutsInGrouping)
+		for i in range(3, 3 + len(groupScouts)):
+			b[robotNumsForMatch[i]] = groupScouts[i-3]
+		self.robotNumToScouts = b
+
+	def robotNumberFromName(self, scoutName):
+		print self.robotNumToScouts
+		for k,v in self.robotNumToScouts.items():
+			if scoutName in v:
+				return k
+
+	def getRobotNumbersForScouts(self, scoutRotatorDict):
+		di = {}
+		for scoutNum, value in scoutRotatorDict.items():
+			if value['mostRecentUser'] in self.sprs.keys():
+				di[scoutNum] = {}
+				di[scoutNum]['mostRecentUser'] = value['mostRecentUser']
+				di[scoutNum]['team'] = self.robotNumberFromName(value['mostRecentUser'])
+		return di
+
+
+
 
 

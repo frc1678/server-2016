@@ -27,7 +27,7 @@ def convertNoneToIdentity(x, identity):
 
 def dictOperation(dict1, dict2, dictOp, identity):
 	newDict = {}
-	map(lambda k: setDictionaryValue(newDict, k, dictOp(convertNoneToIdentity(dict1.get(k, None), identity), convertNoneToIdentity(dict2.get(k, None), identity))), dict1)
+	map(lambda k: setDictionaryValue(newDict, k, dictOp(convertNoneToIdentity(dict1[k], identity), convertNoneToIdentity(dict2[k], identity))), dict1)
 	return newDict
 
 def dictSum(dict1, dict2):

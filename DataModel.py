@@ -15,8 +15,8 @@ class Competition(object):
 		self.currentMatchNum = 0
 	
 	def updateTeamsAndMatchesFromFirebase(self):
-		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("Teams"))
-		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("Matches"))
+		self.teams = utils.makeTeamsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Teams"))
+		self.matches = utils.makeMatchesFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/Matches"))
 		# for match in self.matches:
 		# 	match.redTeams = [t for t in self.teams if t.number in match.redAllianceTeamNumbers]
 		# 	match.blueTeams = [t for t in self.teams if t.number in match.blueAllianceTeamNumbers]
@@ -24,7 +24,7 @@ class Competition(object):
 		# 	team.matches = [m for m in self.matches if team.number in m.redAllianceTeamNumbers + m.blueAllianceTeamNumbers]
 
 	def updateTIMDsFromFirebase(self):
-		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("TeamInMatchDatas"))
+		self.TIMDs = utils.makeTIMDsFromDicts(firebaseCommunicator.getPythonObjectForFirebaseDataAtLocation("/TeamInMatchDatas"))
 		# for match in self.matches:
 		# 	match.timds = [timd for timd in self.TIMDs if timd.matchNumber == match.number]
 		# for team in self.teams:

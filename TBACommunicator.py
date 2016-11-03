@@ -11,7 +11,7 @@ class TBACommunicator(object):
 		self.key = str(self.year) + self.code
 		self.basicURL = "http://www.thebluealliance.com/api/v2/"
 		self.headerKey = "X-TBA-App-Id"
-		self.headerValue = "blm:server1678:004"
+		self.headerValue = "avv:server1678:005"
 
 	def makeRequest(self, url):
 		return utils.makeASCIIFromJSON(requests.get(url, headers={self.headerKey: self.headerValue}).json())
@@ -41,5 +41,3 @@ class TBACommunicator(object):
 	def TBAIsBehind(self, matches):
 		TBACompletedMatches = len(filter(lambda m: m["comp_level"] == 'qm' and m['score_breakdown'] != None, self.makeEventMatchesRequest()))
 		return abs(len(matches) - TBACompletedMatches) >= 3
-
-

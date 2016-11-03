@@ -61,6 +61,7 @@ while(True):
 
 	comp.updateTeamsAndMatchesFromFirebase()
 	comp.updateTIMDsFromFirebase()
+	# print comp.teams, comp.matches
 	checkForMissingData()
 	if shouldEmail:
 		try:
@@ -69,6 +70,7 @@ while(True):
 			emailer.reportServerCrash(traceback.format_exc())
 			sys.exit(0)
 	else: 
+		print "calc"
 		calculator.doCalculations(FBC)
 	time.sleep(secsBetweenCalc)
 	cycle += 1

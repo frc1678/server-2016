@@ -2,9 +2,11 @@ import pyrebase
 import DataModel
 import time
 from firebase import firebase as fir
+import Math
 from SPR import ScoutPrecision
+import random
 
-(secret, url) = ('IMXOxXD3FjOOUoMGJlkAK5pAtn89mGIWAEnaKJhP', 'https://1678-strat-dev-2016.firebaseio.com/')
+(secret, url) = ('qVIARBnAD93iykeZSGG8mWOwGegminXUUGF2q0ee', 'https://1678-scouting-2016.firebaseio.com/')
 auth = fir.FirebaseAuthentication(secret, "1678programming@gmail.com", True, True)
 fire = fir.FirebaseApplication(url, auth)
 url = '1678-scout-rotator'
@@ -14,11 +16,21 @@ config = {
 	"databaseURL": "https://scout-rotator.firebaseio.com/",
 	"storageBucket": url + ".appspot.com"
 }
-firebase = pyrebase.initialize_app(config)
-fb = firebase.database()
-scouts = range(20)
-spr = ScoutPrecision()
+
+
 while True:
-	spr.cycle += 1
-	fb.child("scouts").update(spr.calculateScoutPrecisionScores(fire.get("/TempTeamInMatchDatas", None)))
+	
+	cmn = fire.get('/', 'currentMatchNum')
+	print fire.get('/Matches/' + str(cmn + 1), 'redAllianceTeamNumbers')
+	firebase = pyrebase.initialize_app(config)
+	fb = firebase.database()
+	scouts = range(20)
+	spr = ScoutPrecision()
+	spr.calculateScoutPrecisionScores(fire.get("/TempTeamInMatchDatas", None))
+	try:
+		cmn = fire.get('/', 'currentMatchNum')
+		teams = fire.get('/Matches/' + str(cmn + 1), 'redAllianceTeamNumbers') + fire.get('/Matches/' + str(cmn + 1), 'blueAllianceTeamNumbers')
+		spr.organizeScouts(teams)
+	except:
+		continue
 	time.sleep(2)
