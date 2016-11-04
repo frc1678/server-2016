@@ -35,10 +35,10 @@ class ScoutPrecision(object):
 		self.robotNumToScouts = {}
 		self.TBAC = TBACommunicator.TBACommunicator()
 		self.keysToPointValues = {
-			"numHighShotsMadeAuto" : 10,
-			"numLowShotsMadeAuto" : 5,
-			"numHighShotsMadeTele" : 5,
-			"numLowShotsMadeTele" : 2,
+			"numHighShotsMadeAuto" : 1,
+			"numLowShotsMadeAuto" : 1,
+			"numHighShotsMadeTele" : 1,
+			"numLowShotsMadeTele" : 1,
 		}
 		self.k = ["timesSuccessfulCrossedDefensesTele"]
 
@@ -75,15 +75,16 @@ class ScoutPrecision(object):
 		return vs if len(vs) > 0 else list(set(a))
 
 
-	def calculateScoutPrecisionScores(self, tempTimds):
+	def calculateScoutPrecisionScores(self, temp):
 		self.cycle += 1
 		consolidationGroups = {}
-		for (temptimdKey, temptimd) in tempTIMDs.items():
-			actualKey = temptimdKey.split("-")[0]
-			if actualKey in consolidationGroups.keys():
-				consolidationGroups[actualKey].append(temptimd)
+		for k, c in temp:
+			b = k.split('-')[0]
+			if b not in consolidationGroups.keys():
+				consolidationGroups[b] = [c]
 			else:
-				consolidationGroups[actualKey] = [temptimd]
+				consolidationGroups[b] += [c]
+		print consolidationGroups.keys()
 
 		for v in consolidationGroups.values():
 			for temp in v:
@@ -92,6 +93,7 @@ class ScoutPrecision(object):
 						self.findOddScoutForDataPoint(v, k)
 					if k in self.k:
 						self.getScoutPrecisionForDefenses(v, k)
+		print self.sprs.keys()
 		self.sprs = {k:(v/float(self.cycle)/float(self.getTotalTIMDsForScoutName(k))) for (k,v) in self.sprs.items()}
 
 	def rankScouts(self):
@@ -135,17 +137,14 @@ class ScoutPrecision(object):
 		self.robotNumToScouts = b
 
 	def robotNumberFromName(self, scoutName, currentTeams):
-		print self.robotNumToScouts
 		for k,v in self.robotNumToScouts.items():
 			if scoutName in v:
-				print currentTeams[k]
 				return currentTeams[k]
 
 	def getRobotNumbersForScouts(self, scoutRotatorDict, currentTeams):
 		di = {}
 		for scoutNum, value in scoutRotatorDict.items():
-			print value['mostRecentUser']
-			if value['mostRecentUser'] in self.sprs.keys():
+			if value.get('mostRecentUser') in self.sprs.keys():
 				di[scoutNum] = {}
 				di[scoutNum]['mostRecentUser'] = value['mostRecentUser']
 				di[scoutNum]['team'] = self.robotNumberFromName(value['mostRecentUser'], currentTeams)

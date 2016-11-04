@@ -1,6 +1,7 @@
 import pyrebase
 import numpy as np
 import utils
+import time
 
 config = {
 	"apiKey": "mykey",
@@ -56,6 +57,7 @@ while True:
 	consolidationGroups = utils.makeASCIIFromJSON(consolidationGroups)
 	map(lambda key: firebase.child("TeamInMatchDatas").update({key : joinValues(key)}), consolidationGroups.keys())
 	print str(map(joinValues, consolidationGroups.keys()))  + " consolidated"
+	time.sleep(1)
 
 
 

@@ -19,14 +19,15 @@ config = {
 
 firebase = pyrebase.initialize_app(config)
 fb = firebase.database()
+a = {}
+
 while True:	
 	scouts = range(20)
 	spr = ScoutPrecision()
-	spr.calculateScoutPrecisionScores(fire.get("/TempTeamInMatchDatas", None))
+	spr.calculateScoutPrecisionScores(fb.child('TempTeamInMatchDatas').get().val().items())
 	cmn = fire.get('/', 'currentMatchNum')
 	teams = fire.get('/Matches/' + str(cmn + 1), 'redAllianceTeamNumbers') + fire.get('/Matches/' + str(cmn + 1), 'blueAllianceTeamNumbers')		
 	spr.organizeScouts()
 	sprs = spr.getRobotNumbersForScouts(fb.child('scouts').get().val(), teams)
-	print sprs
 	fb.child('scouts').update(sprs)
 	time.sleep(1)
