@@ -117,7 +117,7 @@ class ScoutPrecision(object):
 
 
 
-	def organizeScouts(self, robotNumsForMatch):
+	def organizeScouts(self):
 		a = []
 		for k,v in self.getScoutFrequencies().items():
 			a += [k] * v
@@ -125,28 +125,30 @@ class ScoutPrecision(object):
 		scoutsInGrouping = []
 		for i in range(3):
 			index = random.randint(0, len(a) - 1)
-			b[robotNumsForMatch[i]] = a[index]
+			b[i] = a[index]
 			a = filter(lambda s: s != a[index], a)				
 			scoutsInGrouping = list(set(a))
 		
 		groupScouts = self.organizeLowScouts(scoutsInGrouping)
 		for i in range(3, 3 + len(groupScouts)):
-			b[robotNumsForMatch[i]] = groupScouts[i-3]
+			b[i] = groupScouts[i-3]
 		self.robotNumToScouts = b
 
-	def robotNumberFromName(self, scoutName):
+	def robotNumberFromName(self, scoutName, currentTeams):
 		print self.robotNumToScouts
 		for k,v in self.robotNumToScouts.items():
 			if scoutName in v:
-				return k
+				print currentTeams[k]
+				return currentTeams[k]
 
-	def getRobotNumbersForScouts(self, scoutRotatorDict):
+	def getRobotNumbersForScouts(self, scoutRotatorDict, currentTeams):
 		di = {}
 		for scoutNum, value in scoutRotatorDict.items():
+			print value['mostRecentUser']
 			if value['mostRecentUser'] in self.sprs.keys():
 				di[scoutNum] = {}
 				di[scoutNum]['mostRecentUser'] = value['mostRecentUser']
-				di[scoutNum]['team'] = self.robotNumberFromName(value['mostRecentUser'])
+				di[scoutNum]['team'] = self.robotNumberFromName(value['mostRecentUser'], currentTeams)
 		return di
 
 

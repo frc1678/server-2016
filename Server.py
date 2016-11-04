@@ -61,7 +61,6 @@ while(True):
 
 	comp.updateTeamsAndMatchesFromFirebase()
 	comp.updateTIMDsFromFirebase()
-	# print comp.teams, comp.matches
 	checkForMissingData()
 	if shouldEmail:
 		try:
