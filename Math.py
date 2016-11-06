@@ -810,15 +810,6 @@ class Calculator(object):
             t.twoBallAutoTriedPercentage = self.twoBallAutoTriedPercentage(team)
             t.twoBallAutoAccuracy = self.twoBallAutoAccuracy(team)
 
-            t.avgNumTimesBeached = self.categoryAAverageDictForDataFunction(team, lambda timd: timd.numTimesBeached)
-            t.avgNumTimesSlowed = { "pc" : self.avgNumTimesSlowed(team, "pc"), "cdf" : self.avgNumTimesSlowed(team, "cdf") }
-            t.avgNumTimesUnaffected = self.categoryAAverageDictForDataFunction(team, lambda timd: timd.numTimesUnaffected)
-            sumCategoryADataPointDict = utils.dictSum(t.avgNumTimesUnaffected, utils.dictSum(t.avgNumTimesBeached, t.avgNumTimesSlowed))
-            
-            t.beachedPercentage = utils.dictQuotient(t.avgNumTimesBeached, sumCategoryADataPointDict)
-            
-            t.slowedPercentage = utils.dictQuotient(t.avgNumTimesSlowed, sumCategoryADataPointDict)
-            t.unaffectedPercentage = utils.dictQuotient(t.avgNumTimesUnaffected, sumCategoryADataPointDict)
             t.avgNumTimesCrossedDefensesAuto = self.getAverageForDataFunctionForTeam(team, lambda tm: tm.calculatedData.totalNumTimesCrossedDefensesAuto)
             self.setDefenseValuesForTeam(team, t.avgSuccessfulTimesCrossedDefensesTele, lambda tm: tm.timesSuccessfulCrossedDefensesTele, 
                 lambda x: np.mean(x) if x!= None and len(x) > 0 else 0, lambda y: len(y) if y != None else 0)
@@ -931,7 +922,7 @@ class Calculator(object):
             self.updateCurrentMatchNum()
             #WARNING - DO NOT RUN NEXT LINE IF YOU HAVE A WEAK COMPUTER - it will potentially crash the program
             map(lambda o: FirebaseWriteObjectProcess(o, FBC).start(), self.cachedComp.teamsWithMatchesCompleted + self.su.getCompletedTIMDsInCompetition() + self.comp.matches)
-            
+            FBC.addCompInfoToFirebase()
             endTime = time.time()
 
             self.writeCalculationDiagnostic(endTime - startTime)
@@ -954,4 +945,4 @@ class Calculator(object):
             print m.number
             if m.redScore == None and m.blueScore == None:
                 self.comp.currentMatchNum = m.number
-        return m.number
+                print self.comp.currentMatchNum

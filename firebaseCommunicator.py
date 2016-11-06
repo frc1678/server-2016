@@ -21,6 +21,7 @@ import datetime
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
 
 firebase = fb.FirebaseApplication(url, auth)
+firebase.delete('/TempTeamInMatchDatas', None)
 
 class FirebaseCommunicator(object):
 	"""docstring for FirebaseCommunicator"""

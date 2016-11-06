@@ -16,8 +16,6 @@ listKeys = ["ballsIntakedAuto"]
 
 firebase = pyrebase.initialize_app(config)
 firebase = firebase.database()
-tempTIMDs = firebase.child("TempTeamInMatchDatas").get().val()
-consolidationGroups = {}
 
 def commonValue(vals):
 	if len(set(map(type, vals))) != 1: return
@@ -47,6 +45,12 @@ def avgDict(dicts):
 	return {d : map(np.mean, zip(*map(lambda tm: tm.get(d) if tm.get(d) != None else [0], dicts))) for d in extendList(map(lambda x: x.keys(), dicts))}
 
 while True:
+	tempTIMDs = firebase.child("TempTeamInMatchDatas").get().val()
+	if tempTIMDs == None:
+		print "No data"
+		time.sleep(1)
+		continue
+	consolidationGroups = {}
 	for (temptimdKey, temptimd) in tempTIMDs.items():
 		actualKey = temptimdKey.split("-")[0]
 		if actualKey in consolidationGroups.keys():

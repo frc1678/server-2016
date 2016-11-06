@@ -84,7 +84,6 @@ class ScoutPrecision(object):
 				consolidationGroups[b] = [c]
 			else:
 				consolidationGroups[b] += [c]
-		print consolidationGroups.keys()
 
 		for v in consolidationGroups.values():
 			for temp in v:
@@ -93,7 +92,6 @@ class ScoutPrecision(object):
 						self.findOddScoutForDataPoint(v, k)
 					if k in self.k:
 						self.getScoutPrecisionForDefenses(v, k)
-		print self.sprs.keys()
 		self.sprs = {k:(v/float(self.cycle)/float(self.getTotalTIMDsForScoutName(k))) for (k,v) in self.sprs.items()}
 
 	def rankScouts(self):
@@ -102,16 +100,20 @@ class ScoutPrecision(object):
 	def getScoutFrequencies(self):
 		rankedScouts = self.rankScouts()
 		return {i:rankedScouts.index(i) * (100/(len(rankedScouts) - 1)) + 1 for i in rankedScouts}
-	
+
+	def filterScouts(self, rankedScouts, available):
+		return filter(lambda x: available[x] == 1, rankedScouts)
+
 	def organizeLowScouts(self, ls):
+		print "ls " + str(ls)
 		b = []
-		rankedScouts = self.rankScouts()	
 		for i in range(3):
 			array = []
-			for i in range(len(ls)):
-				ind = random.randint(0, len(ls)-1)
-				array.append(ls[ind])
-				del ls[ind]
+			for i in range(3):
+				if len(ls) > 0:
+					ind = random.randint(0, len(ls)-1)
+					array.append(ls[ind])
+					del ls[ind]
 			b.append(array)
 			if len(ls) == 0:
 				break
@@ -119,16 +121,19 @@ class ScoutPrecision(object):
 
 	def organizeScouts(self):
 		a = []
-		for k,v in self.getScoutFrequencies().items():
+		scoutFreqs = self.getScoutFrequencies()
+		for k,v in scoutFreqs.items():
 			a += [k] * v
+		print a
 		b = {}
 		scoutsInGrouping = []
 		for i in range(3):
-			index = random.randint(0, len(a) - 1)
-			b[i] = a[index]
-			a = filter(lambda s: s != a[index], a)				
-			scoutsInGrouping = list(set(a))
-		
+			if len(a) > 0:
+				index = random.randint(0, len(a) - 1)
+				b[i] = a[index]
+				a = filter(lambda s: s != a[index], a)				
+				scoutsInGrouping = list(set(a))
+				print "scout in group " + str(scoutsInGrouping)
 		groupScouts = self.organizeLowScouts(scoutsInGrouping)
 		for i in range(3, 3 + len(groupScouts)):
 			b[i] = groupScouts[i-3]
@@ -139,13 +144,14 @@ class ScoutPrecision(object):
 			if scoutName in v:
 				return currentTeams[k]
 
-	def getRobotNumbersForScouts(self, scoutRotatorDict, currentTeams):
+	def getRobotNumbersForScouts(self, scoutRotatorDict, currentTeams, cmn):
 		di = {}
 		for scoutNum, value in scoutRotatorDict.items():
 			if value.get('mostRecentUser') in self.sprs.keys():
 				di[scoutNum] = {}
 				di[scoutNum]['mostRecentUser'] = value['mostRecentUser']
 				di[scoutNum]['team'] = self.robotNumberFromName(value['mostRecentUser'], currentTeams)
+				di[scoutNum]['match'] = cmn + 1
 		return di
 
 
