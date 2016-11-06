@@ -117,8 +117,6 @@ class ScoutPrecision(object):
 				break
 		return b
 
-
-
 	def organizeScouts(self):
 		a = []
 		for k,v in self.getScoutFrequencies().items():
