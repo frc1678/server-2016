@@ -47,12 +47,7 @@ class FirstTIMDProcess(multiprocessing.Process):
             c.numTimesFailedCrossedDefensesTele = self.calculator.numCrossingsForTIMD(self.timd, self.timd.timesFailedCrossedDefensesTele)
             c.crossingsForDefensePercentageAuto = utils.dictPercentage(c.numTimesSuccesfulCrossedDefensesAuto, c.numTimesFailedCrossedDefensesAuto)
             c.crossingsForDefensePercentageTele = utils.dictPercentage(c.numTimesSuccesfulCrossedDefensesTele, c.numTimesFailedCrossedDefensesTele)
-            numCategoryADataPoints = self.timd.numTimesBeached + self.timd.numTimesSlowed + self.timd.numTimesUnaffected
             c.totalNumTimesCrossedDefensesAuto = self.calculator.totalCrossesInAutoForTIMD(self.timd)
-            if numCategoryADataPoints != 0:
-                c.beachedPercentage = float(self.timd.numTimesBeached) / numCategoryADataPoints
-                c.slowedPercentage = float(self.timd.numTimesSlowed) / numCategoryADataPoints
-                c.unaffectedPercentage = float(self.timd.numTimesUnaffected) / numCategoryADataPoints
             c.crossingTimeForDefenseAuto = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesAuto)
             c.crossingTimeForDefenseTele = self.calculator.valueCrossingsForTIMD(self.timd, self.timd.timesSuccessfulCrossedDefensesTele)
             c.wasDisfunctional = utils.convertFirebaseBoolean(self.timd.didGetDisabled) or utils.convertFirebaseBoolean(self.timd.didGetIncapacitated)
