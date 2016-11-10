@@ -13,6 +13,7 @@ config = {
 averageKeys = ["timesFailedCrossedDefensesTele", "timesFailedCrossedDefensesAuto", "timesSuccessfulCrossedDefensesTele",
 			   "timesSuccessfulCrossedDefensesAuto"]
 listKeys = ["ballsIntakedAuto"]
+constants = ['matchNumber', 'teamNumber']
 
 firebase = pyrebase.initialize_app(config)
 firebase = firebase.database()
@@ -33,7 +34,7 @@ def joinList(values):
 	return mCV if values.count(mCV) > len(values) / 2 else np.mean(values)
 
 def joinValues(key):
-	return {k : avgDict(map(lambda tm: tm[k], consolidationGroups[key])) if k in averageKeys else (extendList(map(lambda tm: tm[k], consolidationGroups[key])) if k in listKeys else commonValue(map(lambda tm: tm[k], consolidationGroups[key]))) for k in consolidationGroups[key][0].keys()}	
+	return {k : avgDict(map(lambda tm: tm[k], consolidationGroups[key])) if k in averageKeys else (extendList(map(lambda tm: tm[k], consolidationGroups[key])) if k in listKeys else consolidationGroups[key][0][k] if k in constants else commonValue(map(lambda tm: tm[k], consolidationGroups[key]))) for k in consolidationGroups[key][0].keys()}	
 
 def extendList(lis):
 	a = [v for l in lis for v in l]
@@ -42,6 +43,7 @@ def extendList(lis):
 	return vs if len(vs) > 0 else list(set(a))
 
 def avgDict(dicts):
+	print dicts
 	return {d : map(np.mean, zip(*map(lambda tm: tm.get(d) if tm.get(d) != None else [0], dicts))) for d in extendList(map(lambda x: x.keys(), dicts))}
 
 while True:
@@ -59,7 +61,7 @@ while True:
 			consolidationGroups[actualKey] = [temptimd]
 
 	consolidationGroups = utils.makeASCIIFromJSON(consolidationGroups)
-	map(lambda key: firebase.child("TeamInMatchDatas").update({key : joinValues(key)}), consolidationGroups.keys())
+	map(lambda key: firebase.child("TeamInMatchDatas").child(key).update(joinValues(key)), consolidationGroups.keys())
 	print str(map(joinValues, consolidationGroups.keys()))  + " consolidated"
 	time.sleep(1)
 

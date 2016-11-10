@@ -124,7 +124,7 @@ def setDataForMatch(match):
 	m = DataModel.Match()
 	f = lambda key: [match["alliances"]["red"][key], match["alliances"]["blue"][key]]
 	m.number, m.redAllianceTeamNumbers, m.blueAllianceTeamNumbers = int(match["match_number"]), f("teams")[0], f("teams")[1]
-	m.redScore, m.blueScore, m.TIMDs = f("score")[0], f("score")[1], []
+	m.redScore, m.blueScore, m.TIMDs = 0, 0, []
 	return m
 
 def setDataForTeam(team):

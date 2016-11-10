@@ -21,7 +21,6 @@ import datetime
 auth = fb.FirebaseAuthentication(superSecret, "1678programming@gmail.com", True, True)
 
 firebase = fb.FirebaseApplication(url, auth)
-firebase.delete('/TempTeamInMatchDatas', None)
 
 class FirebaseCommunicator(object):
 	"""docstring for FirebaseCommunicator"""
@@ -56,21 +55,21 @@ class FirebaseCommunicator(object):
 		calculatedTeamDataDict = utils.makeDictFromCalculatedData(team.calculatedData)
 		FBLocation = "/Teams/" + str(team.number) 
 		try: firebase.put(FBLocation, 'calculatedData', calculatedTeamDataDict)
-		except requests.exceptions.RequestException as e: pass
+		except requests.exceptions.RequestException as e: print e
 
 	def addCalculatedTIMDataToFirebase(self, timd):
 		print "Writing team " + str(timd.teamNumber) + " in match " + str(timd.matchNumber) + " to Firebase..."
 		calculatedTIMDataDict = utils.makeDictFromCalculatedData(timd.calculatedData)
 		FBLocation = "/TeamInMatchDatas/" + str(timd.teamNumber) + "Q" + str(timd.matchNumber)
 		try: firebase.put(FBLocation, 'calculatedData', calculatedTIMDataDict)
-		except requests.exceptions.RequestException as e: pass
+		except requests.exceptions.RequestException as e: print e
 	
 	def addCalculatedMatchDataToFirebase(self, match):
 		print "Writing match " + str(match.number) + " to Firebase..."
 		calculatedMatchDataDict = utils.makeDictFromCalculatedData(match.calculatedData)
 		FBLocation = "/Matches/" + str(match.number)
 		try: firebase.put(FBLocation, 'calculatedData', calculatedMatchDataDict)
-		except requests.exceptions.RequestException as e: pass
+		except requests.exceptions.RequestException as e: print e
 
 	def addTeamsToFirebase(self): 
 		print "\nDoing Teams..."

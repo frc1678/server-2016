@@ -10,6 +10,20 @@ import pyrebase
 import numpy as np
 import utils
 
+def sum_to_n(n, size, limit=None):
+    """Produce all lists of `size` positive integers in decreasing order
+    that add up to `n`."""
+    if size == 1:
+        yield [n]
+        return
+    if limit is None:
+        limit = n
+    start = (n + size - 1) // size
+    stop = min(limit, n - size + 1) + 1
+    for i in range(start, stop):
+        for tail in sum_to_n(n - i, size - 1, i):
+            yield [i] + tail
+
 config = {
 	"apiKey": "mykey",
 	"authDomain": "1678-strat-dev-2016.firebaseapp.com",
@@ -40,7 +54,7 @@ class ScoutPrecision(object):
 			"numHighShotsMadeTele" : 1,
 			"numLowShotsMadeTele" : 1,
 		}
-		self.k = ["timesSuccessfulCrossedDefensesTele"]
+		self.k = ["timesSuccessfulCrossedDefensesTele", 'timesSuccessfulCrossedDefensesAuto', 'timesFailedCrossedDefensesTele', 'timesFailedCrossedDefensesAuto']
 
 	def filterToMultiScoutTIMDs(self):
 		return filter(lambda tm: type(tm.scoutName) == list, self.comp.timds)
@@ -64,18 +78,21 @@ class ScoutPrecision(object):
 	def getScoutPrecisionForDefenses(self, tempTIMDs, key):
 		scouts = map(lambda k: k["scoutName"], tempTIMDs)
 		values = map(lambda t: t[key], tempTIMDs)
-		defenseKeys = map(lambda t: t.keys(), values)
+		print key
+		defenseKeys = map(lambda t: t.keys(), tempTIMDs)
 		finalKeys = self.extendList(defenseKeys)
 		for s in range(len(scouts)):
 			self.sprs[scouts[s]] = (self.sprs.get(scouts[s]) or 0) + len(set(defenseKeys[s]) & set(finalKeys))
 	
 	def extendList(self, lis):
-		a = [v for l in lis for v in l]
+		a = self.extendListNoSet(lis)
 		vs = list(set(filter(lambda v: a.count(v) > len(lis) / 2, a)))
 		return vs if len(vs) > 0 else list(set(a))
 
+	def extendListNoSet(self, lis):
+		return [v for l in lis for v in l]
 
-	def calculateScoutPrecisionScores(self, temp):
+	def calculateScoutPrecisionScores(self, temp, available):
 		self.cycle += 1
 		consolidationGroups = {}
 		for k, c in temp:
@@ -93,65 +110,75 @@ class ScoutPrecision(object):
 					if k in self.k:
 						self.getScoutPrecisionForDefenses(v, k)
 		self.sprs = {k:(v/float(self.cycle)/float(self.getTotalTIMDsForScoutName(k))) for (k,v) in self.sprs.items()}
+		for a in available.keys()[:18]:
+			if a not in self.sprs.keys():
+				self.sprs[a] = np.mean(self.sprs.values())
+	
+	def rankScouts(self, available):
+		for i in available.keys():
+			if available.keys().index(i) > 17:
+				del available[i]
+		return filter(lambda k: available.get(k) == 1, sorted(self.sprs.keys(), key=lambda k: self.sprs[k]))
 
-	def rankScouts(self):
-		return sorted(self.sprs.keys(), key=lambda k: self.sprs[k])
-
-	def getScoutFrequencies(self):
-		rankedScouts = self.rankScouts()
+	def getScoutFrequencies(self, available):
+		rankedScouts = self.rankScouts(available)
 		return {i:rankedScouts.index(i) * (100/(len(rankedScouts) - 1)) + 1 for i in rankedScouts}
 
-	def filterScouts(self, rankedScouts, available):
-		return filter(lambda x: available[x] == 1, rankedScouts)
-
-	def organizeLowScouts(self, ls):
-		print "ls " + str(ls)
+	def organizeLowScouts(self, ls, numScouts):
 		b = []
-		for i in range(3):
-			array = []
-			for i in range(3):
-				if len(ls) > 0:
-					ind = random.randint(0, len(ls)-1)
-					array.append(ls[ind])
-					del ls[ind]
-			b.append(array)
-			if len(ls) == 0:
-				break
+		for i in range(numScouts):
+			if len(ls) > 0:
+				ind = random.randint(0, len(ls)-1)
+				b.append(ls[ind])
+				del ls[ind]
 		return b
 
-	def organizeScouts(self):
-		a = []
-		scoutFreqs = self.getScoutFrequencies()
-		for k,v in scoutFreqs.items():
-			a += [k] * v
-		print a
+	def organizeScouts(self, available):
+		a = self.extendListNoSet([[k] * v for k,v in self.getScoutFrequencies(available).items()])
 		b = {}
 		scoutsInGrouping = []
-		for i in range(3):
-			if len(a) > 0:
+		scoutCombos = list(sum_to_n(len(list(set(a))), 6, 3))
+		index = random.randint(0, len(scoutCombos) - 1)
+		i = 0
+		for numScouts in scoutCombos[index]:
+			scoutsInGrouping = list(set(a))
+			if numScouts == 1:
 				index = random.randint(0, len(a) - 1)
 				b[i] = a[index]
-				a = filter(lambda s: s != a[index], a)				
-				scoutsInGrouping = list(set(a))
-				print "scout in group " + str(scoutsInGrouping)
-		groupScouts = self.organizeLowScouts(scoutsInGrouping)
-		for i in range(3, 3 + len(groupScouts)):
-			b[i] = groupScouts[i-3]
+				a = map(lambda s: s != a[index], a)				
+			else:
+				b[i] = self.organizeLowScouts(scoutsInGrouping, numScouts)
+				a = filter(lambda s: s not in b[i], a)
+
+			i += 1
 		self.robotNumToScouts = b
 
 	def robotNumberFromName(self, scoutName, currentTeams):
-		for k,v in self.robotNumToScouts.items():
-			if scoutName in v:
-				return currentTeams[k]
+		return [currentTeams[k] for k,v in self.robotNumToScouts.items() if scoutName in v][0]
 
-	def getRobotNumbersForScouts(self, scoutRotatorDict, currentTeams, cmn):
+	def getRobotNumbersForScouts(self, scoutRotatorDict, currentTeams):
+		scoutsInRotation = map(lambda s: s[0], filter(lambda s: s[0] != None and s[1] != None, map(lambda v: (v.get('mostRecentUser'), v.get('team')), scoutRotatorDict.values())))
+		emptySlots = filter(lambda m: m.get('mostRecentUser') in [None,''], scoutRotatorDict.values())
 		di = {}
-		for scoutNum, value in scoutRotatorDict.items():
-			if value.get('mostRecentUser') in self.sprs.keys():
-				di[scoutNum] = {}
-				di[scoutNum]['mostRecentUser'] = value['mostRecentUser']
-				di[scoutNum]['team'] = self.robotNumberFromName(value['mostRecentUser'], currentTeams)
-				di[scoutNum]['match'] = cmn + 1
+		print self.extendListNoSet(self.robotNumToScouts.values())
+		for scout in scoutsInRotation:
+			if scout not in self.extendListNoSet(self.robotNumToScouts.values()):
+				scoutNum = [k for k in scoutRotatorDict.keys() if scoutRotatorDict[k]['mostRecentUser'] not in self.extendListNoSet(self.robotNumToScouts.values())][0]
+				di[scoutNum] = {'team' : None}
+				d[scoutNum] = {'currentUser' : ''}
+		for scout in self.extendListNoSet(self.robotNumToScouts.values()):
+			if scout in scoutsInRotation:
+				scoutNum = [k for k,v in scoutRotatorDict.items() if v.get('mostRecentUser') == scout][0]
+			else:
+				if len(emptySlots) > 0:
+					scoutNum = scoutRotatorDict.keys()[scoutRotatorDict.values().index(emptySlots[0])]
+					del emptySlots[0]
+				else:
+					scoutNum = [k for k in scoutRotatorDict.keys() if scoutRotatorDict[k]['mostRecentUser'] not in self.extendListNoSet(self.robotNumToScouts.values())][0]
+					scoutsInRotation.append(scout)
+			di[scoutNum] = {'currentUser' : scout, 'team' : self.robotNumberFromName(scout, currentTeams)}
+
+
 		return di
 
 
