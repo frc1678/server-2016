@@ -111,14 +111,11 @@ class ScoutPrecision(object):
 						self.getScoutPrecisionForDefenses(v, k)
 		self.sprs = {k:(v/float(self.cycle)/float(self.getTotalTIMDsForScoutName(k))) for (k,v) in self.sprs.items()}
 		for a in available.keys()[:18]:
-			if a not in self.sprs.keys():
+			if a not in self.sprs.keys() and available.get(a) == 1:
 				self.sprs[a] = np.mean(self.sprs.values())
 	
 	def rankScouts(self, available):
-		for i in available.keys():
-			if available.keys().index(i) > 17:
-				del available[i]
-		return filter(lambda k: available.get(k) == 1, sorted(self.sprs.keys(), key=lambda k: self.sprs[k]))
+		return sorted(self.sprs.keys(), key=lambda k: self.sprs[k])
 
 	def getScoutFrequencies(self, available):
 		rankedScouts = self.rankScouts(available)
@@ -144,8 +141,8 @@ class ScoutPrecision(object):
 			scoutsInGrouping = list(set(a))
 			if numScouts == 1:
 				index = random.randint(0, len(a) - 1)
-				b[i] = a[index]
-				a = map(lambda s: s != a[index], a)				
+				b[i] = [a[index]]
+				a = filter(lambda s: s != a[index], a)				
 			else:
 				b[i] = self.organizeLowScouts(scoutsInGrouping, numScouts)
 				a = filter(lambda s: s not in b[i], a)
@@ -161,11 +158,10 @@ class ScoutPrecision(object):
 		emptySlots = filter(lambda m: m.get('mostRecentUser') in [None,''], scoutRotatorDict.values())
 		di = {}
 		print self.extendListNoSet(self.robotNumToScouts.values())
-		for scout in scoutsInRotation:
-			if scout not in self.extendListNoSet(self.robotNumToScouts.values()):
-				scoutNum = [k for k in scoutRotatorDict.keys() if scoutRotatorDict[k]['mostRecentUser'] not in self.extendListNoSet(self.robotNumToScouts.values())][0]
-				di[scoutNum] = {'team' : None}
-				d[scoutNum] = {'currentUser' : ''}
+		scoutNums = [k for k in scoutRotatorDict.keys() if scoutRotatorDict[k].get('currentUser') not in self.extendListNoSet(self.robotNumToScouts.values())]
+		for scoutNum in scoutNums:
+			di[scoutNum] = {'team' : None}
+			di[scoutNum] = {'currentUser' : ''}
 		for scout in self.extendListNoSet(self.robotNumToScouts.values()):
 			if scout in scoutsInRotation:
 				scoutNum = [k for k,v in scoutRotatorDict.items() if v.get('mostRecentUser') == scout][0]

@@ -636,7 +636,10 @@ class Calculator(object):
     def cacheSecondTeamData(self):
         map(lambda (func, dictionary): self.rValuesForAverageFunctionForDict(func, dictionary), self.rScoreParams())
         map(self.doSecondCachingForTeam, self.comp.teams)
-        self.cachedComp.actualSeedings = self.TBAC.makeEventRankingsRequest()
+        try:
+            self.cachedComp.actualSeedings = self.TBAC.makeEventRankingsRequest()
+        except:
+            self.cachedComp.actualSeedings = []
         self.cachedComp.predictedSeedings = self.teamsSortedByRetrievalFunctions(self.getPredictedSeedingFunctions()) 
         self.doSecondCachingForTeam(self.averageTeam)
 
@@ -846,8 +849,12 @@ class Calculator(object):
         if not len(self.su.getCompletedMatchesForTeam(team)) <= 0:
             t = team.calculatedData
             t.predictedNumRPs = self.predictedNumberOfRPs(team)
-            t.actualNumRPs = self.getTeamRPsFromTBA(team)
-            t.actualSeed = self.getTeamSeed(team)
+            try:
+                t.actualNumRPs = self.getTeamRPsFromTBA(team)
+                t.actualSeed = self.getTeamSeed(team)
+            except:
+                t.actualNumRPs = self.actualNumberOfRPs(team)
+                t.actualSeed = self.teamsSortedByRetrievalFunctions(self.getSeedingFunctions())
             t.predictedSeed = self.cachedComp.predictedSeedings.index(team) + 1
             t.RScoreTorque = self.cachedComp.torqueZScores[team.number]
             t.RScoreSpeed = self.cachedComp.speedZScores[team.number]
