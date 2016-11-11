@@ -51,15 +51,18 @@ class ScoutRotatorProcess(multiprocessing.Process):
 			scouts = fb.child('scouts').get().val()
 			newcmn = fb.child('currentMatchNum').get().val()
 			if cmn != newcmn:
-				for i in scouts.values():
-					i['mostRecentUser'] = i.get('currentUser') if i.get('currentUser') != None else ''
+				if scouts != None:
+					for i in scouts.values():
+						i['mostRecentUser'] = i.get('currentUser') if i.get('currentUser') != None else ''
 				fb.child('scouts').update(scouts)
 				cmn = fb.child('currentMatchNum').get().val()
 				data = fb.child('TempTeamInMatchDatas').get().val()
+				print data
 				available = fb.child('available').get().val()
 				if data == None or cmn == None:
+					print "NOne"
 					firstMatchTeams = firb.get('Matches/1', 'redAllianceTeamNumbers') + firb.get('Matches/1', 'blueAllianceTeamNumbers')
-					n = len(filter(lambda k: available.get(k) == 1, available.keys())[:18])
+					n = len(filter(lambda k: available.get(k) == 1, available.keys())[:17])
 					scoutCombos = list(SPR.sum_to_n(n,6,3))[random.randint(0, len(list(SPR.sum_to_n(n,6,3))) - 1)]
 					scoutNum = 1
 					i = 0

@@ -110,7 +110,7 @@ class ScoutPrecision(object):
 					if k in self.k:
 						self.getScoutPrecisionForDefenses(v, k)
 		self.sprs = {k:(v/float(self.cycle)/float(self.getTotalTIMDsForScoutName(k))) for (k,v) in self.sprs.items()}
-		for a in available.keys()[:18]:
+		for a in available.keys()[:17]:
 			if a not in self.sprs.keys() and available.get(a) == 1:
 				self.sprs[a] = np.mean(self.sprs.values())
 	
